@@ -5,7 +5,7 @@ En este archivo usted encontrará las diferentes pruebas de validacióm para los
 """
 
 import pytest
-from aeroalpes.seedwork.dominio.servicios import Servicio
+from alpespartners.seedwork.dominio.servicios import Servicio
 
 
 """

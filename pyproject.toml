@@ -1,10 +1,10 @@
 [project]
-name = "aeroalpes"
+name = "alpespartners"
 version = "1.0.0"
 authors = [
-  { name="Juan Urrego", email="js.urrego110@uniandes.edu.co" },
+  { name="Reactive Builders", email="d.diazm@uniandes.edu.co" },
 ]
-description = "Proyecto de ejemplo de AeroAlpes"
+description = "Proyecto de AlpesPartners"
 readme = "README.md"
 requires-python = ">=3.12"
 

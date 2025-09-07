@@ -4,7 +4,7 @@ En este archivo usted encontrará las diferentes pruebas de validacióm para las
 
 """
 
-from aeroalpes.seedwork.dominio.excepciones import (
+from alpespartners.seedwork.dominio.excepciones import (
     ExcepcionDominio, 
     IdDebeSerInmutableExcepcion, 
     ReglaNegocioExcepcion,

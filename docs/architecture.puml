@@ -2,7 +2,7 @@
 ' Vista de paquetes basada en arquitectura hexagonal
 
 package "src" {
-    package "aeroalpes" as aeroalpes_src {
+    package "alpespartners" as alpespartners_src {
         package "api" as api
         note right of api
             Endpoints HTTP expuestos via Flask.
@@ -40,7 +40,7 @@ package "src" {
     }
 
     package "sidecar" as sidecar_pkg {
-        package "aeroalpes" as aeroalpes_sidecar {
+        package "alpespartners" as alpespartners_sidecar {
             package "pb2py"
             package "protos"
             package "servicios"
@@ -49,7 +49,7 @@ package "src" {
     }
     note bottom of sidecar_pkg
         Adaptador gRPC que comunica
-        clientes externos con AeroAlpes.
+        clientes externos con AlpesPartners.
     end note
     
     package "notification"
@@ -59,7 +59,7 @@ package "src" {
     end note
     
     package "ui" as ui_pkg {
-        package "aeroalpes" as aeroalpes_ui {
+        package "alpespartners" as alpespartners_ui {
             package "vistas"
             
         }

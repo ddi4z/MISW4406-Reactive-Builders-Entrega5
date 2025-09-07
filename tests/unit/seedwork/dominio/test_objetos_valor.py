@@ -7,13 +7,13 @@ En este archivo usted encontrará las diferentes pruebas de validación para los
 from dataclasses import dataclass, field
 import pytest
 from datetime import datetime
-from aeroalpes.seedwork.dominio.objetos_valor import (
+from alpespartners.seedwork.dominio.objetos_valor import (
     ObjetoValor,
     Codigo,
     Ruta,
     Pais,
     Ciudad)
-from aeroalpes.seedwork.dominio.excepciones import IdDebeSerInmutableExcepcion
+from alpespartners.seedwork.dominio.excepciones import IdDebeSerInmutableExcepcion
 
 
 """

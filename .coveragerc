@@ -1,7 +1,7 @@
 [run]
 branch = True
 include = *src/*
-source = aeroalpes
+source = alpespartners
 
 [report]
 exclude_lines =
