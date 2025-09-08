@@ -3,7 +3,7 @@ from alpespartners.modulos.externo.dominio.entidades import MedioMarketing
 from alpespartners.modulos.externo.dominio.repositorios import RepositorioMediosMarketing
 from alpespartners.seedwork.aplicacion.comandos import Comando
 from alpespartners.modulos.externo.aplicacion.dto import MedioMarketingDTO
-from .base import CrearPublicacionBaseHandler
+from .base import CrearMedioMarketingBaseHandler
 from dataclasses import dataclass
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando as comando
 
@@ -19,7 +19,7 @@ class CrearMedioMarketing(Comando):
 
 
 
-class CrearMedioMarketingHandler(CrearPublicacionBaseHandler):
+class CrearMedioMarketingHandler(CrearMedioMarketingBaseHandler):
 
     def handle(self, comando: CrearMedioMarketing):
         medio_dto = MedioMarketingDTO(
@@ -28,10 +28,11 @@ class CrearMedioMarketingHandler(CrearPublicacionBaseHandler):
             id=comando.id
         )
 
-        medio: MedioMarketing = self.fabrica_publicaciones.crear_objeto(medio_dto, MapeadorMedioMarketing())
-        medio.crear_medio(medio)
+        medio: MedioMarketing = self.fabrica_medios_marketing.crear_objeto(medio_dto, MapeadorMedioMarketing())
+        medio.crear_medio_marketing(medio)
+        
 
-        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioMediosMarketing.__class__)
+        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioMediosMarketing)
 
         UnidadTrabajoPuerto.registrar_batch(repositorio.agregar, medio)
         UnidadTrabajoPuerto.savepoint()

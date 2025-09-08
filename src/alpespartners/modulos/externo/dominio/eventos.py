@@ -17,7 +17,7 @@ class EventoCreado(EventoDominio):
 class MedioMarketingCreado(EventoDominio):
     id_medioMarketing: uuid.UUID = None
     fecha_creacion: datetime = None
-    id_plataforma: uuid.UUID = None
+    nombre_plataforma: str = None
     
 @dataclass
 class PublicacionCreada(EventoDominio):

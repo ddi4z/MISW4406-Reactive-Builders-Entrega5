@@ -1,4 +1,4 @@
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioEventos, RepositorioPublicaciones
+from alpespartners.modulos.externo.dominio.repositorios import RepositorioEventos, RepositorioMediosMarketing, RepositorioPublicaciones
 from alpespartners.seedwork.aplicacion.servicios import Servicio
 from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion
 from alpespartners.modulos.externo.dominio.fabricas import FabricaEventos, FabricaMediosMarketing, FabricaPublicaciones
@@ -59,7 +59,7 @@ class ServicioMedioMarketing(Servicio):
         medio: MedioMarketing = self.fabrica_medios_marketing.crear_objeto(medio_dto, MapeadorMedioMarketing())
         medio.crear_medio(medio)
 
-        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioReservas.__class__)
+        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioMediosMarketing.__class__)
 
         UnidadTrabajoPuerto.registrar_batch(repositorio.agregar, medio)
         UnidadTrabajoPuerto.savepoint()

@@ -25,7 +25,6 @@ class CrearPublicacionHandler(CrearPublicacionBaseHandler):
             fecha_actualizacion=comando.fecha_actualizacion,
             fecha_creacion=comando.fecha_creacion,
             id=comando.id,
-            tipo_publicacion=comando.tipo_publicacion
         )
 
         publicacion: Publicacion = self.fabrica_publicaciones.crear_objeto(publicacion_dto, MapeadorPublicacion())

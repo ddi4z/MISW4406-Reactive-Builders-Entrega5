@@ -21,6 +21,7 @@ class Despachador:
 
     def publicar_evento(self, evento, topico):
         # TODO Debe existir un forma de crear el Payload en Avro con base al tipo del evento
+        pass
         payload = ReservaCreadaPayload(
             id_reserva=str(evento.id_reserva), 
             id_cliente=str(evento.id_cliente), 

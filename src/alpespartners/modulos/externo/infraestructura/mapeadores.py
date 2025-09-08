@@ -1,86 +1,86 @@
-""" Mapeadores para la capa de infrastructura del dominio de vuelos
+"""Mapeadores para la capa de infraestructura del dominio de externo
 
 En este archivo usted encontrará los diferentes mapeadores
 encargados de la transformación entre formatos de dominio y DTOs
-
 """
 
+from alpespartners.modulos.externo import dominio
 from alpespartners.seedwork.dominio.repositorios import Mapeador
-from alpespartners.modulos.externo.dominio.objetos_valor import Odo, Leg, Segmento, Itinerario
-from alpespartners.modulos.externo.dominio.entidades import Aeropuerto, Reserva
-from .dto import Reserva as ReservaDTO
-from .dto import Itinerario as ItinerarioDTO
+from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion 
+from alpespartners.modulos.externo.infraestructura.dto import (
+    MedioMarketingDTO,
+    PublicacionDTO,
+    EventoDTO
+)
 
-class MapeadorReserva(Mapeador):
-    _FORMATO_FECHA = '%Y-%m-%dT%H:%M:%SZ'
 
-    def _procesar_itinerario_dto(self, itinerarios_dto: list) -> list[Itinerario]:
-        itin_dict = dict()
-        
-        for itin in itinerarios_dto:
-            destino = Aeropuerto(codigo=itin.destino_codigo, nombre=None)
-            origen = Aeropuerto(codigo=itin.origen_codigo, nombre=None)
-            fecha_salida = itin.fecha_salida
-            fecha_llegada = itin.fecha_llegada
-
-            itin_dict.setdefault(str(itin.odo_orden),{}).setdefault(str(itin.segmento_orden), {}).setdefault(str(itin.leg_orden), Leg(fecha_salida, fecha_llegada, origen, destino))
-
-        odos = list()
-        for k, odos_dict in itin_dict.items():
-            segmentos = list()
-            for k, seg_dict in odos_dict.items():
-                legs = list()
-                for k, leg in seg_dict.items():
-                    legs.append(leg)
-                segmentos.append(Segmento(legs))
-            odos.append(Odo(segmentos))
-
-        return [Itinerario(odos)]
-
-    def _procesar_itinerario(self, itinerario: any) -> list[ItinerarioDTO]:
-        itinerarios_dto = list()
-
-        for i, odo in enumerate(itinerario.odos):
-            for j, seg in enumerate(odo.segmentos):
-                for k, leg in enumerate(seg.legs):
-                    itinerario_dto = ItinerarioDTO()
-                    itinerario_dto.destino_codigo = leg.destino.codigo
-                    itinerario_dto.origen_codigo = leg.origen.codigo
-                    itinerario_dto.fecha_salida = leg.fecha_salida
-                    itinerario_dto.fecha_llegada = leg.fecha_llegada
-                    itinerario_dto.leg_orden = k
-                    itinerario_dto.segmento_orden = j
-                    itinerario_dto.odo_orden = i
-
-                    itinerarios_dto.append(itinerario_dto)
-
-        return itinerarios_dto
-
+class MapeadorMedioMarketing(Mapeador):
     def obtener_tipo(self) -> type:
-        return Reserva.__class__
+        return MedioMarketing.__class__
 
-    def entidad_a_dto(self, entidad: Reserva) -> ReservaDTO:
-        
-        reserva_dto = ReservaDTO()
-        reserva_dto.fecha_creacion = entidad.fecha_creacion
-        reserva_dto.fecha_actualizacion = entidad.fecha_actualizacion
-        reserva_dto.id = str(entidad.id)
+    def entidad_a_dto(self, entidad: MedioMarketing) -> MedioMarketingDTO:
+        dto = MedioMarketingDTO()
+        dto.id = str(entidad.id)
+        dto.fecha_creacion = entidad.fecha_creacion
+        dto.fecha_actualizacion = entidad.fecha_actualizacion
+        dto.nombre_plataforma = entidad.plataforma.nombre
+        return dto
 
-        itinerarios_dto = list()
-        
-        for itinerario in entidad.itinerarios:
-            itinerarios_dto.extend(self._procesar_itinerario(itinerario))
+    def dto_a_entidad(self, dto: MedioMarketingDTO) -> MedioMarketing:
+        entidad = MedioMarketing(
+            id=dto.id,
+            fecha_creacion=dto.fecha_creacion,
+            fecha_actualizacion=dto.fecha_actualizacion
+        )
+        entidad.plataforma.nombre = dto.nombre_plataforma
+        return entidad
 
-        reserva_dto.itinerarios = itinerarios_dto
 
-        return reserva_dto
+class MapeadorPublicacion(Mapeador):
+    def obtener_tipo(self) -> type:
+        return Publicacion
 
-    def dto_a_entidad(self, dto: ReservaDTO) -> Reserva:
-        reserva = Reserva(dto.id, dto.fecha_creacion, dto.fecha_actualizacion)
-        reserva.itinerarios = list()
+    def entidad_a_dto(self, entidad: Publicacion) -> PublicacionDTO:
+        dto = PublicacionDTO()
+        dto.id = str(entidad.id)
+        dto.fecha_creacion = entidad.fecha_creacion
+        dto.fecha_actualizacion = entidad.fecha_actualizacion
+        dto.tipo_publicacion = entidad.tipo_publicacion.valor
 
-        itinerarios_dto: list[ItinerarioDTO] = dto.itinerarios
+        if hasattr(entidad, "id_medio_marketing") and entidad.id_medio_marketing:
+            dto.id_medio_marketing = str(entidad.id_medio_marketing)
 
-        reserva.itinerarios.extend(self._procesar_itinerario_dto(itinerarios_dto))
-        
-        return reserva
+        return dto
+
+    def dto_a_entidad(self, dto: PublicacionDTO) -> Publicacion:
+        entidad = Publicacion(
+            id=dto.id,
+            fecha_creacion=dto.fecha_creacion,
+            fecha_actualizacion=dto.fecha_actualizacion
+        )
+        entidad.tipo_publicacion.valor = dto.tipo_publicacion
+        if dto.id_medio_marketing:
+            entidad.id_medio_marketing = dto.id_medio_marketing
+        return entidad
+
+
+class MapeadorEvento(Mapeador):
+    def obtener_tipo(self) -> type:
+        return Evento.__class__
+
+    def entidad_a_dto(self, entidad: Evento) -> EventoDTO:
+        dto = EventoDTO()
+        dto.id = str(entidad.id)
+        dto.fecha_evento = entidad.fecha_evento
+        dto.tipo_evento = entidad.__class__.__name__
+        dto.id_publicacion = str(entidad.id_publicacion)
+        return dto
+
+    def dto_a_entidad(self, dto: EventoDTO) -> Evento:
+        clase_evento = getattr(dominio, dto.tipo_evento, Evento)
+        entidad = clase_evento(
+            id=dto.id,
+            fecha_evento=dto.fecha_evento,
+            id_publicacion=dto.id_publicacion
+        )
+        return entidad
