@@ -23,18 +23,29 @@ from alpespartners.seedwork.dominio.entidades import AgregacionRaiz, Entidad
 @dataclass
 class Publicacion(Entidad):
     tipo_publicacion: ov.TipoPublicacion = field(default_factory=ov.TipoPublicacion)
-    def crear_publicacion(self, publicacion: Publicacion):
-        MedioMarketing.agregar_evento(PublicacionCreada(id_publicacion=publicacion.id, fecha_creacion=self.fecha_creacion, id_medioMarketing=self.id))
+    id_medio_marketing: int = field(hash=True, default=None)
+
     
 
 @dataclass
 class MedioMarketing(AgregacionRaiz):
     plataforma: ov.Plataforma = field(default_factory=ov.Plataforma)
-    
+    publicaciones: list[Publicacion] = field(default_factory=list)
+
     def crear_medio_marketing(self, medio: MedioMarketing):
         self.plataforma = medio.plataforma
         self.agregar_evento(MedioMarketingCreado(id_medioMarketing=self.id, fecha_creacion=self.fecha_creacion, nombre_plataforma=self.plataforma.nombre))
         
+    def crear_publicacion(self, publicacion: Publicacion):
+        self.publicaciones.append(publicacion)
+        self.agregar_evento(
+            PublicacionCreada(
+                id_publicacion=publicacion.id,
+                id_medioMarketing=self.id,
+                fecha_creacion=self.fecha_creacion,
+            )
+        )
+
 
 """
     EVENTOS

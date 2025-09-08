@@ -33,7 +33,7 @@ class MedioMarketingDTO(db.Model):
 
     nombre_plataforma = db.Column(db.String, nullable=False)
 
-    # relación con publicaciones
+  
     publicaciones = db.relationship("PublicacionDTO", back_populates="medio_marketing")
 
 
@@ -46,11 +46,10 @@ class PublicacionDTO(db.Model):
 
     tipo_publicacion = db.Column(db.String, nullable=False)
 
-    # FK al medio de marketing
+
     id_medio_marketing = db.Column(db.String, db.ForeignKey("medios_marketing.id"))
     medio_marketing = db.relationship("MedioMarketingDTO", back_populates="publicaciones")
 
-    # relación con eventos
     eventos = db.relationship("EventoDTO", back_populates="publicacion")
 
 
@@ -61,6 +60,5 @@ class EventoDTO(db.Model):
     fecha_evento = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     tipo_evento = db.Column(db.String, nullable=False)
 
-    # FK a publicación
     id_publicacion = db.Column(db.String, db.ForeignKey("publicaciones.id"))
     publicacion = db.relationship("PublicacionDTO", back_populates="eventos")

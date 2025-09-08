@@ -40,7 +40,7 @@ def crear_publicacion_asincrona():
         map_publicacion = MapeadorPublicacionDTOJson()
         publicacion_dto = map_publicacion.externo_a_dto(publicacion_dict)
 
-        comando = CrearPublicacion(publicacion_dto.fecha_creacion, publicacion_dto.fecha_actualizacion, publicacion_dto.id, publicacion_dto.itinerarios)
+        comando = CrearPublicacion(publicacion_dto.fecha_creacion, publicacion_dto.fecha_actualizacion, publicacion_dto.id, publicacion_dto.id_medio_marketing, tipo_publicacion= publicacion_dto.tipo_publicacion)
         
         # TODO Reemplace es todo código sincrono y use el broker de eventos para propagar este comando de forma asíncrona
 

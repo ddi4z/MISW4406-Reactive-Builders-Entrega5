@@ -1,4 +1,4 @@
-from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion, Publicacion
+from alpespartners.modulos.externo.dominio.entidades import Evento, InteraccionPublicacion, Lead, MedioMarketing, Publicacion, Publicacion
 import alpespartners.modulos.externo.dominio.objetos_valor as ov
 from alpespartners.modulos.externo.aplicacion.dto import EventoDTO, PublicacionDTO
 from alpespartners.seedwork.aplicacion.dto import Mapeador as AppMap
@@ -10,15 +10,22 @@ from datetime import datetime
 
 class MapeadorEventoDTOJson(AppMap):    
     def externo_a_dto(self, externo: dict) -> EventoDTO:
-        evento_dto = EventoDTO()
-        evento_dto.fecha_creacion = externo.get('fecha_creacion')
-        evento_dto.fecha_actualizacion = externo.get('fecha_actualizacion')
-        evento_dto.id = externo.get('id')
-
+        evento_dto = EventoDTO(
+            fecha_creacion=externo.get('fecha_creacion'),
+            fecha_actualizacion=externo.get('fecha_actualizacion'),
+            id=externo.get('id'),
+            tipo_evento=externo.get('tipo_evento'),
+            id_publicacion=externo.get('id_publicacion')
+        )
         return evento_dto
 
     def dto_a_externo(self, dto: EventoDTO) -> dict:
-        return dto.__dict__
+        return {
+            "fecha_creacion": dto.fecha_creacion,
+            "fecha_actualizacion": dto.fecha_actualizacion,
+            "id": dto.id,
+            "tipo_evento": dto.tipo_evento 
+        }
 
 class MapeadorEvento(RepMap):
     _FORMATO_FECHA = '%Y-%m-%dT%H:%M:%SZ'
@@ -27,21 +34,46 @@ class MapeadorEvento(RepMap):
         return Evento.__class__
 
     def entidad_a_dto(self, entidad: Evento) -> EventoDTO:
-
         fecha_creacion = entidad.fecha_creacion.strftime(self._FORMATO_FECHA)
         fecha_actualizacion = entidad.fecha_actualizacion.strftime(self._FORMATO_FECHA)
-        _id = str(entidad.id)
+        _id = entidad.id
+        id_publicacion = entidad.id_publicacion
 
+        if isinstance(entidad, Lead):
+            tipo_evento = "Lead"
+        elif isinstance(entidad, InteraccionPublicacion):
+            tipo_evento = "InteraccionPublicacion"
+        else:
+            raise ValueError(f"Tipo de evento no soportado: {entidad.__class__.__name__}")
 
-        return EventoDTO(fecha_creacion, fecha_actualizacion, _id)
+        return EventoDTO(
+            fecha_creacion=fecha_creacion,
+            fecha_actualizacion=fecha_actualizacion,
+            id=_id,
+            tipo_evento=tipo_evento,
+            id_publicacion = id_publicacion
+        )
 
     def dto_a_entidad(self, dto: EventoDTO) -> Evento:
-        evento = Evento()
-        evento.fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
-        evento.fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
-        evento.id = int(dto.id)
+        fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
+        fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
 
-        return evento
+        if dto.tipo_evento == "Lead":
+            return Lead(
+                id=dto.id,
+                fecha_creacion=fecha_creacion,
+                fecha_actualizacion=fecha_actualizacion,
+                id_publicacion = dto.id_publicacion
+            )
+        elif dto.tipo_evento == "InteraccionPublicacion":
+            return InteraccionPublicacion(
+                id=dto.id,
+                fecha_creacion=fecha_creacion,
+                fecha_actualizacion=fecha_actualizacion,
+                id_publicacion = dto.id_publicacion
+            )
+        else:
+            raise ValueError(f"Tipo de evento no soportado en DTO: {dto.tipo_evento}")
     
     
 class MapeadorPublicacionDTOJson(AppMap):    
@@ -49,7 +81,9 @@ class MapeadorPublicacionDTOJson(AppMap):
         fecha_creacion = externo.get('fecha_creacion')
         fecha_actualizacion = externo.get('fecha_actualizacion')
         id = externo.get('id')
-        return PublicacionDTO(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=id)
+        id_medio_marketing = externo.get('id_medio_marketing')
+        tipo_publicacion = externo.get('tipo_publicacion')
+        return PublicacionDTO(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=id, id_medio_marketing=id_medio_marketing, tipo_publicacion=tipo_publicacion)
 
     def dto_a_externo(self, dto: PublicacionDTO) -> dict:
         return dto.__dict__
@@ -69,12 +103,14 @@ class MapeadorPublicacion(RepMap):
         return PublicacionDTO(fecha_creacion, fecha_actualizacion, _id)
 
     def dto_a_entidad(self, dto: PublicacionDTO) -> Publicacion:
-        publicacion = Publicacion()
-        publicacion.fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
-        publicacion.fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
-        publicacion.id = int(dto.id)
+        
+        fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
+        fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
+        id = dto.id
+        id_medio_marketing = dto.id_medio_marketing
+        tipo_publicacion = dto.tipo_publicacion
 
-        return publicacion
+        return Publicacion(fecha_creacion = fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=id, id_medio_marketing=id_medio_marketing, tipo_publicacion=tipo_publicacion)
     
 class MapeadorMedioMarketingDTOJson(AppMap):    
     def externo_a_dto(self, externo: dict) -> MedioMarketingDTO:
@@ -115,7 +151,7 @@ class MapeadorMedioMarketing(RepMap):
     def dto_a_entidad(self, dto: MedioMarketingDTO) -> MedioMarketing:
         fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
         fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
-        _id = int(dto.id)
+        _id = dto.id
         plataforma = ov.Plataforma(nombre=dto.plataforma.nombre)
 
         return MedioMarketing(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=_id, plataforma=plataforma)

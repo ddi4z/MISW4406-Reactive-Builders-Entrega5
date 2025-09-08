@@ -6,6 +6,7 @@ encargados de la transformación entre formatos de dominio y DTOs
 
 from alpespartners.modulos.externo import dominio
 from alpespartners.seedwork.dominio.repositorios import Mapeador
+import alpespartners.modulos.externo.dominio.objetos_valor as ov
 from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion 
 from alpespartners.modulos.externo.infraestructura.dto import (
     MedioMarketingDTO,
@@ -19,20 +20,24 @@ class MapeadorMedioMarketing(Mapeador):
         return MedioMarketing.__class__
 
     def entidad_a_dto(self, entidad: MedioMarketing) -> MedioMarketingDTO:
-        dto = MedioMarketingDTO()
-        dto.id = str(entidad.id)
-        dto.fecha_creacion = entidad.fecha_creacion
-        dto.fecha_actualizacion = entidad.fecha_actualizacion
-        dto.nombre_plataforma = entidad.plataforma.nombre
+        dto = MedioMarketingDTO(
+            id = str(entidad.id),
+            fecha_creacion = entidad.fecha_creacion,
+            fecha_actualizacion = entidad.fecha_actualizacion,
+            nombre_plataforma = entidad.plataforma.nombre,
+            publicaciones = [MapeadorPublicacion().entidad_a_dto(pub) for pub in entidad.publicaciones]
+        )
+
         return dto
 
     def dto_a_entidad(self, dto: MedioMarketingDTO) -> MedioMarketing:
         entidad = MedioMarketing(
             id=dto.id,
             fecha_creacion=dto.fecha_creacion,
-            fecha_actualizacion=dto.fecha_actualizacion
+            fecha_actualizacion=dto.fecha_actualizacion,
+            plataforma = ov.Plataforma(dto.nombre_plataforma),
+            publicaciones=[MapeadorPublicacion().dto_a_entidad(pub_dto) for pub_dto in dto.publicaciones]
         )
-        entidad.plataforma.nombre = dto.nombre_plataforma
         return entidad
 
 
@@ -45,7 +50,7 @@ class MapeadorPublicacion(Mapeador):
         dto.id = str(entidad.id)
         dto.fecha_creacion = entidad.fecha_creacion
         dto.fecha_actualizacion = entidad.fecha_actualizacion
-        dto.tipo_publicacion = entidad.tipo_publicacion.valor
+        dto.tipo_publicacion = entidad.tipo_publicacion
 
         if hasattr(entidad, "id_medio_marketing") and entidad.id_medio_marketing:
             dto.id_medio_marketing = str(entidad.id_medio_marketing)

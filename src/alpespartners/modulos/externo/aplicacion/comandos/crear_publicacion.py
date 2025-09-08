@@ -1,7 +1,8 @@
-from alpespartners.modulos.externo.dominio.entidades import Publicacion
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioPublicaciones
+from alpespartners.modulos.externo.dominio.entidades import MedioMarketing, Publicacion
+from alpespartners.modulos.externo.dominio.repositorios import RepositorioMediosMarketing, RepositorioPublicaciones
 from alpespartners.seedwork.aplicacion.comandos import Comando
 from alpespartners.modulos.externo.aplicacion.dto import PublicacionDTO
+from alpespartners.seedwork.dominio.excepciones import ExcepcionDominio
 from .base import CrearPublicacionBaseHandler
 from dataclasses import dataclass
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando as comando
@@ -15,24 +16,33 @@ class CrearPublicacion(Comando):
     fecha_creacion: str
     fecha_actualizacion: str
     id: str
-
+    id_medio_marketing: str
+    tipo_publicacion: str
 
 
 class CrearPublicacionHandler(CrearPublicacionBaseHandler):
 
-    def handle(self, comando: CrearPublicacion):
+      def handle(self, comando: CrearPublicacion):
+
         publicacion_dto = PublicacionDTO(
             fecha_actualizacion=comando.fecha_actualizacion,
             fecha_creacion=comando.fecha_creacion,
             id=comando.id,
+            id_medio_marketing=comando.id_medio_marketing,
+            tipo_publicacion=comando.tipo_publicacion
         )
 
         publicacion: Publicacion = self.fabrica_publicaciones.crear_objeto(publicacion_dto, MapeadorPublicacion())
-        publicacion.crear_publicacion(publicacion)
 
-        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioPublicaciones.__class__)
+        repo_medios = self.fabrica_repositorio.crear_objeto(RepositorioMediosMarketing)
+        medio: MedioMarketing = repo_medios.obtener_por_id(comando.id_medio_marketing)
 
-        UnidadTrabajoPuerto.registrar_batch(repositorio.agregar, publicacion)
+        if not medio:
+            raise ExcepcionDominio(f"Medio de marketing {comando.id_medio_marketing} no encontrado")
+
+        medio.crear_publicacion(publicacion)
+
+        UnidadTrabajoPuerto.registrar_batch(repo_medios.agregar, medio)
         UnidadTrabajoPuerto.savepoint()
         UnidadTrabajoPuerto.commit()
 

@@ -41,7 +41,6 @@ class FabricaEventos(Fabrica):
 @dataclass
 class FabricaMediosMarketing(Fabrica):
     def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:
-        print()
         if mapeador.obtener_tipo() == MedioMarketing.__class__:
             if isinstance(obj, Entidad):
                 return mapeador.entidad_a_dto(obj)

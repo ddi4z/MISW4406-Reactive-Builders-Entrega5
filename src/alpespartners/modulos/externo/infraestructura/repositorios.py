@@ -5,6 +5,7 @@ from alpespartners.modulos.externo.dominio.repositorios import (
     RepositorioPublicaciones
 )
 from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion
+from alpespartners.modulos.externo.infraestructura.dto import MedioMarketingDTO
 from .mapeadores import (
     MapeadorMedioMarketing,
     MapeadorPublicacion,
@@ -60,7 +61,7 @@ class RepositorioMediosMarketingPostgres(RepositorioMediosMarketing):
         return self._fabrica_medios
 
     def obtener_por_id(self, id: UUID) -> MedioMarketing:
-        dto = db.session.query(self.fabrica_medios.dto()).filter_by(id=str(id)).first()
+        dto = db.session.query(MedioMarketingDTO).filter_by(id=str(id)).first()
         if dto:
             return self.fabrica_medios.crear_objeto(dto, MapeadorMedioMarketing())
         return None
@@ -70,18 +71,7 @@ class RepositorioMediosMarketingPostgres(RepositorioMediosMarketing):
         return [self.fabrica_medios.crear_objeto(dto, MapeadorMedioMarketing()) for dto in dtos]
 
     def agregar(self, entity: MedioMarketing):
-        print("a")
-        print("a")
-        print("a")
-        print("a")
-        print("a")
-        print(entity.__class__)
-        print(entity)
         dto = self.fabrica_medios.crear_objeto(entity, MapeadorMedioMarketing())
-        print("1")
-        print("1")
-        print("1")
-        print("1")
         db.session.add(dto)
 
     def actualizar(self, entity: MedioMarketing):

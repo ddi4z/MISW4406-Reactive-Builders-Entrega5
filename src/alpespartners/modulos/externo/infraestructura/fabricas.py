@@ -18,8 +18,6 @@ class FabricaRepositorio(Fabrica):
     def crear_objeto(self, obj: type, mapeador: any = None) -> Repositorio:
         if issubclass(obj, RepositorioEventos):
             return RepositorioEventosPostgres()
-        elif issubclass(obj, RepositorioPublicaciones):
-            return RepositorioPublicacionesPostgres()
         elif issubclass(obj, RepositorioMediosMarketing):
             return RepositorioMediosMarketingPostgres()
         else:

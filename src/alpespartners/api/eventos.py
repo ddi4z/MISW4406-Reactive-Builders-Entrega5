@@ -20,7 +20,7 @@ def crear_evento_asincrono():
         map_evento = MapeadorEventoDTOJson()
         evento_dto = map_evento.externo_a_dto(evento_dict)
 
-        comando = CrearEvento(evento_dto.fecha_creacion, evento_dto.fecha_actualizacion, evento_dto.id, evento_dto.itinerarios)
+        comando = CrearEvento(evento_dto.fecha_creacion, evento_dto.fecha_actualizacion, evento_dto.id, evento_dto.tipo_evento, evento_dto.id_publicacion)
 
         # TODO Reemplace es todo código sincrono y use el broker de eventos para propagar este comando de forma asíncrona
 
