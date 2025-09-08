@@ -1,9 +1,9 @@
-from alpespartners.modulos.externo.dominio.objetos_valor import Odo, ParametroBusca
-from alpespartners.modulos.externo.dominio.entidades import Itinerario, Proveedor
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioProveedores as rp
+from alpespartners.modulos.eventos_medios.dominio.objetos_valor import Odo, ParametroBusca
+from alpespartners.modulos.eventos_medios.dominio.entidades import Itinerario, Proveedor
+from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioProveedores as rp
 from alpespartners.seedwork.dominio.servicios import Servicio
-from alpespartners.modulos.externo.dominio.mixins import FiltradoItinerariosMixin
-from alpespartners.modulos.externo.dominio.reglas import MinimoUnAdulto, RutaValida
+from alpespartners.modulos.eventos_medios.dominio.mixins import FiltradoItinerariosMixin
+from alpespartners.modulos.eventos_medios.dominio.reglas import MinimoUnAdulto, RutaValida
 
 class ServicioBusqueda(Servicio, FiltradoItinerariosMixin):
 

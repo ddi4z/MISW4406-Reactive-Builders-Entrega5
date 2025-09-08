@@ -6,7 +6,7 @@ objetos complejos en la capa de infraestructura del dominio de vuelos
 """
 
 from dataclasses import dataclass, field
-from alpespartners.modulos.externo.infraestructura.repositorios import RepositorioEventosPostgres, RepositorioMediosMarketingPostgres, RepositorioPublicacionesPostgres
+from alpespartners.modulos.eventos_medios.infraestructura.repositorios import RepositorioEventosPostgres, RepositorioMediosMarketingPostgres, RepositorioPublicacionesPostgres
 from alpespartners.seedwork.dominio.fabricas import Fabrica
 from alpespartners.seedwork.dominio.repositorios import Repositorio
 from .repositorios import RepositorioEventos, RepositorioMediosMarketing, RepositorioPublicaciones

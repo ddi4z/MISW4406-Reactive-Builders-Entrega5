@@ -1,8 +1,8 @@
 import pulsar
 from pulsar.schema import *
 
-from alpespartners.modulos.externo.infraestructura.schema.v1.eventos import EventoReservaCreada, ReservaCreadaPayload
-from alpespartners.modulos.externo.infraestructura.schema.v1.comandos import ComandoCrearReserva, ComandoCrearReservaPayload
+from alpespartners.modulos.eventos_medios.infraestructura.schema.v1.eventos import EventoReservaCreada, ReservaCreadaPayload
+from alpespartners.modulos.eventos_medios.infraestructura.schema.v1.comandos import ComandoCrearReserva, ComandoCrearReservaPayload
 from alpespartners.seedwork.infraestructura import utils
 
 import datetime

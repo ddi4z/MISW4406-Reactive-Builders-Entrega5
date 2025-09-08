@@ -1,6 +1,6 @@
-from alpespartners.modulos.externo.dominio.entidades import Evento, InteraccionPublicacion, Lead, MedioMarketing, Publicacion, Publicacion
-import alpespartners.modulos.externo.dominio.objetos_valor as ov
-from alpespartners.modulos.externo.aplicacion.dto import EventoDTO, PublicacionDTO
+from alpespartners.modulos.eventos_medios.dominio.entidades import Evento, InteraccionPublicacion, Lead, MedioMarketing, Publicacion, Publicacion
+import alpespartners.modulos.eventos_medios.dominio.objetos_valor as ov
+from alpespartners.modulos.eventos_medios.aplicacion.dto import EventoDTO, PublicacionDTO
 from alpespartners.seedwork.aplicacion.dto import Mapeador as AppMap
 from alpespartners.seedwork.dominio.repositorios import Mapeador as RepMap
 from .dto import MedioMarketingDTO, PlataformaDTO

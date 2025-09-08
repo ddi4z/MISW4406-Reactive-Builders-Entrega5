@@ -12,8 +12,8 @@ import uuid
 
 
 
-import alpespartners.modulos.externo.dominio.objetos_valor as ov
-from alpespartners.modulos.externo.dominio.eventos import EventoCreado, MedioMarketingCreado, PlataformaCreada, PublicacionCreada
+import alpespartners.modulos.eventos_medios.dominio.objetos_valor as ov
+from alpespartners.modulos.eventos_medios.dominio.eventos import EventoCreado, MedioMarketingCreado, PlataformaCreada, PublicacionCreada
 from alpespartners.seedwork.dominio.entidades import AgregacionRaiz, Entidad
 
 """

@@ -4,11 +4,11 @@ En este archivo usted encontrará los diferentes mapeadores
 encargados de la transformación entre formatos de dominio y DTOs
 """
 
-from alpespartners.modulos.externo.dominio import entidades
+from alpespartners.modulos.eventos_medios.dominio import entidades
 from alpespartners.seedwork.dominio.repositorios import Mapeador
-import alpespartners.modulos.externo.dominio.objetos_valor as ov
-from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion 
-from alpespartners.modulos.externo.infraestructura.dto import (
+import alpespartners.modulos.eventos_medios.dominio.objetos_valor as ov
+from alpespartners.modulos.eventos_medios.dominio.entidades import Evento, MedioMarketing, Publicacion 
+from alpespartners.modulos.eventos_medios.infraestructura.dto import (
     MedioMarketingDTO,
     PublicacionDTO,
     EventoDTO

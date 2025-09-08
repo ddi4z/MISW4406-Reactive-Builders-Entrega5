@@ -1,5 +1,5 @@
-from alpespartners.modulos.externo.dominio.objetos_valor import Odo, ParametroBusca, Segmento, Leg, CodigoIATA, Itinerario
-from alpespartners.modulos.externo.dominio.entidades import Proveedor,Aeropuerto
+from alpespartners.modulos.eventos_medios.dominio.objetos_valor import Odo, ParametroBusca, Segmento, Leg, CodigoIATA, Itinerario
+from alpespartners.modulos.eventos_medios.dominio.entidades import Proveedor,Aeropuerto
 
 def filtrar_mejores_itinerarios(itinerarios: list[Itinerario]) -> list[Itinerario]:
     # Logica compleja para filtrar itinerarios

@@ -1,6 +1,6 @@
 from alpespartners.seedwork.aplicacion.comandos import ComandoHandler
-from alpespartners.modulos.externo.infraestructura.fabricas import FabricaRepositorio
-from alpespartners.modulos.externo.dominio.fabricas import FabricaEventos, FabricaMediosMarketing, FabricaPublicaciones
+from alpespartners.modulos.eventos_medios.infraestructura.fabricas import FabricaRepositorio
+from alpespartners.modulos.eventos_medios.dominio.fabricas import FabricaEventos, FabricaMediosMarketing, FabricaPublicaciones
 
 class CrearPublicacionBaseHandler(ComandoHandler):
     def __init__(self):

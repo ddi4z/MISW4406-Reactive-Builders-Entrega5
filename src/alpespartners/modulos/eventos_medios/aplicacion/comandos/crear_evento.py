@@ -1,14 +1,14 @@
 from abc import ABC
-from alpespartners.modulos.externo.dominio.entidades import Evento
-from alpespartners.modulos.externo.aplicacion.dto import EventoDTO
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioEventos
+from alpespartners.modulos.eventos_medios.dominio.entidades import Evento
+from alpespartners.modulos.eventos_medios.aplicacion.dto import EventoDTO
+from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioEventos
 from alpespartners.seedwork.aplicacion.comandos import Comando
 from .base import CrearEventoBaseHandler, CrearPublicacionBaseHandler
 from dataclasses import dataclass
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando as comando
 
 from alpespartners.seedwork.infraestructura.uow import UnidadTrabajoPuerto
-from alpespartners.modulos.externo.aplicacion.mapeadores import MapeadorEvento
+from alpespartners.modulos.eventos_medios.aplicacion.mapeadores import MapeadorEvento
 
 
 @dataclass

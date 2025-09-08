@@ -1,5 +1,5 @@
-from alpespartners.modulos.externo.aplicacion.comandos.crear_evento import CrearEvento
-from alpespartners.modulos.externo.aplicacion.queries.obtener_evento import ObtenerEvento
+from alpespartners.modulos.eventos_medios.aplicacion.comandos.crear_evento import CrearEvento
+from alpespartners.modulos.eventos_medios.aplicacion.queries.obtener_evento import ObtenerEvento
 from alpespartners.seedwork.aplicacion.queries import ejecutar_query
 import alpespartners.seedwork.presentacion.api as api
 import json
@@ -7,7 +7,7 @@ from alpespartners.seedwork.dominio.excepciones import ExcepcionDominio
 
 from flask import request
 from flask import Response
-from alpespartners.modulos.externo.aplicacion.mapeadores import MapeadorEventoDTOJson
+from alpespartners.modulos.eventos_medios.aplicacion.mapeadores import MapeadorEventoDTOJson
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando
 
 bp = api.crear_blueprint('eventos', '/eventos')

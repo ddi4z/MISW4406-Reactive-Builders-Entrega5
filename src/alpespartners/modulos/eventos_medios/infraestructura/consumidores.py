@@ -5,8 +5,8 @@ import time
 import logging
 import traceback
 
-from alpespartners.modulos.externo.infraestructura.schema.v1.eventos import EventoReservaCreada
-from alpespartners.modulos.externo.infraestructura.schema.v1.comandos import ComandoCrearReserva
+from alpespartners.modulos.eventos_medios.infraestructura.schema.v1.eventos import EventoReservaCreada
+from alpespartners.modulos.eventos_medios.infraestructura.schema.v1.comandos import ComandoCrearReserva
 from alpespartners.seedwork.infraestructura import utils
 
 def suscribirse_a_eventos():

@@ -1,8 +1,8 @@
-from alpespartners.modulos.externo.aplicacion.mapeadores import MapeadorMedioMarketing
-from alpespartners.modulos.externo.dominio.entidades import MedioMarketing
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioMediosMarketing
+from alpespartners.modulos.eventos_medios.aplicacion.mapeadores import MapeadorMedioMarketing
+from alpespartners.modulos.eventos_medios.dominio.entidades import MedioMarketing
+from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioMediosMarketing
 from alpespartners.seedwork.aplicacion.comandos import Comando
-from alpespartners.modulos.externo.aplicacion.dto import MedioMarketingDTO
+from alpespartners.modulos.eventos_medios.aplicacion.dto import MedioMarketingDTO
 from .base import CrearMedioMarketingBaseHandler
 from dataclasses import dataclass
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando as comando

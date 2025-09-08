@@ -1,12 +1,12 @@
-from alpespartners.modulos.externo.aplicacion.comandos.crear_medio_marketing import CrearMedioMarketing
-from alpespartners.modulos.externo.aplicacion.comandos.crear_publicacion import CrearPublicacion
+from alpespartners.modulos.eventos_medios.aplicacion.comandos.crear_medio_marketing import CrearMedioMarketing
+from alpespartners.modulos.eventos_medios.aplicacion.comandos.crear_publicacion import CrearPublicacion
 import alpespartners.seedwork.presentacion.api as api
 import json
 from alpespartners.seedwork.dominio.excepciones import ExcepcionDominio
 
 from flask import request
 from flask import Response
-from alpespartners.modulos.externo.aplicacion.mapeadores import MapeadorMedioMarketingDTOJson, MapeadorPublicacionDTOJson
+from alpespartners.modulos.eventos_medios.aplicacion.mapeadores import MapeadorMedioMarketingDTOJson, MapeadorPublicacionDTOJson
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando
 
 bp = api.crear_blueprint('medios_marketing', '/medios_marketing')

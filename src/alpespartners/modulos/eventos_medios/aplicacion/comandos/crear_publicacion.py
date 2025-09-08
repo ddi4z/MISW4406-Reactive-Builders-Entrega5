@@ -1,14 +1,14 @@
-from alpespartners.modulos.externo.dominio.entidades import MedioMarketing, Publicacion
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioMediosMarketing, RepositorioPublicaciones
+from alpespartners.modulos.eventos_medios.dominio.entidades import MedioMarketing, Publicacion
+from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioMediosMarketing, RepositorioPublicaciones
 from alpespartners.seedwork.aplicacion.comandos import Comando
-from alpespartners.modulos.externo.aplicacion.dto import PublicacionDTO
+from alpespartners.modulos.eventos_medios.aplicacion.dto import PublicacionDTO
 from alpespartners.seedwork.dominio.excepciones import ExcepcionDominio
 from .base import CrearPublicacionBaseHandler
 from dataclasses import dataclass
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando as comando
 
 from alpespartners.seedwork.infraestructura.uow import UnidadTrabajoPuerto
-from alpespartners.modulos.externo.aplicacion.mapeadores import MapeadorPublicacion
+from alpespartners.modulos.eventos_medios.aplicacion.mapeadores import MapeadorPublicacion
 
 
 @dataclass

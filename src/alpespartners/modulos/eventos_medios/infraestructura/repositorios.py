@@ -1,17 +1,17 @@
 from alpespartners.config.db import db
-from alpespartners.modulos.externo.dominio.repositorios import (
+from alpespartners.modulos.eventos_medios.dominio.repositorios import (
     RepositorioEventos,
     RepositorioMediosMarketing,
     RepositorioPublicaciones
 )
-from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion
-from alpespartners.modulos.externo.infraestructura.dto import EventoDTO, MedioMarketingDTO
+from alpespartners.modulos.eventos_medios.dominio.entidades import Evento, MedioMarketing, Publicacion
+from alpespartners.modulos.eventos_medios.infraestructura.dto import EventoDTO, MedioMarketingDTO
 from .mapeadores import (
     MapeadorMedioMarketing,
     MapeadorPublicacion,
     MapeadorEvento
 )
-from alpespartners.modulos.externo.dominio.fabricas import (
+from alpespartners.modulos.eventos_medios.dominio.fabricas import (
     FabricaMediosMarketing,
     FabricaEventos,
     FabricaPublicaciones

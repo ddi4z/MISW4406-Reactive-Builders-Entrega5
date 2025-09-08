@@ -1,5 +1,5 @@
 from alpespartners.seedwork.aplicacion.handlers import Handler
-from alpespartners.modulos.externo.infraestructura.despachadores import Despachador
+from alpespartners.modulos.eventos_medios.infraestructura.despachadores import Despachador
 
 class HandlerReservaIntegracion(Handler):
 

@@ -1,6 +1,6 @@
 from alpespartners.seedwork.aplicacion.queries import QueryHandler
-from alpespartners.modulos.externo.infraestructura.fabricas import FabricaRepositorio
-from alpespartners.modulos.externo.dominio.fabricas import FabricaEventos
+from alpespartners.modulos.eventos_medios.infraestructura.fabricas import FabricaRepositorio
+from alpespartners.modulos.eventos_medios.dominio.fabricas import FabricaEventos
 
 class EventoQueryBaseHandler(QueryHandler):
     def __init__(self):

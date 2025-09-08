@@ -1,9 +1,9 @@
-from alpespartners.modulos.externo.dominio.repositorios import RepositorioEventos, RepositorioMediosMarketing, RepositorioPublicaciones
+from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioEventos, RepositorioMediosMarketing, RepositorioPublicaciones
 from alpespartners.seedwork.aplicacion.servicios import Servicio
-from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion
-from alpespartners.modulos.externo.dominio.fabricas import FabricaEventos, FabricaMediosMarketing, FabricaPublicaciones
-from alpespartners.modulos.externo.infraestructura.fabricas import FabricaRepositorio
-from alpespartners.modulos.externo.infraestructura.repositorios import RepositorioReservas
+from alpespartners.modulos.eventos_medios.dominio.entidades import Evento, MedioMarketing, Publicacion
+from alpespartners.modulos.eventos_medios.dominio.fabricas import FabricaEventos, FabricaMediosMarketing, FabricaPublicaciones
+from alpespartners.modulos.eventos_medios.infraestructura.fabricas import FabricaRepositorio
+from alpespartners.modulos.eventos_medios.infraestructura.repositorios import RepositorioReservas
 from alpespartners.seedwork.infraestructura.uow import UnidadTrabajoPuerto
 from .mapeadores import MapeadorEvento, MapeadorMedioMarketing, MapeadorPublicacion
 

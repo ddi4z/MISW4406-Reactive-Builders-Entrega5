@@ -7,10 +7,10 @@ from flask_swagger import swagger
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 def registrar_handlers():
-    import alpespartners.modulos.externo.aplicacion
+    import alpespartners.modulos.eventos_medios.aplicacion
 
 def importar_modelos_alchemy():
-    import alpespartners.modulos.externo.infraestructura.dto
+    import alpespartners.modulos.eventos_medios.infraestructura.dto
 
 
 def comenzar_consumidor():
@@ -21,7 +21,7 @@ def comenzar_consumidor():
     """
 
     import threading
-    import alpespartners.modulos.externo.infraestructura.consumidores as vuelos
+    import alpespartners.modulos.eventos_medios.infraestructura.consumidores as vuelos
 
     # Suscripción a eventos
     threading.Thread(target=vuelos.suscribirse_a_eventos).start()

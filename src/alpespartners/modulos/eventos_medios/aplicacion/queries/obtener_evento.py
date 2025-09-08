@@ -1,9 +1,9 @@
-from alpespartners.modulos.externo.infraestructura.repositorios import RepositorioEventos
-from alpespartners.seedwork.aplicacion.queries import Query, QueryHandler, QueryResultado
+from alpespartners.modulos.eventos_medios.infraestructura.repositorios import RepositorioEventos
+from alpespartners.seedwork.aplicacion.queries import Query, QueryResultado
 from alpespartners.seedwork.aplicacion.queries import ejecutar_query as query
 from dataclasses import dataclass
 from .base import EventoQueryBaseHandler
-from alpespartners.modulos.externo.aplicacion.mapeadores import MapeadorEvento
+from alpespartners.modulos.eventos_medios.aplicacion.mapeadores import MapeadorEvento
 import uuid
 
 @dataclass
