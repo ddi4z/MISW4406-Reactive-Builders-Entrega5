@@ -1,0 +1,268 @@
+{
+	"info": {
+		"_postman_id": "f7e77797-7dc9-468b-989b-33e6fb059b38",
+		"name": "Reactive Builders",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47472012"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear medio de marketing",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"0e0076b5-9430-4427-a48c-25175c7ed7eb\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"platafoma\": {\r\n        \"nombre\": \"Facebook\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/medios_marketing/medio-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"medios_marketing",
+						"medio-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear publicacion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"id_medio_marketing\": \"3c55836b-01ec-4f09-adca-71dfcc08aae6\",\r\n    \"tipo_publicacion\": \"Tipo 1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/medios_marketing/publicacion-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"medios_marketing",
+						"publicacion-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear lead",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"tipo_evento\":\"Lead\",\r\n    \"id_publicacion\": \"707b0067-e0e7-4b3f-83bc-c1650056e294\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/eventos/evento-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"eventos",
+						"evento-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear InteraccionPublicacion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"tipo_evento\":\"InteraccionPublicacion\",\r\n    \"id_publicacion\": \"040754d7-af82-488b-bd58-44192785441b\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/eventos/evento-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"eventos",
+						"evento-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todos",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"tipo_evento\":\"Lead\",\r\n    \"id_publicacion\": \"707b0067-e0e7-4b3f-83bc-c1650056e294\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/eventos/evento-query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"eventos",
+						"evento-query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener por Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"tipo_evento\":\"Lead\",\r\n    \"id_publicacion\": \"707b0067-e0e7-4b3f-83bc-c1650056e294\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/eventos/evento-query/57b059a9-9843-4d1e-b9a9-34425fc54151",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"eventos",
+						"evento-query",
+						"57b059a9-9843-4d1e-b9a9-34425fc54151"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear recompensa",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"descripcion\":\"recompensa\",\r\n    \"id_evento\": \"57b059a9-9843-4d1e-b9a9-34425fc54151\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/prueba/recompensa-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"prueba",
+						"recompensa-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear comision",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"monto_comision\": {\r\n        \"valor\": 1\r\n    },\r\n    \"id_evento\": \"57b059a9-9843-4d1e-b9a9-34425fc54151\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/prueba/comision-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"prueba",
+						"comision-comando"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
