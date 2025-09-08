@@ -31,6 +31,27 @@ En particular, se implementaron las siguientes agregaciones en los módulos a co
 
 **Atribución de eventos** (módulo `comision_recompensa`): Contiene las agregaciones Comisión (color amarillo) y Recompensas (color rosa)
 
+## Escenarios de calidad relacionados con el microservicio
+
+​**Escenario #1 - Escalabilidad:** Durante una jornada de descuentos de una marca que dura pocas horas, el sistema debe ser capaz de hacer tracking a los clicks, generando eventos y atribuciones concurrentes sin que sufra degradación​
+
+- Se relaciona con el manejo de comandos asíncronos de creación de eventos
+
+- Depende más del despliegue y pruebas similares a un entorno de producción que de la implementación actual.
+
+**Escenario #4 - Modificabilidad:** En caso de que se requiera agregar un nuevo caso de uso de negocio que implique tanto un comando como una consulta, este podrá ser creado sin necesidad de modificar handlers existentes, manteniendo estable la lógica ya implementada.
+
+- Se relaciona con el manejo de comandos asíncronos de creación de eventos
+    
+- Por ahora, se relaciona con los patrones de EDA y CQS, junto a la implementación guiada por DDD
+
+**Escenario #7 - Disponibilidad:** En caso de que el componente pagos falle, el tracking de los eventos y atribución seguirá operando sin perder ningún registro
+
+- Se relaciona con la atribución manejada por este componentente antes de conectarse con pagos
+
+- Se relaciona con la independencia de los microservicios facilitada por ahora y el manejo de eventos de integración en el futuro.
+
+
 ## Pasos de ejecución
 
 El proyecto está pensado para su ejecución de forma local. Por lo tanto, clone el repositorio primero.
