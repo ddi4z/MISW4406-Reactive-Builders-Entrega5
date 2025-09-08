@@ -219,3 +219,5 @@ Los siguientes endpoints corresponden a pruebas sobre la aplicación adicionales
 ## Video de la ejecución
 
 Se encuentra en el directorio principal, con el nombre `video.mp4`
+
+[Link video](https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega3/blob/main/video.mp4)
