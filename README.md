@@ -51,6 +51,53 @@ En particular, se implementaron las siguientes agregaciones en los módulos a co
 
 - Se relaciona con la independencia de los microservicios facilitada por ahora y el manejo de eventos de integración en el futuro.
 
+## Aplicación de DDD y EDA
+
+### Diseño estratégico
+
+**Dominio:** Solo se cuenta con el dominio de creación, gestión y escalamiento de asociaciones estratégicas entre marcas y socios. También es conocido como Performance marketing.
+
+**Subdominio:** El subdominio núcleo de Tracking y procesamiento de eventos fue implementado a través de un (micro)servicio.
+
+**Contexto acotado:** El contexto acotado Tracking y atribución de eventos conforma implementa el subdominio mencionado solamente. En el organigrama, ya existe una división llamada Procesamiento de eventos, con los equipos Tracking y Eventos web, por lo que esta seleccion de contexto acotado se asocia con la realidad organizacional.
+
+### Diseño táctico
+
+**Entidades:** Se implementaron 7 entidades, 5 en el módulo de manejo de externos y 2 en el de internos.
+
+**Objetos valor:** Se implementaron 3 objetos valor, 2 en el módulo externo y 1 en el interno.
+
+**Seedwork:** Se utilizó el seedwork provisto para tener una base de implementación de los conceptos de DDD en las diferentes capas.
+
+**Servicios:** Existen servicios para los eventos, medios de marketing y publicaciones.
+
+**Módulos:** Se tienen los dos módulos mencionados anteriormente, donde el primero es la interfaz para la comunicacion con sistemas externos relacionados al tracking de eventos, mientras que el segundo se relaciona con las interacciones internas de Alpes Partners, incluyendo la atribución de recompensas y comisiones.
+
+**Agregaciones:** Cada módulo cuenta con dos agregaciones, visualizadas en el previo apartado de arquitectura. Cada agregación conforma un contexto transaccional y posee una entidad raíz, encargada de representar a las demás entidades. Como se puede apreciar en el diagrama de dominio, se cumplen también las relaciones entre entidades según su tipo (raíz o no)
+
+**Fábricas:** Se utilizan fábricas para los repositorios (conexión con la persistencia que puede estar implementada de diversas formas, por ejemplo, diferentes bases de datos). También ocurre para las comisiones, ya que este objeto del dominio requiere una creación cuidadosa, manteniendo reglas y atributos complejos en una implementación real.
+
+**DTOs:** Los DTOs permiten la comunicación entre capas, especialmente para no contaminar el dominio con conceptos externos a su lenguaje ubicuo, y para tampoco revelarlo.
+
+**Comunicación entre capas:** Existe una comunicación entre las capas de aplicación, dominio e infraestructura como propone DDD. Favorece la inversión de **dependencias**, al aislar la capa de dominio.
+
+**Repositorios:** Se encargan de la conexión con la persistencia, guardando los conceptos de infraestructura.
+
+**Arquitectura hexagonal - cebolla:** Demuestra el uso de **puertos y adaptadores**, al tener diferentes interfaces que posteriormente se implementan. Estos adaptadores se encuentan en la capa de infraestructura.
+
+### Comunicación y otros patrones
+
+**Arquitectura basada en eventos:** Se utilizan eventos para la comunicación entre módulos. Posteriormente se hará entre microservicios.
+
+**Eventos de dominio:** Se utilizan eventos de dominio para la comunicación del módulo externo con el interno, delegando tareas
+
+**Comunicación síncrona (similar a BFF):** Se necesita comunicación sincrona, en este caso a través de una API REST, para poder probar los requerimientos, simulando el llamado de los usuarios y/o sistemas externos. En un futuro, esto será mejor implementado a través de patrones como BFF.
+
+**Comandos y consultas:** Se tienen comandos para la inicialización de entidades, al igual que consultas sobre las mismas
+
+**CQS:** La división de comandos y consultas dentro del microservicio se implementa a través de CQS, evitando tener una gran cantidad de métodos en un servicio. Esto también aísla los side effects propios de los comandos de las consultas típicas.
+
+**Unidad de Trabajo (UoW):** Se manejan unidades de trabajo para aprovechar sus funcionalidades de commit y rollback. Esto garantiza un estado consistente y propicia la publicación de eventos cuando es debido.
 
 ## Pasos de ejecución
 
