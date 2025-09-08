@@ -11,6 +11,7 @@ def registrar_handlers():
 
 def importar_modelos_alchemy():
     import alpespartners.modulos.eventos_medios.infraestructura.dto
+    import alpespartners.modulos.comision_recompensa.infraestructura.dto
 
 
 def comenzar_consumidor():
@@ -64,9 +65,11 @@ def create_app(configuracion={}):
     # Importa Blueprints
     from . import medios_marketing
     from . import eventos
+    from . import prueba
 
     app.register_blueprint(medios_marketing.bp)
     app.register_blueprint(eventos.bp)
+    app.register_blueprint(prueba.bp)
 
     @app.route("/spec")
     def spec():

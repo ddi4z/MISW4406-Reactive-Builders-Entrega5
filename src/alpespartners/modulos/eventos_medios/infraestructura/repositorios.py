@@ -2,7 +2,6 @@ from alpespartners.config.db import db
 from alpespartners.modulos.eventos_medios.dominio.repositorios import (
     RepositorioEventos,
     RepositorioMediosMarketing,
-    RepositorioPublicaciones
 )
 from alpespartners.modulos.eventos_medios.dominio.entidades import Evento, MedioMarketing, Publicacion
 from alpespartners.modulos.eventos_medios.infraestructura.dto import EventoDTO, MedioMarketingDTO
@@ -83,34 +82,3 @@ class RepositorioMediosMarketingPostgres(RepositorioMediosMarketing):
         if dto:
             db.session.delete(dto)
 
-
-class RepositorioPublicacionesPostgres(RepositorioPublicaciones):
-    def __init__(self):
-        self._fabrica_publicaciones: FabricaPublicaciones = FabricaPublicaciones()
-
-    @property
-    def fabrica_publicaciones(self):
-        return self._fabrica_publicaciones
-
-    def obtener_por_id(self, id: UUID) -> Publicacion:
-        dto = db.session.query(self.fabrica_publicaciones.dto()).filter_by(id=str(id)).first()
-        if dto:
-            return self.fabrica_publicaciones.crear_objeto(dto, MapeadorPublicacion())
-        return None
-
-    def obtener_todos(self) -> list[Publicacion]:
-        dtos = db.session.query(self.fabrica_publicaciones.dto()).all()
-        return [self.fabrica_publicaciones.crear_objeto(dto, MapeadorPublicacion()) for dto in dtos]
-
-    def agregar(self, entity: Publicacion):
-        dto = self.fabrica_publicaciones.crear_objeto(entity, MapeadorPublicacion())
-        db.session.add(dto)
-
-    def actualizar(self, entity: Publicacion):
-        dto = self.fabrica_publicaciones.crear_objeto(entity, MapeadorPublicacion())
-        db.session.merge(dto)
-
-    def eliminar(self, entity_id: UUID):
-        dto = db.session.query(self.fabrica_publicaciones.dto()).filter_by(id=str(entity_id)).first()
-        if dto:
-            db.session.delete(dto)

@@ -117,8 +117,9 @@ class MapeadorMedioMarketingDTOJson(AppMap):
     
         fecha_creacion = externo.get('fecha_creacion')
         fecha_actualizacion = externo.get('fecha_actualizacion')
+        plataforma = externo.get('plataforma')
         id = externo.get('id')
-        return MedioMarketingDTO(fecha_creacion, fecha_actualizacion, id)
+        return MedioMarketingDTO(fecha_creacion, fecha_actualizacion, id, plataforma=plataforma)
 
     def dto_a_externo(self, dto: MedioMarketingDTO) -> dict:
         return dto.__dict__

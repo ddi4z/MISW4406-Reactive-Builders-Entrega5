@@ -8,8 +8,9 @@ del dominio de vuelos
 from abc import ABC
 from alpespartners.seedwork.dominio.repositorios import Repositorio
 
-class RepositorioEventos(Repositorio, ABC):
+class RepositorioComisiones(Repositorio, ABC):
     ...
-
-class RepositorioMediosMarketing(Repositorio, ABC):
+    
+class RepositorioRecompensas(Repositorio, ABC):
     ...
+    

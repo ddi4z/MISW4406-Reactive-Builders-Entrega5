@@ -1,8 +1,10 @@
 from abc import ABC
-from alpespartners.modulos.eventos_medios.dominio.entidades import Evento
+from alpespartners.modulos.comision_recompensa.aplicacion.comandos.crear_comision import CrearComision
+from alpespartners.modulos.comision_recompensa.aplicacion.comandos.crear_recompensa import CrearRecompensa
+from alpespartners.modulos.eventos_medios.dominio.entidades import Evento, Lead
 from alpespartners.modulos.eventos_medios.aplicacion.dto import EventoDTO
 from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioEventos
-from alpespartners.seedwork.aplicacion.comandos import Comando
+from alpespartners.seedwork.aplicacion.comandos import Comando, ejecutar_commando
 from .base import CrearEventoBaseHandler, CrearPublicacionBaseHandler
 from dataclasses import dataclass
 from alpespartners.seedwork.aplicacion.comandos import ejecutar_commando as comando
@@ -38,6 +40,13 @@ class CrearEventoHandler(CrearEventoBaseHandler):
         UnidadTrabajoPuerto.registrar_batch(repositorio.agregar, evento)
         UnidadTrabajoPuerto.savepoint()
         UnidadTrabajoPuerto.commit()
+        
+        if isinstance(evento, Lead):
+            comando = CrearComision(evento.fecha_creacion.strftime("%Y-%m-%dT%H:%M:%SZ"), evento.fecha_actualizacion.strftime("%Y-%m-%dT%H:%M:%SZ"), evento.id, evento.id)
+            ejecutar_commando(comando)
+        else:
+            comando = CrearRecompensa(evento.fecha_creacion.strftime("%Y-%m-%dT%H:%M:%SZ"), evento.fecha_actualizacion.strftime("%Y-%m-%dT%H:%M:%SZ"), evento.id, evento.id)
+            ejecutar_commando(comando)
 
 
 @comando.register(CrearEvento)

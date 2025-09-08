@@ -6,20 +6,20 @@ objetos complejos en la capa de infraestructura del dominio de vuelos
 """
 
 from dataclasses import dataclass, field
-from alpespartners.modulos.eventos_medios.infraestructura.repositorios import RepositorioEventosPostgres, RepositorioMediosMarketingPostgres
+from .repositorios import RepositorioComisiones, RepositorioRecompensas
+from alpespartners.modulos.comision_recompensa.infraestructura.repositorios import RepositorioRecompensasPostgres, RepositorioComisionesPostgres
 from alpespartners.seedwork.dominio.fabricas import Fabrica
 from alpespartners.seedwork.dominio.repositorios import Repositorio
-from .repositorios import RepositorioEventos, RepositorioMediosMarketing
 from .excepciones import ExcepcionFabrica
 
 @dataclass
 @dataclass
 class FabricaRepositorio(Fabrica):
     def crear_objeto(self, obj: type, mapeador: any = None) -> Repositorio:
-        if issubclass(obj, RepositorioEventos):
-            return RepositorioEventosPostgres()
-        elif issubclass(obj, RepositorioMediosMarketing):
-            return RepositorioMediosMarketingPostgres()
+        if issubclass(obj, RepositorioRecompensas):
+            return RepositorioRecompensasPostgres()
+        elif issubclass(obj, RepositorioComisiones):
+            return RepositorioComisionesPostgres()
         else:
             raise ExcepcionFabrica(f"No se reconoce el repositorio para {obj}")
 

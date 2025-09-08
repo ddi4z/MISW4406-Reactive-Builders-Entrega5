@@ -62,3 +62,7 @@ class EventoDTO(db.Model):
 
     id_publicacion = db.Column(db.String, db.ForeignKey("publicaciones.id"))
     publicacion = db.relationship("PublicacionDTO", back_populates="eventos")
+    
+    recompensa = db.relationship("RecompensaDTO", back_populates="evento", uselist=False)
+
+    comision = db.relationship("ComisionDTO", back_populates="evento", uselist=False)

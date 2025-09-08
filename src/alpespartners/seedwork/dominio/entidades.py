@@ -28,9 +28,11 @@ class Entidad:
         return self._id
 
     @id.setter
-    def id(self, id: uuid.UUID) -> None:
+    def id(self, id_param: uuid.UUID) -> None:
         if not IdEntidadEsInmutable(self).es_valido():
             raise IdDebeSerInmutableExcepcion()
+        if id_param:
+            self._id = id_param
         self._id = self.siguiente_id()
         
 

@@ -1,5 +1,5 @@
 from alpespartners.modulos.eventos_medios.dominio.entidades import MedioMarketing, Publicacion
-from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioMediosMarketing, RepositorioPublicaciones
+from alpespartners.modulos.eventos_medios.dominio.repositorios import RepositorioMediosMarketing
 from alpespartners.seedwork.aplicacion.comandos import Comando
 from alpespartners.modulos.eventos_medios.aplicacion.dto import PublicacionDTO
 from alpespartners.seedwork.dominio.excepciones import ExcepcionDominio
@@ -45,6 +45,8 @@ class CrearPublicacionHandler(CrearPublicacionBaseHandler):
         UnidadTrabajoPuerto.registrar_batch(repo_medios.agregar, medio)
         UnidadTrabajoPuerto.savepoint()
         UnidadTrabajoPuerto.commit()
+        
+        
 
 
 @comando.register(CrearPublicacion)

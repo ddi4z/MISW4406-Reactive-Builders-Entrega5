@@ -1,4 +1,6 @@
 from alpespartners.modulos.eventos_medios.aplicacion.comandos.crear_evento import CrearEvento
+from alpespartners.modulos.comision_recompensa.aplicacion.comandos.crear_comision import CrearComision
+from alpespartners.modulos.comision_recompensa.aplicacion.comandos.crear_recompensa import CrearRecompensa
 from alpespartners.modulos.eventos_medios.aplicacion.queries.obtener_evento import ObtenerEvento
 from alpespartners.seedwork.aplicacion.queries import ejecutar_query
 import alpespartners.seedwork.presentacion.api as api
