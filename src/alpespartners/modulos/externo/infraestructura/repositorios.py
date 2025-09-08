@@ -5,7 +5,7 @@ from alpespartners.modulos.externo.dominio.repositorios import (
     RepositorioPublicaciones
 )
 from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion
-from alpespartners.modulos.externo.infraestructura.dto import MedioMarketingDTO
+from alpespartners.modulos.externo.infraestructura.dto import EventoDTO, MedioMarketingDTO
 from .mapeadores import (
     MapeadorMedioMarketing,
     MapeadorPublicacion,
@@ -29,13 +29,13 @@ class RepositorioEventosPostgres(RepositorioEventos):
         return self._fabrica_eventos
 
     def obtener_por_id(self, id: UUID) -> Evento:
-        dto = db.session.query(self.fabrica_eventos.dto()).filter_by(id=str(id)).first()
+        dto = db.session.query(EventoDTO).filter_by(id=str(id)).first()
         if dto:
             return self.fabrica_eventos.crear_objeto(dto, MapeadorEvento())
         return None
 
     def obtener_todos(self) -> list[Evento]:
-        dtos = db.session.query(self.fabrica_eventos.dto()).all()
+        dtos = db.session.query(EventoDTO).all()
         return [self.fabrica_eventos.crear_objeto(dto, MapeadorEvento()) for dto in dtos]
 
     def agregar(self, entity: Evento):
@@ -47,7 +47,7 @@ class RepositorioEventosPostgres(RepositorioEventos):
         db.session.merge(dto)
 
     def eliminar(self, entity_id: UUID):
-        dto = db.session.query(self.fabrica_eventos.dto()).filter_by(id=str(entity_id)).first()
+        dto = db.session.query(EventoDTO).filter_by(id=str(entity_id)).first()
         if dto:
             db.session.delete(dto)
 
@@ -67,7 +67,7 @@ class RepositorioMediosMarketingPostgres(RepositorioMediosMarketing):
         return None
 
     def obtener_todos(self) -> list[MedioMarketing]:
-        dtos = db.session.query(self.fabrica_medios.dto()).all()
+        dtos = db.session.query(MedioMarketingDTO).all()
         return [self.fabrica_medios.crear_objeto(dto, MapeadorMedioMarketing()) for dto in dtos]
 
     def agregar(self, entity: MedioMarketing):

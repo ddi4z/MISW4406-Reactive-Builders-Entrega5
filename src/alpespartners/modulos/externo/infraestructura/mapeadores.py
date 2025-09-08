@@ -4,7 +4,7 @@ En este archivo usted encontrará los diferentes mapeadores
 encargados de la transformación entre formatos de dominio y DTOs
 """
 
-from alpespartners.modulos.externo import dominio
+from alpespartners.modulos.externo.dominio import entidades
 from alpespartners.seedwork.dominio.repositorios import Mapeador
 import alpespartners.modulos.externo.dominio.objetos_valor as ov
 from alpespartners.modulos.externo.dominio.entidades import Evento, MedioMarketing, Publicacion 
@@ -74,15 +74,16 @@ class MapeadorEvento(Mapeador):
         return Evento.__class__
 
     def entidad_a_dto(self, entidad: Evento) -> EventoDTO:
-        dto = EventoDTO()
-        dto.id = str(entidad.id)
-        dto.fecha_evento = entidad.fecha_evento
-        dto.tipo_evento = entidad.__class__.__name__
-        dto.id_publicacion = str(entidad.id_publicacion)
+        dto = EventoDTO(
+            id = str(entidad.id),
+            fecha_evento = entidad.fecha_evento,
+            tipo_evento = entidad.__class__.__name__,
+            id_publicacion = str(entidad.id_publicacion),
+        )
         return dto
 
     def dto_a_entidad(self, dto: EventoDTO) -> Evento:
-        clase_evento = getattr(dominio, dto.tipo_evento, Evento)
+        clase_evento = getattr(entidades, dto.tipo_evento, Evento)
         entidad = clase_evento(
             id=dto.id,
             fecha_evento=dto.fecha_evento,

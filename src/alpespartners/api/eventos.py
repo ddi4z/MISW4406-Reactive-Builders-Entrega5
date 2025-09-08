@@ -1,4 +1,6 @@
 from alpespartners.modulos.externo.aplicacion.comandos.crear_evento import CrearEvento
+from alpespartners.modulos.externo.aplicacion.queries.obtener_evento import ObtenerEvento
+from alpespartners.seedwork.aplicacion.queries import ejecutar_query
 import alpespartners.seedwork.presentacion.api as api
 import json
 from alpespartners.seedwork.dominio.excepciones import ExcepcionDominio
@@ -31,3 +33,11 @@ def crear_evento_asincrono():
         return Response(json.dumps(dict(error=str(e))), status=400, mimetype='application/json')
 
 
+@bp.route('/evento-query', methods=('GET',))
+@bp.route('/evento-query/<id>', methods=('GET',))
+def dar_evento_usando_query(id=None):
+    query_resultado = ejecutar_query(ObtenerEvento(id))
+    map_evento = MapeadorEventoDTOJson()
+    if id:
+        return map_evento.dto_a_externo(query_resultado.resultado)
+    return [map_evento.dto_a_externo(evento) for evento in query_resultado.resultado]
