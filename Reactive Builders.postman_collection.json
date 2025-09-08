@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "f7e77797-7dc9-468b-989b-33e6fb059b38",
+		"_postman_id": "65526bb5-c6af-4cd4-a5df-9124f98d000d",
 		"name": "Reactive Builders",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "47472012"
+		"_exporter_id": "29104017"
 	},
 	"item": [
 		{
@@ -231,7 +231,8 @@
 						"prueba",
 						"recompensa-comando"
 					]
-				}
+				},
+				"description": "Este endpoint es de prueba para probar directamente el comando de crear recompensa. No obstante, con la ejecución de la creación de eventos (Leads o interacciones con publicaciones) no es necesario ejecutar este endpoint."
 			},
 			"response": []
 		},
@@ -260,7 +261,8 @@
 						"prueba",
 						"comision-comando"
 					]
-				}
+				},
+				"description": "Este endpoint es de prueba para probar directamente el comando de crear recompensa. No obstante, con la ejecución de la creación de eventos (Leads o interacciones con publicaciones) no es necesario ejecutar este endpoint."
 			},
 			"response": []
 		}
