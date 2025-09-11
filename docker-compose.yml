@@ -134,3 +134,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  # MySQL8
+  db_asociaciones_estrategicas:
+    image: mysql:8.0.28
+    hostname: mysqldb
+    container_name: mysqldb
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=asociaciones_estrategicas
+      - MYSQL_ROOT_PASSWORD=pwdadmin
+    profiles: ["asociaciones_estrategicas", "db_asociaciones_estrategicas"]
+    networks:
+      - pulsar
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./data/mysql:/var/lib/mysql             
