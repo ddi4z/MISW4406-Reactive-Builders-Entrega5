@@ -14,8 +14,7 @@ class HandlerAsociacionIntegracion(Handler):
         despachador.publicar_evento(evento, "eventos-asociacion")
 
 
-    #@staticmethod
-    #TODO
-    #def handle_asociacion_finalizada(evento: AsociacionFinalizada):
-    #    despachador = Despachador()
-    #    despachador.publicar_evento(evento, "eventos-asociacion")
+    @staticmethod
+    def handle_asociacion_finalizada(evento: AsociacionFinalizada):
+        despachador = Despachador()
+        despachador.publicar_evento(evento, "eventos-asociacion")

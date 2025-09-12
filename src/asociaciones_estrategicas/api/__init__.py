@@ -7,17 +7,9 @@ from flask_swagger import swagger
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 def registrar_handlers():
-    pass #TODO
-    #import aeroalpes.modulos.cliente.aplicacion
-    #import aeroalpes.modulos.vuelos.aplicacion
+    import asociaciones_estrategicas.modulos.asociaciones.aplicacion
 def importar_modelos_alchemy():
-    pass #TODO
-    #import aeroalpes.modulos.cliente.infraestructura.dto
-    #import aeroalpes.modulos.hoteles.infraestructura.dto
-    #import aeroalpes.modulos.pagos.infraestructura.dto
-    #import aeroalpes.modulos.precios_dinamicos.infraestructura.dto
-    #import aeroalpes.modulos.vehiculos.infraestructura.dto
-    #import aeroalpes.modulos.vuelos.infraestructura.dto
+    import asociaciones_estrategicas.modulos.asociaciones.infraestructura.dto
 
 def comenzar_consumidor(app):
     """
@@ -27,29 +19,15 @@ def comenzar_consumidor(app):
     """
     pass #TODO
 
-    #import threading
-    #import aeroalpes.modulos.cliente.infraestructura.consumidores as cliente
-    #import aeroalpes.modulos.hoteles.infraestructura.consumidores as hoteles
-    #import aeroalpes.modulos.pagos.infraestructura.consumidores as pagos
-    #import aeroalpes.modulos.precios_dinamicos.infraestructura.consumidores as precios_dinamicos
-    #import aeroalpes.modulos.vehiculos.infraestructura.consumidores as vehiculos
+    import threading
     #import aeroalpes.modulos.vuelos.infraestructura.consumidores as vuelos
+    import asociaciones_estrategicas.modulos.asociaciones.infraestructura.consumidores as asociaciones
 
     # Suscripción a eventos
-    #threading.Thread(target=cliente.suscribirse_a_eventos).start()
-    #threading.Thread(target=hoteles.suscribirse_a_eventos).start()
-    #threading.Thread(target=pagos.suscribirse_a_eventos).start()
-    #threading.Thread(target=precios_dinamicos.suscribirse_a_eventos).start()
-    #threading.Thread(target=vehiculos.suscribirse_a_eventos).start()
-    #threading.Thread(target=vuelos.suscribirse_a_eventos, args=[app]).start()
+    threading.Thread(target=asociaciones.suscribirse_a_eventos, args=[app]).start()
 
     # Suscripción a comandos
-    #threading.Thread(target=cliente.suscribirse_a_comandos).start()
-    #threading.Thread(target=hoteles.suscribirse_a_comandos).start()
-    #threading.Thread(target=pagos.suscribirse_a_comandos).start()
-    #threading.Thread(target=precios_dinamicos.suscribirse_a_comandos).start()
-    #threading.Thread(target=vehiculos.suscribirse_a_comandos).start()
-    #threading.Thread(target=vuelos.suscribirse_a_comandos, args=[app]).start()
+    threading.Thread(target=asociaciones.suscribirse_a_comandos, args=[app]).start()
 
 def create_app(configuracion={}):
     # Init la aplicacion de Flask
@@ -78,20 +56,11 @@ def create_app(configuracion={}):
             comenzar_consumidor(app)
 
     # Importa Blueprints
-    #from . import cliente
-    #from . import hoteles
-    #from . import pagos
-    #from . import precios_dinamicos
-    #from . import vehiculos
     #from . import vuelos
+    from . import asociaciones 
 
     # Registro de Blueprints
-    #app.register_blueprint(cliente.bp)
-    #app.register_blueprint(hoteles.bp)
-    #app.register_blueprint(pagos.bp)
-    #app.register_blueprint(precios_dinamicos.bp)
-    #app.register_blueprint(vehiculos.bp)
-    #app.register_blueprint(vuelos.bp)
+    app.register_blueprint(asociaciones.bp)
 
     @app.route("/spec")
     def spec():
