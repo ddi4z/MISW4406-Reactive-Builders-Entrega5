@@ -10,7 +10,7 @@ import datetime
 import uuid
 from asociaciones_estrategicas.seedwork.dominio.entidades import AgregacionRaiz
 from asociaciones_estrategicas.modulos.asociaciones.dominio.objetos_valor import PeriodoVigencia, TipoAsociacion
-
+from asociaciones_estrategicas.modulos.asociaciones.dominio.eventos import AsociacionCreada, AsociacionFinalizada
 
 @dataclass
 class AsociacionEstrategica(AgregacionRaiz):

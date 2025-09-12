@@ -1,7 +1,7 @@
 from asociaciones_estrategicas.seedwork.infraestructura.vistas import Vista
 from asociaciones_estrategicas.modulos.asociaciones.dominio.entidades import AsociacionEstrategica
 from asociaciones_estrategicas.config.db import db
-from .dto import Asociacion as AsociacionDTO
+from .dto import AsociacionEstrategica as AsociacionDTO
 from asociaciones_estrategicas.modulos.asociaciones.dominio.objetos_valor import PeriodoVigencia, TipoAsociacion
 
 class VistaAsociacion(Vista):

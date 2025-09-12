@@ -1,7 +1,7 @@
 from asociaciones_estrategicas.seedwork.infraestructura.proyecciones import Proyeccion, ProyeccionHandler
 from asociaciones_estrategicas.seedwork.infraestructura.proyecciones import ejecutar_proyeccion as proyeccion
 from asociaciones_estrategicas.seedwork.infraestructura.utils import millis_a_datetime
-from asociaciones_estrategicas.modulos.asociaciones.infraestructura.dto import AsociacionesAnalitica, Asociacion as AsociacionDTO
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.dto import AsociacionesAnalitica, AsociacionEstrategica as AsociacionDTO
 from asociaciones_estrategicas.modulos.asociaciones.dominio.entidades import AsociacionEstrategica
 from asociaciones_estrategicas.modulos.asociaciones.dominio.objetos_valor import PeriodoVigencia, TipoAsociacion
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.mapeadores import MapeadorAsociacionEstrategica

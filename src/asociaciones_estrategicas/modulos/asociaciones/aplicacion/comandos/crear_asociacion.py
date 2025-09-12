@@ -54,13 +54,7 @@ class CrearAsociacionHandler(CrearAsociacionBaseHandler):
         asociacion: AsociacionEstrategica = self.fabrica_asociaciones.crear_objeto(
             asociacion_dto, MapeadorAsociacion()
         )
-        asociacion.crear_asociacion(
-            id_marca=asociacion.id_marca,
-            id_socio=asociacion.id_socio,
-            tipo=asociacion.tipo,
-            vigencia=asociacion.vigencia,
-            descripcion=asociacion.descripcion,
-        )
+        asociacion.crear_asociacion(asociacion)
 
         repositorio = self.fabrica_repositorio.crear_objeto(RepositorioAsociacionEstrategica)
         repositorio_eventos = self.fabrica_repositorio.crear_objeto(RepositorioEventosAsociacionEstrategica)
