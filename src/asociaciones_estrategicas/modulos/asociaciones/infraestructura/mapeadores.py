@@ -132,13 +132,17 @@ class MapeadorAsociacionEstrategica(Mapeador):
 
     def dto_a_entidad(self, dto: AsociacionDTO) -> AsociacionEstrategica:
         asociacion = AsociacionEstrategica(
+            #id = UUID(dto.id),
             id_marca=UUID(dto.id_marca),
             id_socio=UUID(dto.id_socio),
             tipo=TipoAsociacion(dto.tipo),
             descripcion=dto.descripcion,
             vigencia=PeriodoVigencia(dto.fecha_inicio, dto.fecha_fin)
         )
-        asociacion.id = UUID(dto.id)
+        
+        # Forzar a que conserve el id correcto
+        asociacion._id = UUID(dto.id)
+
         asociacion.fecha_creacion = dto.fecha_creacion
         asociacion.fecha_actualizacion = dto.fecha_actualizacion
         return asociacion

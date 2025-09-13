@@ -112,6 +112,23 @@ services:
       - PULSAR_ADDRESS=broker
     ports:
       - "5000:5000"
+  #Configura retención para el micro/asociaciones para usar Event Sourcing
+  pulsar-retention-topic:
+    image: apachepulsar/pulsar:latest
+    container_name: pulsar-retention-topic
+    profiles: ["pulsar"]
+    networks:
+      - pulsar
+    depends_on:
+      broker:
+        condition: service_started
+    command: >
+      /bin/bash -c "
+        sleep 10 &&
+        bin/pulsar-admin namespaces set-retention public/default --size -1 --time -1&&
+        echo '✅ Retention configurado en el tópico eventos-asociacion'
+      "
+
   postgres:
     image: postgres:15
     container_name: postgres
@@ -134,6 +151,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+      
   # MySQL8
   db_asociaciones_estrategicas:
     image: mysql:8.0.28

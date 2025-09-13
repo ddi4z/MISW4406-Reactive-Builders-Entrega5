@@ -5,20 +5,17 @@ from .dto import AsociacionEstrategica as AsociacionDTO
 from asociaciones_estrategicas.modulos.asociaciones.dominio.objetos_valor import PeriodoVigencia, TipoAsociacion
 
 class VistaAsociacion(Vista):
-    def obtener_por(id=None, id_marca=None, id_socio=None, tipo=None, **kwargs) -> [AsociacionEstrategica]:
-        params = dict()
+    def obtener_por(self, id_asociacion=None, id_marca=None, id_socio=None, tipo=None, **kwargs) -> [AsociacionEstrategica]:
+        params = {}
 
-        if id:
-            params['id'] = str(id)
-
+        if id_asociacion:
+            params['id'] = str(id_asociacion)
         if id_marca:
             params['id_marca'] = str(id_marca)
-
         if id_socio:
             params['id_socio'] = str(id_socio)
-
         if tipo:
-            params['tipo'] = str(tipo)  # enum o string
+            params['tipo'] = str(tipo)
 
         asociaciones_dto = db.session.query(AsociacionDTO).filter_by(**params)
 

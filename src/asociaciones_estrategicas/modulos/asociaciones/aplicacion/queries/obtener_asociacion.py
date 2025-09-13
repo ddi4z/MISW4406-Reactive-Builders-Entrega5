@@ -26,7 +26,7 @@ class ObtenerAsociacionHandler(AsociacionQueryBaseHandler):
 
     def handle(self, query: ObtenerAsociacion) -> QueryResultado:
         vista = self.fabrica_vista.crear_objeto(AsociacionEstrategica)
-        asociaciones = vista.obtener_por(id=query.id)
+        asociaciones = vista.obtener_por(query.id)
 
         if not asociaciones:
             return QueryResultado(resultado=None)

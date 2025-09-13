@@ -14,24 +14,29 @@ import uuid
 
 @dataclass
 class Entidad:
-    id: uuid.UUID = field(hash=True)
-    _id: uuid.UUID = field(init=False, repr=False, hash=True)
-    fecha_creacion: datetime =  field(default=datetime.now())
-    fecha_actualizacion: datetime = field(default=datetime.now())
+    _id: uuid.UUID = field(default=None, init=False, repr=False)
+    fecha_creacion: datetime = field(default_factory=datetime.now)
+    fecha_actualizacion: datetime = field(default_factory=datetime.now)
+
+    def __post_init__(self):
+        # Si no hay id asignado, se genera automáticamente
+        if self._id is None:
+            self._id = self.siguiente_id()
 
     @classmethod
-    def siguiente_id(self) -> uuid.UUID:
+    def siguiente_id(cls) -> uuid.UUID:
         return uuid.uuid4()
 
     @property
-    def id(self):
+    def id(self) -> uuid.UUID:
         return self._id
 
     @id.setter
-    def id(self, id: uuid.UUID) -> None:
-        if not IdEntidadEsInmutable(self).es_valido():
+    def id(self, value: uuid.UUID) -> None:
+        # solo permite asignar una vez (para reconstrucción desde BD)
+        if getattr(self, "_id", None) is not None:
             raise IdDebeSerInmutableExcepcion()
-        self._id = self.siguiente_id()
+        self._id = value if value else self.siguiente_id()
         
 
 @dataclass

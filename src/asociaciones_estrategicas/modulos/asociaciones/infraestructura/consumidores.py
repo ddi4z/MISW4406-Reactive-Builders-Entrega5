@@ -29,28 +29,39 @@ def suscribirse_a_eventos(app=None):
         while True:
             mensaje = consumidor.receive()
             datos = mensaje.value().data
+            mensaje_evento = mensaje.value()   # Evento completo
             print(f"Evento recibido: {datos}")
 
             # TODO: distinguir si el evento es creación, actualización o eliminación
-            ejecutar_proyeccion(
-                ProyeccionAsociacionesTotales(datos.fecha_creacion, ProyeccionAsociacionesTotales.ADD),
-                app=app,
-            )
+            if mensaje_evento.type == "AsociacionCreada":
+                ejecutar_proyeccion(
+                    ProyeccionAsociacionesTotales(datos.fecha_creacion, ProyeccionAsociacionesTotales.ADD),
+                    app=app,
+                )
 
-            ejecutar_proyeccion(
-                ProyeccionAsociacionesLista(
-                    datos.id_asociacion,
-                    datos.id_marca,
-                    datos.id_socio,
-                    datos.tipo,
-                    datos.descripcion,           
-                    datos.fecha_inicio,          
-                    datos.fecha_fin,             
-                    datos.fecha_creacion,
-                    datos.fecha_creacion,        # fecha_actualizacion inicial
-                ),
-                app=app,
-            )
+                ejecutar_proyeccion(
+                    ProyeccionAsociacionesLista(
+                        datos.id_asociacion,
+                        datos.id_marca,
+                        datos.id_socio,
+                        datos.tipo,
+                        datos.descripcion,           
+                        datos.fecha_inicio,          
+                        datos.fecha_fin,             
+                        datos.fecha_creacion,
+                        datos.fecha_creacion,        # fecha_actualizacion inicial
+                    ),
+                    app=app,
+                )
+
+            elif mensaje_evento.type == "AsociacionFinalizada":
+                pass # TODO: implementar si se requiere actualizar alguna proyección existente o crear
+                # quizás otra proyección específica
+            else:
+                logging.warning(f"Evento desconocido: {mensaje_evento.type}")
+
+
+
 
             consumidor.acknowledge(mensaje)
 
