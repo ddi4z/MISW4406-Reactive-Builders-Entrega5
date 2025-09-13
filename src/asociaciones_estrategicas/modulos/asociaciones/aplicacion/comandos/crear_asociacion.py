@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.despachadores import Despachador
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import ComandoIniciarTracking, ComandoIniciarTrackingPayload
 from asociaciones_estrategicas.seedwork.aplicacion.comandos import Comando
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.dto import AsociacionDTO, VigenciaDTO
 from .base import CrearAsociacionBaseHandler
@@ -11,7 +13,7 @@ from asociaciones_estrategicas.modulos.asociaciones.infraestructura.repositorios
     RepositorioAsociacionEstrategica,
     RepositorioEventosAsociacionEstrategica,
 )
-
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.servicios import ServicioTracking
 
 # ==========
 # Comando
@@ -65,6 +67,9 @@ class CrearAsociacionHandler(CrearAsociacionBaseHandler):
             repositorio_eventos_func=repositorio_eventos.agregar,
         )
         UnidadTrabajoPuerto.commit()
+
+        # Publicar comando a Tracking al microservicio eventos y tracking
+        ServicioTracking().iniciar_tracking(asociacion)
 
 
 # ==========

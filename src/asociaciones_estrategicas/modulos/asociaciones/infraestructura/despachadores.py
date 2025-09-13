@@ -24,6 +24,7 @@ class Despachador:
         evento_integracion = self.mapper.entidad_a_dto(evento)
         self._publicar_mensaje(evento_integracion, topico, AvroSchema(evento_integracion.__class__))
 
-    def publicar_comando(self, comando, topico):
-        # TODO: implementar si en este micro se van a enviar comandos a otros servicios
-        raise NotImplementedError("Publicación de comandos aún no implementada en Asociaciones Estratégicas")
+    def publicar_comando(self, comando, topico, schema=None):
+        # Si el comando ya es un Avro Record con schema conocido
+        schema = schema or AvroSchema(comando.__class__)
+        self._publicar_mensaje(comando, topico, schema)
