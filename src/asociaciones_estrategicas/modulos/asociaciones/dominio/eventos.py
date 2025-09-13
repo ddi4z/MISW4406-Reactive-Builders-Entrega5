@@ -13,7 +13,11 @@ class AsociacionCreada(EventoAsociacionEstrategica):
     id_marca: uuid.UUID = None
     id_socio: uuid.UUID = None
     tipo: str = None
+    descripcion: str = None              
+    fecha_inicio: datetime = None        
+    fecha_fin: datetime = None           
     fecha_creacion: datetime = None
+
     
 @dataclass
 class AsociacionFinalizada(EventoAsociacionEstrategica):

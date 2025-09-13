@@ -22,10 +22,10 @@ class AsociacionEstrategica(db.Model):
     id_socio = db.Column(db.String(40), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)
     descripcion = db.Column(db.String(255))
-    fecha_inicio = db.Column(db.DateTime, nullable=False)
-    fecha_fin = db.Column(db.DateTime, nullable=False)
-    fecha_creacion = db.Column(db.DateTime, nullable=False)
-    fecha_actualizacion = db.Column(db.DateTime, nullable=True)
+    fecha_inicio = db.Column(db.DateTime(timezone=True), nullable=False)
+    fecha_fin = db.Column(db.DateTime(timezone=True), nullable=False)
+    fecha_creacion = db.Column(db.DateTime(timezone=True), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime(timezone=True), nullable=True)
 
 
 class EventosAsociacion(db.Model):

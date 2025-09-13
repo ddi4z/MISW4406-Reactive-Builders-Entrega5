@@ -42,12 +42,16 @@ class MapeadorEventosAsociacionEstrategica(Mapeador):
     def _entidad_a_asociacion_creada(self, entidad: AsociacionCreada, version=LATEST_VERSION):
         def v1(evento):
             from .schema.v1.eventos import AsociacionCreadaPayload, EventoAsociacionCreada
+            from asociaciones_estrategicas.seedwork.infraestructura.utils import unix_time_millis
 
             payload = AsociacionCreadaPayload(
                 id_asociacion=str(evento.id_asociacion),
                 id_marca=str(evento.id_marca),
                 id_socio=str(evento.id_socio),
                 tipo=str(evento.tipo),
+                descripcion=evento.descripcion,                              # ✅
+                fecha_inicio=int(unix_time_millis(evento.fecha_inicio)),     # ✅
+                fecha_fin=int(unix_time_millis(evento.fecha_fin)),           # ✅
                 fecha_creacion=int(unix_time_millis(evento.fecha_creacion))
             )
 
@@ -65,6 +69,7 @@ class MapeadorEventosAsociacionEstrategica(Mapeador):
             raise Exception(f"No se sabe procesar la version {version}")
 
         return v1(entidad)
+
 
     def _entidad_a_asociacion_finalizada(self, entidad: AsociacionFinalizada, version=LATEST_VERSION):
         def v1(evento):

@@ -5,7 +5,7 @@ from asociaciones_estrategicas.modulos.asociaciones.dominio.entidades import Aso
 from asociaciones_estrategicas.modulos.asociaciones.dominio.objetos_valor import PeriodoVigencia, TipoAsociacion
 from .dto import AsociacionDTO, VigenciaDTO
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class MapeadorAsociacionDTOJson(AppMap):
@@ -60,10 +60,16 @@ class MapeadorAsociacion(RepMap):
         )
 
     def dto_a_entidad(self, dto: AsociacionDTO) -> AsociacionEstrategica:
-        vigencia = PeriodoVigencia(
-            datetime.fromisoformat(dto.vigencia.fecha_inicio),
-            datetime.fromisoformat(dto.vigencia.fecha_fin),
-        )
+
+        def _parse_fecha(fecha_str, fin=False):
+            if len(fecha_str) == 10:
+                fecha_str += "T23:59:59" if fin else "T00:00:00"
+            return datetime.fromisoformat(fecha_str).replace(tzinfo=timezone.utc)
+
+        fecha_inicio = _parse_fecha(dto.vigencia.fecha_inicio)
+        fecha_fin = _parse_fecha(dto.vigencia.fecha_fin, fin=True)
+
+        vigencia = PeriodoVigencia(fecha_inicio, fecha_fin)
 
         asociacion = AsociacionEstrategica(
             id_marca=dto.id_marca,

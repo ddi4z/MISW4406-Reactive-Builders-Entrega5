@@ -43,11 +43,11 @@ def suscribirse_a_eventos(app=None):
                     datos.id_marca,
                     datos.id_socio,
                     datos.tipo,
-                    "",  # descripción no viene en el evento, se podría extender
+                    datos.descripcion,           
+                    datos.fecha_inicio,          
+                    datos.fecha_fin,             
                     datos.fecha_creacion,
-                    datos.fecha_creacion,  # fecha_fin puede venir en evento futuro
-                    datos.fecha_creacion,
-                    datos.fecha_creacion,
+                    datos.fecha_creacion,        # fecha_actualizacion inicial
                 ),
                 app=app,
             )

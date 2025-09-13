@@ -29,12 +29,14 @@ class AsociacionEstrategica(AgregacionRaiz):
         self.descripcion = asociacion_estrategica.descripcion
         self.fecha_creacion = datetime.datetime.now()
 
-        # Publicar evento
         self.agregar_evento(AsociacionCreada(
             id_asociacion=self.id,
             id_marca=self.id_marca,
             id_socio=self.id_socio,
             tipo=self.tipo.value,
+            descripcion=self.descripcion,            
+            fecha_inicio=self.vigencia.fecha_inicio, 
+            fecha_fin=self.vigencia.fecha_fin,       
             fecha_creacion=self.fecha_creacion
         ))
 
