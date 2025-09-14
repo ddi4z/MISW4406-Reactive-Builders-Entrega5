@@ -1,0 +1,120 @@
+{
+  "collection": {
+    "info": {
+      "name": "Microservicio Asociaciones",
+      "_postman_id": "new-uuid",
+      "description": "Colecci\u00f3n para probar el microservicio de Asociaciones Estrat\u00e9gicas",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Crear Asociaci\u00f3n",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "url": {
+            "raw": "{{base_url}}/asociaciones",
+            "host": [
+              "{{base_url}}"
+            ],
+            "path": [
+              "asociaciones"
+            ]
+          },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id_marca\": \"111e4567-e89b-12d3-a456-426614174000\",\n  \"id_socio\": \"222e4567-e89b-12d3-a456-426614174000\",\n  \"tipo\": \"campania\",\n  \"descripcion\": \"Alianza especial para afiliados\",\n  \"vigencia\": {\n    \"fecha_inicio\": \"2023-09-01T00:00:00\",\n    \"fecha_fin\": \"2025-12-31T23:59:59\"\n  }\n}"
+          }
+        }
+      },
+      {
+        "name": "Obtener Asociaci\u00f3n por ID",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/asociaciones/123e4567-e89b-12d3-a456-426614174000",
+            "host": [
+              "{{base_url}}"
+            ],
+            "path": [
+              "asociaciones",
+              "123e4567-e89b-12d3-a456-426614174000"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Obtener Asociaciones por Marca",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/asociaciones/marca/111e4567-e89b-12d3-a456-426614174000",
+            "host": [
+              "{{base_url}}"
+            ],
+            "path": [
+              "asociaciones",
+              "marca",
+              "111e4567-e89b-12d3-a456-426614174000"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Listar Asociaciones (con filtros)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/asociaciones/lista?id_marca=111e4567-e89b-12d3-a456-426614174000&id_socio=222e4567-e89b-12d3-a456-426614174000&tipo=campania",
+            "host": [
+              "{{base_url}}"
+            ],
+            "path": [
+              "asociaciones",
+              "lista?id_marca=111e4567-e89b-12d3-a456-426614174000&id_socio=222e4567-e89b-12d3-a456-426614174000&tipo=campania"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Obtener Anal\u00edtica Asociaciones",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/asociaciones/analitica",
+            "host": [
+              "{{base_url}}"
+            ],
+            "path": [
+              "asociaciones",
+              "analitica"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "environment": {
+    "id": "d3b0a3c9-4e9c-4c2f-b22f-2c2b8f1c9f10",
+    "name": "Asociaciones Local",
+    "values": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:5000",
+        "enabled": true
+      }
+    ],
+    "_postman_variable_scope": "environment",
+    "_postman_exported_at": "2025-09-13T00:00:00Z",
+    "_postman_exported_using": "ChatGPT"
+  }
+}

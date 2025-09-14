@@ -133,3 +133,12 @@ dmypy.json
 
 # Data Volume for Zookeeper
 /data
+
+# Logs
+src/asociaciones_estrategicas/compile_files.py
+src/asociaciones_estrategicas/contents_summary.txt
+src/compile_files.py
+src/contents_summary.txt
+compile_files.py
+contents_summary.txt
+recrear_persistencia.sh
