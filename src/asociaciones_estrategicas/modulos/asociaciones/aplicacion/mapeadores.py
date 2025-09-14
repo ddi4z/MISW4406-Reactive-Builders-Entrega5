@@ -31,7 +31,19 @@ class MapeadorAsociacionDTOJson(AppMap):
         )
 
     def dto_a_externo(self, dto: AsociacionDTO) -> dict:
-        return dto.__dict__
+        return {
+            "id": str(dto.id),
+            "id_marca": str(dto.id_marca),
+            "id_socio": str(dto.id_socio),
+            "tipo": str(dto.tipo),  # 👈 aseguramos string
+            "descripcion": dto.descripcion,
+            "vigencia": {
+                "fecha_inicio": str(dto.vigencia.fecha_inicio) if dto.vigencia else None,
+                "fecha_fin": str(dto.vigencia.fecha_fin) if dto.vigencia else None,
+            },
+            "fecha_creacion": str(dto.fecha_creacion) if dto.fecha_creacion else None,
+            "fecha_actualizacion": str(dto.fecha_actualizacion) if dto.fecha_actualizacion else None,
+        }
 
 
 class MapeadorAsociacion(RepMap):

@@ -35,8 +35,6 @@ class ObtenerAsociacionHandler(AsociacionQueryBaseHandler):
             asociaciones[0], MapeadorAsociacion()
         )
         return QueryResultado(resultado=asociacion)
-
-
 # ==========
 # Registro
 # ==========
@@ -44,4 +42,4 @@ class ObtenerAsociacionHandler(AsociacionQueryBaseHandler):
 @query.register(ObtenerAsociacion)
 def ejecutar_query_obtener_asociacion(query: ObtenerAsociacion):
     handler = ObtenerAsociacionHandler()
-    return handler.handle(query)
+    return handler.handle(query)    

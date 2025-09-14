@@ -1,3 +1,5 @@
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_lista import ObtenerAsociaciones
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_por_marca import ObtenerAsociacionesPorMarca
 import asociaciones_estrategicas.seedwork.presentacion.api as api
 import json
 from flask import request, session, Response
@@ -63,3 +65,29 @@ def obtener_asociacion_usando_query(id=None):
     else:
         # TODO: aquí podemos implementar una query para listar asociaciones por filtros
         return [{'message': 'GET asociaciones!'}]
+
+@bp.route('/marca/<id_marca>', methods=('GET',))
+def obtener_asociaciones_por_marca(id_marca):
+    query_resultado = ejecutar_query(ObtenerAsociacionesPorMarca(id_marca))
+    map_asociacion = MapeadorAsociacionDTOJson()
+    asociaciones_json = []
+    for asociacion in query_resultado.resultado:
+        asociaciones_json.append(map_asociacion.dto_a_externo(asociacion))
+    return asociaciones_json
+
+@bp.route('/lista', methods=('GET',))
+def listar_asociaciones():
+    id_marca = request.args.get("id_marca")
+    id_socio = request.args.get("id_socio")
+    tipo = request.args.get("tipo")
+    # Si no hay filtros → devuelve un mensaje o lista vacía
+    if not any([id_marca, id_socio, tipo]):
+        return [{"message": "Use /asociaciones/<id> para buscar por id, o parámetros ?id_marca, ?id_socio, ?tipo"}]
+    query_resultado = ejecutar_query(
+        ObtenerAsociaciones(id_marca=id_marca, id_socio=id_socio, tipo=tipo)
+    )
+    map_asociacion = MapeadorAsociacionDTOJson()
+    asociaciones_json = []
+    for asociacion in query_resultado.resultado:
+        asociaciones_json.append(map_asociacion.dto_a_externo(asociacion))
+    return asociaciones_json
