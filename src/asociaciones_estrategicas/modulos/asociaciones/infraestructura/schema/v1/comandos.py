@@ -1,6 +1,7 @@
 from pulsar.schema import *
 from dataclasses import dataclass, field
 from asociaciones_estrategicas.seedwork.infraestructura.schema.v1.comandos import (ComandoIntegracion)
+from pulsar.schema import AvroSchema
 
 class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
     id_usuario = String()
@@ -8,8 +9,9 @@ class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
     id_socio = String()
     tipo = String()
     descripcion = String()
-    # TODO vigencia: PeriodoVigencia = None    
-    # TODO Cree los records para itinerarios
+    fecha_inicio = String()
+    fecha_fin = String()
+
 
 class ComandoCrearAsociacionEstrategica(ComandoIntegracion):
     data = ComandoCrearAsociacionEstrategicaPayload()
