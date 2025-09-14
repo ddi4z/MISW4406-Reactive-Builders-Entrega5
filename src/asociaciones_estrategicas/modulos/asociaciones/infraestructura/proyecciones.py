@@ -30,8 +30,9 @@ class ProyeccionAsociacionesTotales(ProyeccionAsociacion):
     ADD = 1
     DELETE = 2
 
-    def __init__(self, fecha_creacion, operacion):
-        self.fecha_creacion = millis_a_datetime(fecha_creacion)
+    def __init__(self, fecha_creacion, tipo_asociacion, operacion):
+        self.fecha_creacion = millis_a_datetime(fecha_creacion).date()
+        self.tipo_asociacion = tipo_asociacion
         self.operacion = operacion
 
     def ejecutar(self, db=None):
@@ -40,22 +41,25 @@ class ProyeccionAsociacionesTotales(ProyeccionAsociacion):
             return
 
         record = db.session.query(AsociacionesAnalitica).filter_by(
-            fecha_creacion=self.fecha_creacion.date()
+            fecha_creacion=self.fecha_creacion,
+            tipo_asociacion=self.tipo_asociacion
         ).one_or_none()
 
         if record and self.operacion == self.ADD:
             record.total += 1
         elif record and self.operacion == self.DELETE:
-            record.total -= 1
-            record.total = max(record.total, 0)
+            record.total = max(record.total - 1, 0)
         else:
             db.session.add(
                 AsociacionesAnalitica(
-                    fecha_creacion=self.fecha_creacion.date(), total=1
+                    fecha_creacion=self.fecha_creacion,
+                    tipo_asociacion=self.tipo_asociacion,
+                    total=1
                 )
             )
 
         db.session.commit()
+
 
 
 # =====================

@@ -35,7 +35,11 @@ def suscribirse_a_eventos(app=None):
             # TODO: distinguir si el evento es creación, actualización o eliminación
             if mensaje_evento.type == "AsociacionCreada":
                 ejecutar_proyeccion(
-                    ProyeccionAsociacionesTotales(datos.fecha_creacion, ProyeccionAsociacionesTotales.ADD),
+                    ProyeccionAsociacionesTotales(
+                        datos.fecha_creacion,
+                        datos.tipo,                           # 👈 pasamos tipo de asociación
+                        ProyeccionAsociacionesTotales.ADD
+                    ),
                     app=app,
                 )
 

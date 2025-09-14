@@ -43,6 +43,6 @@ class EventosAsociacion(db.Model):
 
 class AsociacionesAnalitica(db.Model):
     __tablename__ = "analitica_asociaciones"
-
     fecha_creacion = db.Column(db.Date, primary_key=True)
-    total = db.Column(db.Integer, primary_key=True, nullable=False)
+    tipo_asociacion = db.Column(db.String(50), primary_key=True)   # Agrupamiento por tipo de asociacion
+    total = db.Column(db.Integer, nullable=False, default=0)
