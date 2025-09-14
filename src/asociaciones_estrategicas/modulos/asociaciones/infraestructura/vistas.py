@@ -28,3 +28,9 @@ class VistaAsociacion(Vista):
             asociaciones.append(mapeador.dto_a_entidad(dto))
 
         return asociaciones
+    
+class VistaAnaliticaAsociacion(Vista):
+    def obtener_por(self, **kwargs):
+        from .dto import AsociacionesAnalitica
+        query = db.session.query(AsociacionesAnalitica)
+        return query.all()

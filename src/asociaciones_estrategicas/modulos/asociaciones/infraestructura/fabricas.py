@@ -16,7 +16,7 @@ from asociaciones_estrategicas.modulos.asociaciones.infraestructura.repositorios
     RepositorioAsociacionesSQLAlchemy,
     RepositorioEventosAsociacionesSQLAlchemy,
 )
-from asociaciones_estrategicas.modulos.asociaciones.infraestructura.vistas import VistaAsociacion
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.vistas import VistaAnaliticaAsociacion, VistaAsociacion
 from .excepciones import ExcepcionFabrica
 
 
@@ -36,5 +36,7 @@ class FabricaVista(Fabrica):
     def crear_objeto(self, obj: type, mapeador: any = None) -> Vista:
         if obj == AsociacionEstrategica:
             return VistaAsociacion()
+        elif obj == "Analitica":  
+            return VistaAnaliticaAsociacion()
         else:
             raise ExcepcionFabrica(f"No existe fábrica para el objeto {obj}")

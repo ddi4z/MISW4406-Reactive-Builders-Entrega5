@@ -1,3 +1,4 @@
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_analitica import ObtenerAnaliticaAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_lista import ObtenerAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_por_marca import ObtenerAsociacionesPorMarca
 import asociaciones_estrategicas.seedwork.presentacion.api as api
@@ -10,6 +11,7 @@ from asociaciones_estrategicas.modulos.asociaciones.aplicacion.comandos.crear_as
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion import ObtenerAsociacion
 from asociaciones_estrategicas.seedwork.aplicacion.comandos import ejecutar_commando
 from asociaciones_estrategicas.seedwork.aplicacion.queries import ejecutar_query
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.mapeadores import MapeadorAnaliticaAsociacionDTOJson
 
 bp = api.crear_blueprint('asociaciones', '/asociaciones')
 
@@ -91,3 +93,15 @@ def listar_asociaciones():
     for asociacion in query_resultado.resultado:
         asociaciones_json.append(map_asociacion.dto_a_externo(asociacion))
     return asociaciones_json
+
+
+@bp.route('/analitica', methods=('GET',))
+def obtener_analitica_asociaciones():
+    query_resultado = ejecutar_query(ObtenerAnaliticaAsociaciones())
+    map_analitica = MapeadorAnaliticaAsociacionDTOJson()
+
+    analitica_json = []
+    for fila in query_resultado.resultado:
+        analitica_json.append(map_analitica.dto_a_externo(fila))
+
+    return analitica_json

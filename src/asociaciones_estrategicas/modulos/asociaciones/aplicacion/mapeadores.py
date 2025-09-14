@@ -92,3 +92,16 @@ class MapeadorAsociacion(RepMap):
         )
 
         return asociacion
+
+class MapeadorAnaliticaAsociacionDTOJson(AppMap):
+    """Convierte DTO de analítica ↔ JSON externo"""
+
+    def externo_a_dto(self, externo: dict):
+        raise NotImplementedError("Solo soportamos DTO → JSON en este caso")
+
+    def dto_a_externo(self, dto) -> dict:
+        return {
+            "fecha_creacion": str(dto.fecha_creacion),
+            "tipo_asociacion": dto.tipo_asociacion,
+            "total": dto.total,
+        }
