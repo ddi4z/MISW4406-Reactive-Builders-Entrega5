@@ -94,12 +94,12 @@ services:
     command: bash -c "bin/apply-config-from-env.py conf/broker.conf
       &&  exec bin/pulsar broker"
   
-  # Servicios de AeroAlpes
-  aeroalpes:
-    container_name: aeroalpes
-    hostname: aeroalpes
-    image: aeroalpes/flask 
-    profiles: ["aeroalpes", "monolito"]
+  # Servicios de alpespartners
+  alpespartners:
+    container_name: alpespartners
+    hostname: alpespartners
+    image: alpespartners/flask 
+    profiles: ["alpespartners", "monolito"]
     networks:
       - sidecar
       - pulsar
@@ -108,7 +108,7 @@ services:
     depends_on:
       - broker
     environment:
-      - AEROALPES_ADDRESS=aeroalpes
+      - alpespartners_ADDRESS=alpespartners
       - PULSAR_ADDRESS=broker
     ports:
       - "5000:5000"
@@ -141,13 +141,13 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: aeroalpes
+      POSTGRES_DB: alpespartners
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d aeroalpes"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d alpespartners"]
       interval: 10s
       timeout: 5s
       retries: 5

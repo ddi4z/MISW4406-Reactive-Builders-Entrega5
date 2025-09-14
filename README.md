@@ -154,7 +154,7 @@ docker-compose --profile db up
 
 **Port:** 5433
 
-**Database:** aeroalpes
+**Database:** alpespartners
 
 **Username:** admin
 
