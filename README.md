@@ -11,19 +11,33 @@
 
 ## Estructura del proyecto
 
+Cada microservicio se encuentra en la carpeta `src`. En el repositorio principal se encuentra el `docker-compose.yml` para pruebas locales y el `infra.yaml` para despliegue
 
+## Repartición de trabajo
+
+| Nombre | Contribución |
+| :--- | :--- |
+| Orlando Giovanny Solarte Delgado | Microservicio de Asociaciones estratégicas |
+| Martín Flores Arango | BFF |
+| Sara Sofía Cárdenas Rodríguez | Microservicio de Pagos y Despliegue GCP |
+| Daniel Felipe Díaz Moreno | Complementar Microservicio de Eventos y Atribución (Entrega 3), Configuración de Pulsar y Despliegue GCP  |
 
 ## Arquitectura
 
+![Dominio](Dominio.jpg)
+
+![Componentes](Componentes.png)
 
 
 ## Escenarios de calidad relacionados
 
-
+**Escalabilidad:** Escenario de calidad: Crecimiento de clics ante jornada de descuentos
+**Modificabilidad:** Agregar un nuevo caso de uso sin modificarlos existentes
+**Disponibilidad:** Caída de un servicio y el sistema sigue operando ante el cliente
 
 ## Aplicación de DDD y EDA
 
-
+Explicada en los videos
 
 ## Pasos de ejecución
 
