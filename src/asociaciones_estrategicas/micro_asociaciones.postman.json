@@ -3,12 +3,12 @@
     "info": {
       "name": "Microservicio Asociaciones",
       "_postman_id": "new-uuid",
-      "description": "Colecci\u00f3n para probar el microservicio de Asociaciones Estrat\u00e9gicas",
+      "description": "Colección para probar el microservicio de Asociaciones Estratégicas",
       "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
       {
-        "name": "Crear Asociaci\u00f3n",
+        "name": "Crear Asociación",
         "request": {
           "method": "POST",
           "header": [
@@ -28,23 +28,23 @@
           },
           "body": {
             "mode": "raw",
-            "raw": "{\n  \"id_marca\": \"111e4567-e89b-12d3-a456-426614174000\",\n  \"id_socio\": \"222e4567-e89b-12d3-a456-426614174000\",\n  \"tipo\": \"campania\",\n  \"descripcion\": \"Alianza especial para afiliados\",\n  \"vigencia\": {\n    \"fecha_inicio\": \"2023-09-01T00:00:00\",\n    \"fecha_fin\": \"2025-12-31T23:59:59\"\n  }\n}"
+            "raw": "{\n  \"id_marca\": \"c80c323c-aa79-4ae4-9038-a36f7b2eb685\",\n  \"id_socio\": \"9c21eb6b-4171-41d1-a6c8-438aae01f857\",\n  \"tipo\": \"campania\",\n  \"descripcion\": \"Alianza especial para afiliados\",\n  \"vigencia\": {\n    \"fecha_inicio\": \"2023-09-01T00:00:00\",\n    \"fecha_fin\": \"2025-12-31T23:59:59\"\n  }\n}"
           }
         }
       },
       {
-        "name": "Obtener Asociaci\u00f3n por ID",
+        "name": "Obtener Asociación por ID",
         "request": {
           "method": "GET",
           "header": [],
           "url": {
-            "raw": "{{base_url}}/asociaciones/123e4567-e89b-12d3-a456-426614174000",
+            "raw": "{{base_url}}/asociaciones/df1fa5db-ae22-4765-9079-3a9841bc1a5e",
             "host": [
               "{{base_url}}"
             ],
             "path": [
               "asociaciones",
-              "123e4567-e89b-12d3-a456-426614174000"
+              "df1fa5db-ae22-4765-9079-3a9841bc1a5e"
             ]
           }
         }
@@ -55,14 +55,14 @@
           "method": "GET",
           "header": [],
           "url": {
-            "raw": "{{base_url}}/asociaciones/marca/111e4567-e89b-12d3-a456-426614174000",
+            "raw": "{{base_url}}/asociaciones/marca/c80c323c-aa79-4ae4-9038-a36f7b2eb685",
             "host": [
               "{{base_url}}"
             ],
             "path": [
               "asociaciones",
               "marca",
-              "111e4567-e89b-12d3-a456-426614174000"
+              "c80c323c-aa79-4ae4-9038-a36f7b2eb685"
             ]
           }
         }
@@ -73,19 +73,19 @@
           "method": "GET",
           "header": [],
           "url": {
-            "raw": "{{base_url}}/asociaciones/lista?id_marca=111e4567-e89b-12d3-a456-426614174000&id_socio=222e4567-e89b-12d3-a456-426614174000&tipo=campania",
+            "raw": "{{base_url}}/asociaciones/lista?id_marca=c80c323c-aa79-4ae4-9038-a36f7b2eb685&id_socio=9c21eb6b-4171-41d1-a6c8-438aae01f857&tipo=campania",
             "host": [
               "{{base_url}}"
             ],
             "path": [
               "asociaciones",
-              "lista?id_marca=111e4567-e89b-12d3-a456-426614174000&id_socio=222e4567-e89b-12d3-a456-426614174000&tipo=campania"
+              "lista?id_marca=c80c323c-aa79-4ae4-9038-a36f7b2eb685&id_socio=9c21eb6b-4171-41d1-a6c8-438aae01f857&tipo=campania"
             ]
           }
         }
       },
       {
-        "name": "Obtener Anal\u00edtica Asociaciones",
+        "name": "Obtener Analítica Asociaciones",
         "request": {
           "method": "GET",
           "header": [],

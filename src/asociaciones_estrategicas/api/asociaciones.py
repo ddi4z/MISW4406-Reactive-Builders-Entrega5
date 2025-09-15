@@ -1,6 +1,7 @@
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_analitica import ObtenerAnaliticaAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_lista import ObtenerAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_por_marca import ObtenerAsociacionesPorMarca
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.servicios import ServicioAsociacion
 import asociaciones_estrategicas.seedwork.presentacion.api as api
 import json
 from flask import request, session, Response
@@ -29,21 +30,24 @@ def crear_asociacion_usando_comando():
         map_asociacion = MapeadorAsociacionDTOJson()
         asociacion_dto = map_asociacion.externo_a_dto(asociacion_dict)
 
-        comando = CrearAsociacion(
-            id=asociacion_dto.id,
-            id_marca=asociacion_dto.id_marca,
-            id_socio=asociacion_dto.id_socio,
-            tipo=asociacion_dto.tipo,
-            descripcion=asociacion_dto.descripcion,
-            fecha_inicio=asociacion_dto.vigencia.fecha_inicio,
-            fecha_fin=asociacion_dto.vigencia.fecha_fin,
-            fecha_creacion=asociacion_dto.fecha_creacion,
-            fecha_actualizacion=asociacion_dto.fecha_actualizacion,
-        )
+        #comando = CrearAsociacion(
+        #    id=asociacion_dto.id,
+        #    id_marca=asociacion_dto.id_marca,
+        #    id_socio=asociacion_dto.id_socio,
+        #    tipo=asociacion_dto.tipo,
+        #    descripcion=asociacion_dto.descripcion,
+        #    fecha_inicio=asociacion_dto.vigencia.fecha_inicio,
+        #    fecha_fin=asociacion_dto.vigencia.fecha_fin,
+        #    fecha_creacion=asociacion_dto.fecha_creacion,
+        #    fecha_actualizacion=asociacion_dto.fecha_actualizacion,
+        #)
 
         # TODO Reemplaze es todo código sincrono y use el broker de eventos para propagar este comando de forma asíncrona
         # Revise la clase Despachador de la capa de infraestructura
-        ejecutar_commando(comando)
+        #ejecutar_commando(comando)
+
+        #se pasa la petición al servicio que publica el comando en el broker
+        ServicioAsociacion().crear_asociacion(asociacion_dto)
 
         return Response("{}", status=202, mimetype='application/json')
     except ExcepcionDominio as e:
