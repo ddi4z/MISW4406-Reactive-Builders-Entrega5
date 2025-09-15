@@ -1,143 +1,100 @@
 
-Levantar por docker-compose micro asociaciones 
+# 🏗️ Microservicio de Asociaciones Estratégicas
+
+## 👥 Integrantes - Reactive Builders
+
+| Nombre | Correo |
+| :--- | :--- |
+| Orlando Giovanny Solarte Delgado | o.solarte@uniandes.edu.co |
+| Martín Flores Arango | r.floresa@uniandes.edu.co |
+| Sara Sofía Cárdenas Rodríguez | ss.cardenas@uniandes.edu.co |
+| Daniel Felipe Díaz Moreno | d.diazm@uniandes.edu.co |
+
+---
+
+## 🚀 Ejecución del microservicio
+
+### 1. Levantar con Docker Compose
+
+**Microservicio + Pulsar**
+```bash
 docker compose --profile asociaciones_estrategicas --profile pulsar up --force-recreate --build
+```
 
-
-
-Base de datos asociaciones
+**Base de datos**
+```bash
 docker-compose --profile db_asociaciones_estrategicas up
+```
 
-Broker
+**Broker de eventos**
+```bash
 docker-compose --profile pulsar up
+```
 
-Subir la app
+**Aplicación Flask**
+```bash
 flask --app src/asociaciones_estrategicas/api --debug run --host=0.0.0.0 --port=5000
+```
 
-
-
-
-NOTA:
-Una cosa que no menciono en el video es que como se usa Event Sourcing 
-en el docker-compose deje un nuevo componente que fija la retención en -1 de los topicos para que persistan
+📌 **Nota:** Como se usa **Event Sourcing**, se configuró Pulsar con **retención infinita (-1)** en los tópicos para permitir el *replay* de eventos y reconstrucción de proyecciones:
+```bash
 ./bin/pulsar-admin namespaces set-retention public/default --size -1 --time -1
+```
 
+---
 
-class TipoAsociacion(Enum):
-    PROGRAMA_AFILIADOS = "programa_afiliados"
-    COLABORACION_DIRECTA = "colaboracion_directa"
-    CAMPANIA = "campania"
-    PROGRAMA_LEALTAD = "programa_lealtad"
-    ALIANZA_B2B = "alianza_b2b"
-    
-	
-Base de datos asociaciones
-docker-compose --profile db_asociaciones_estrategicas up
+## 🗂️ Modelo de dominio
 
-Broker
-docker-compose --profile pulsar up
+El microservicio gestiona la creación y finalización de **asociaciones estratégicas** entre marcas y socios.  
 
-Subir la app
-flask --app src/asociaciones_estrategicas/api --debug run --host=0.0.0.0 --port=5000
+Tipos de asociación disponibles (`TipoAsociacion`):  
+- `PROGRAMA_AFILIADOS`  
+- `COLABORACION_DIRECTA`  
+- `CAMPANIA`  
+- `PROGRAMA_LEALTAD`  
+- `ALIANZA_B2B`  
 
+Cada asociación estratégica se representa como una **agregación raíz** en el dominio.
 
+---
 
-Escuchar los topicos
+## 📡 Comunicación basada en eventos
 
-docker exec -it broker bash
-./bin/pulsar-client consume -s "sub-datos" public/default/eventos-asociacion -n 0 
+Este microservicio sigue un patrón **Event-Driven Architecture (EDA)** usando **Apache Pulsar** como broker.  
+Los mensajes usan **Avro** como esquema y se dividen en **eventos** y **comandos**.
 
+### 🔔 Eventos de integración
 
-docker exec -it broker bash
-./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
+**Tópico:** `public/default/eventos-asociacion`
 
-docker exec -it broker bash
-./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.crear_asociacion" -n 0
-
-
-
-
-from pulsar.schema import *
-from asociaciones_estrategicas.seedwork.infraestructura.schema.v1.eventos import EventoIntegracion
-from asociaciones_estrategicas.seedwork.infraestructura.utils import time_millis
-import uuid
-
-
-# ======================
-# Payloads
-# ======================
-
+- **EventoAsociacionCreada**
+```python
 class AsociacionCreadaPayload(Record):
     id_asociacion = String()
     id_marca = String()
     id_socio = String()
     tipo = String()
-    descripcion = String()      
-    fecha_inicio = Long()       
-    fecha_fin = Long()          
+    descripcion = String()
+    fecha_inicio = Long()
+    fecha_fin = Long()
     fecha_creacion = Long()
+```
 
-
-
+- **EventoAsociacionFinalizada**
+```python
 class AsociacionFinalizadaPayload(Record):
     id_asociacion = String()
     fecha_actualizacion = Long()
+```
 
+---
 
-# ======================
-# Eventos de integración
-# ======================
+### 📩 Comandos
 
-# ======================
-# Payloads
-# ======================
-
-TOPICO: public/default/eventos-asociacion 
-
-class AsociacionCreadaPayload(Record):
-    id_asociacion = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-    descripcion = String()      
-    fecha_inicio = Long()       
-    fecha_fin = Long()          
-    fecha_creacion = Long()
-
-
-class EventoAsociacionCreada(EventoIntegracion):
-    # NOTE La librería Record de Pulsar no es capaz de reconocer campos heredados, 
-    # por lo que los mensajes al ser codificados pierden sus valores
-    # Dupliqué el los cambios que ya se encuentran en la clase Mensaje
-    id = String(default=str(uuid.uuid4()))
-    time = Long()
-    ingestion = Long(default=time_millis())
-    specversion = String()
-    type = String()
-    datacontenttype = String()
-    service_name = String()
-    data = AsociacionCreadaPayload()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-TOPICO comandos-eventos_y_atribucion.iniciar_tracking
-
-# Payload: solo los datos de negocio
-class ComandoIniciarTrackingPayload(Record):
-    id_asociacion_estrategica = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-
-# Comando: metadatos + payload
-class ComandoIniciarTracking(ComandoIntegracion):
-    data = ComandoIniciarTrackingPayload()    
-	
-	
-	
-# Comando: Crear Asociacion estrategica
-TOPICO 	comandos-asociaciones.crear_asociacion
+1. **Crear asociación estratégica**  
+   - **Tópico:** `comandos-asociaciones.crear_asociacion`  
+   - **Payload:**
+```python
 class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
     id_usuario = String()
     id_marca = String()
@@ -146,9 +103,80 @@ class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
     descripcion = String()
     fecha_inicio = String()
     fecha_fin = String()
+```
 
+2. **Iniciar tracking**  
+   - **Tópico:** `comandos-eventos_y_atribucion.iniciar_tracking`  
+   - **Payload:**
+```python
+class ComandoIniciarTrackingPayload(Record):
+    id_asociacion_estrategica = String()
+    id_marca = String()
+    id_socio = String()
+    tipo = String()
+```
 
-class ComandoCrearAsociacionEstrategica(ComandoIntegracion):
-    data = ComandoCrearAsociacionEstrategicaPayload()
+---
 
+## 👂 Consumir mensajes manualmente
 
+Se pueden escuchar los tópicos directamente en el contenedor de Pulsar:
+
+```bash
+docker exec -it broker bash
+
+./bin/pulsar-client consume -s "sub-datos" public/default/eventos-asociacion -n 0
+./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
+./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.crear_asociacion -n 0
+```
+
+---
+
+## 🧩 Decisiones de diseño
+
+- **CQRS + Event Sourcing**:  
+  Escrituras manejadas por comandos → generan eventos → aplicados en proyecciones.  
+  Lecturas van directo a proyecciones materializadas (listas y analíticas).  
+
+- **Unidad de Trabajo (UoW híbrida)**:  
+  Coordina en una sola transacción lógica la persistencia en BD y la publicación de eventos en el broker.  
+  Asegura consistencia y evita inconsistencias.  
+
+- **Eventos gordos de integración**:  
+  Los eventos incluyen toda la información relevante, evitando dependencias adicionales entre microservicios.  
+
+- **Persistencia de eventos en Pulsar**:  
+  Configuración de retención infinita permite reprocesar eventos y reconstruir proyecciones.  
+
+- **Autonomía de microservicios**:  
+  Cada servicio mantiene su propia BD y proyecciones → resiliencia ante fallos.  
+
+- **Evolución de esquemas (Avro)**:  
+  Los mensajes están versionados y validados en tiempo de ejecución.  
+
+- **Escalabilidad y resiliencia en el consumo**:  
+  Uso de suscripción `Shared` en Pulsar permite que múltiples instancias procesen mensajes en paralelo.  
+
+---
+
+## 🛠️ Endpoints principales
+
+- **Crear asociación estratégica**  
+  `POST /asociaciones`  
+
+- **Obtener asociación por id**  
+  `GET /asociaciones/<id>`  
+
+- **Listar asociaciones con filtros**  
+  `GET /asociaciones/lista?id_marca=...&id_socio=...&tipo=...`  
+
+- **Analítica de asociaciones (proyección)**  
+  `GET /asociaciones/analitica`  
+
+---
+
+## 📽️ Demo
+
+Se incluyó un video de ejecución en el repositorio (`videoFinalMicroAsociaciones.mp4` ).
+
+---
