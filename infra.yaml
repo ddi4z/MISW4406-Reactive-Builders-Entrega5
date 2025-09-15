@@ -233,6 +233,7 @@ resources:
         sourceImage: projects/debian-cloud/global/images/family/debian-11
     networkInterfaces:
     - network: global/networks/default
+      networkIP: 10.128.0.24
       accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
     tags:
       items: [app-server]
@@ -394,11 +395,18 @@ resources:
           #!/bin/bash
           sudo apt-get update
           sudo apt-get install -y python3-pip git
+
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
+          
           sudo apt-get install -y python3-dev gcc
           pip3 install --no-cache-dir -r bff-requirements.txt
-          export PYTHONPATH=/app/src
+
+          export PATH=$PATH:$HOME/.local/bin
+          export ASSOCIATIONS_HOST=10.128.0.24
+          export ASSOCIATIONS_PORT=8080
+          export BFF_PORT=8080
+
           cd src
           uvicorn bff_web.main:app --host 0.0.0.0 --port 8080
 
