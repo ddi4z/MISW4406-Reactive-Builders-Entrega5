@@ -1,0 +1,17 @@
+# enable apis
+gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com
+
+# editar yaml
+nano infra.yaml
+
+#  crear deployment
+gcloud deployment-manager deployments create alpes-infra --config infra.yaml
+
+# listar
+gcloud compute instances list
+
+# update
+gcloud deployment-manager deployments update alpes-infra --config infra.yaml
+
+# delete
+gcloud deployment-manager deployments delete alpes-infra --quiet
