@@ -66,5 +66,5 @@ Para esto, puede usar extensiones de VS Code como Database Client, que también 
 Desde el directorio `src` ejecute el siguiente comando
 
 ```bash
-uvicorn pagos.main:app --host localhost --port 8001 --reload
+uvicorn pagos.api.pagos:app --host localhost --port 8001 --reload
 ```

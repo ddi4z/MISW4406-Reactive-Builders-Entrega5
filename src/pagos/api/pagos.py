@@ -1,16 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+
 import asyncio
 from contextlib import asynccontextmanager
 
 from pydantic_settings import BaseSettings
 from typing import Any
 
-from .eventos import EventoPago, PagoRevertido, ReservaPagada
-from .comandos import ComandoPagarReserva, ComandoRevertirPago, RevertirPagoPayload, PagarReservaPayload
-from .consumidores import suscribirse_a_topico
-from .despachadores import Despachador
+from ..eventos import EventoPago, PagoRevertido, ReservaPagada
+from ..comandos import ComandoPagarReserva, ComandoRevertirPago, RevertirPagoPayload, PagarReservaPayload
+from ..consumidores import suscribirse_a_topico
+from ..despachadores import Despachador
 
-from . import utils
+from ..config.db import Base, engine
+from ..config.db_dependencies import get_db
+
+from .. import utils
 
 class Config(BaseSettings):
     APP_VERSION: str = "1"
@@ -21,16 +27,17 @@ tasks = []
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+
     # task1 = asyncio.create_task(suscribirse_a_topico("evento-pago", "sub-pagos", EventoPago))
     # task2 = asyncio.create_task(suscribirse_a_topico("comando-pagar-reserva", "sub-com-pagos-reservar", ComandoPagarReserva))
     # task3 = asyncio.create_task(suscribirse_a_topico("comando-revertir-pago", "sub-com-pagos-revertir", ComandoRevertirPago))
     # tasks.extend([task1, task2, task3])
 
-    # yield
+    yield
 
     # for task in tasks:
         # task.cancel()
-    yield
     
 app = FastAPI(lifespan=lifespan, **app_configs)
 
@@ -110,3 +117,8 @@ async def prueba_revertir_pago() -> dict[str, str]:
     despachador = Despachador()
     despachador.publicar_mensaje(comando, "comando-revertir-pago")
     return {"status": "ok"}
+
+@app.get("/ping")
+def ping(db: Session = Depends(get_db)):
+    result = db.execute(text("SELECT 1")).scalar()
+    return {"pong": result}
