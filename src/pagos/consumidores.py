@@ -4,7 +4,7 @@ import pulsar, _pulsar
 import aiopulsar
 import asyncio
 from pulsar.schema import *
-from cliente.seedwork.infraestructura import utils
+# from cliente.seedwork.infraestructura import utils
 
 async def suscribirse_a_topico(topico: str, suscripcion: str, schema: Record, tipo_consumidor:_pulsar.ConsumerType=_pulsar.ConsumerType.Shared):
     try:

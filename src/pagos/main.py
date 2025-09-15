@@ -21,16 +21,17 @@ tasks = []
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task1 = asyncio.create_task(suscribirse_a_topico("evento-pago", "sub-pagos", EventoPago))
-    task2 = asyncio.create_task(suscribirse_a_topico("comando-pagar-reserva", "sub-com-pagos-reservar", ComandoPagarReserva))
-    task3 = asyncio.create_task(suscribirse_a_topico("comando-revertir-pago", "sub-com-pagos-revertir", ComandoRevertirPago))
-    tasks.extend([task1, task2, task3])
+    # task1 = asyncio.create_task(suscribirse_a_topico("evento-pago", "sub-pagos", EventoPago))
+    # task2 = asyncio.create_task(suscribirse_a_topico("comando-pagar-reserva", "sub-com-pagos-reservar", ComandoPagarReserva))
+    # task3 = asyncio.create_task(suscribirse_a_topico("comando-revertir-pago", "sub-com-pagos-revertir", ComandoRevertirPago))
+    # tasks.extend([task1, task2, task3])
 
+    # yield
+
+    # for task in tasks:
+        # task.cancel()
     yield
-
-    for task in tasks:
-        task.cancel()
-
+    
 app = FastAPI(lifespan=lifespan, **app_configs)
 
 @app.get("/prueba-reserva-pagada", include_in_schema=False)
