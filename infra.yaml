@@ -3,7 +3,7 @@ resources:
 - name: allow-8080
   type: compute.v1.firewall
   properties:
-    network: https://www.googleapis.com/compute/v1/projects/no-monoliticas/global/networks/default
+    network: https://www.googleapis.com/compute/v1/projects/reactive-builders/global/networks/default
     priority: 1000
     direction: INGRESS
     sourceRanges: 
@@ -15,12 +15,29 @@ resources:
       ports: 
       - 8080
 
+# 🔹 Regla de firewall global para Postgres
+- name: allow-postgres-internal
+  type: compute.v1.firewall
+  properties:
+    network: https://www.googleapis.com/compute/v1/projects/reactive-builders/global/networks/default
+    priority: 1000
+    direction: INGRESS
+    sourceTags:
+    - app-server
+    targetTags:
+    - postgres
+    allowed:
+    - IPProtocol: TCP
+      ports:
+      - "5432"
+
+
 # 🔹 Base de datos Postgres - Pagos
 - name: postgres-pagos
   type: compute.v1.instance
   properties:
     zone: us-central1-c
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-c/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-c/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -31,6 +48,9 @@ resources:
     networkInterfaces:
     - network: global/networks/default
       networkIP: 10.128.0.21
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
     tags:
       items: [postgres]
     metadata:
@@ -38,17 +58,59 @@ resources:
       - key: startup-script
         value: |
           #!/bin/bash
+          set -e
+
+          # instalar postgres
           apt-get update
-          apt-get install -y postgresql
-          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
-          sudo -u postgres psql -c "CREATE DATABASE pagosdb OWNER admin;"
+          DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
+
+          # asegurar que postgres arranque en boot
+          systemctl enable postgresql
+          systemctl restart postgresql
+
+          # localizar carpeta de configuración
+          PGDIR=$(ls -d /etc/postgresql/*/main | head -n1)
+          PG_CONF="$PGDIR/postgresql.conf"
+          PG_HBA="$PGDIR/pg_hba.conf"
+
+          # permitir que Postgres escuche en todas las interfaces
+          sed -i "s/^#listen_addresses.*/listen_addresses = '*'/" "$PG_CONF"
+          if ! grep -q "^listen_addresses" "$PG_CONF"; then
+            echo "listen_addresses = '*'" >> "$PG_CONF"
+          fi
+
+          # permitir conexiones desde cualquier IP (confías en firewall de GCP)
+          if ! grep -q "host all all 0.0.0.0/0 md5" "$PG_HBA"; then
+            echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+          fi
+
+          # reiniciar postgres para aplicar cambios
+          systemctl restart postgresql
+
+          # crear usuario admin si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          DO $$
+          BEGIN
+            IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'admin') THEN
+              CREATE ROLE admin WITH LOGIN PASSWORD 'admin';
+            END IF;
+          END
+          $$;
+          EOF
+
+          # crear base de datos si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          SELECT 'CREATE DATABASE pagosdb OWNER admin ENCODING "UTF8"' 
+          WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'pagosdb')\gexec
+          EOF
+
 
 # 🔹 App Pagos
-- name: pagos-fq3n
+- name: pagos-app
   type: compute.v1.instance
   properties:
     zone: us-central1-c
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-c/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-c/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -72,22 +134,22 @@ resources:
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
           sudo apt install lsof -y
-          pip3 install -r requirements.txt
+          pip3 install -r pagos-requirements.txt
           export PATH=$PATH:$HOME/.local/bin
           export DB_USER=admin
           export DB_PASSWORD=admin
           export DB_HOST=10.128.0.21
           export DB_PORT=5432
           export DB_NAME=pagosdb
-          cd src/pagos
-          flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
+          cd src
+          uvicorn pagos.api.pagos:app --host 0.0.0.0 --port 8080
 
 # 🔹 Base de datos Postgres - Asociaciones
 - name: postgres-asociaciones
   type: compute.v1.instance
   properties:
     zone: us-central1-f
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-f/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-f/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -98,6 +160,9 @@ resources:
     networkInterfaces:
     - network: global/networks/default
       networkIP: 10.128.0.22
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
     tags:
       items: [postgres]
     metadata:
@@ -105,17 +170,60 @@ resources:
       - key: startup-script
         value: |
           #!/bin/bash
+          set -e
+
+          # instalar postgres
           apt-get update
-          apt-get install -y postgresql
-          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
-          sudo -u postgres psql -c "CREATE DATABASE asociacionesdb OWNER admin;"
+          DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
+
+          # asegurar que postgres arranque en boot
+          systemctl enable postgresql
+          systemctl restart postgresql
+
+          # localizar carpeta de configuración
+          PGDIR=$(ls -d /etc/postgresql/*/main | head -n1)
+          PG_CONF="$PGDIR/postgresql.conf"
+          PG_HBA="$PGDIR/pg_hba.conf"
+
+          # permitir que Postgres escuche en todas las interfaces
+          sed -i "s/^#listen_addresses.*/listen_addresses = '*'/" "$PG_CONF"
+          if ! grep -q "^listen_addresses" "$PG_CONF"; then
+            echo "listen_addresses = '*'" >> "$PG_CONF"
+          fi
+
+          # permitir conexiones desde cualquier IP (confías en firewall de GCP)
+          if ! grep -q "host all all 0.0.0.0/0 md5" "$PG_HBA"; then
+            echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+          fi
+
+          # reiniciar postgres para aplicar cambios
+          systemctl restart postgresql
+
+          # crear usuario admin si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          DO $$
+          BEGIN
+            IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'admin') THEN
+              CREATE ROLE admin WITH LOGIN PASSWORD 'admin';
+            END IF;
+          END
+          $$;
+          EOF
+
+          # crear base de datos si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          SELECT 'CREATE DATABASE asociacionesdb OWNER admin ENCODING "UTF8"' 
+          WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'asociacionesdb')\gexec
+          EOF
+
+
 
 # 🔹 App Asociaciones
-- name: asociaciones-sxtw
+- name: asociaciones-app
   type: compute.v1.instance
   properties:
     zone: us-central1-f
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-f/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-f/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -139,7 +247,6 @@ resources:
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
           sudo apt install lsof -y
-          pip3 install -r requirements.txt
           export PATH=$PATH:$HOME/.local/bin
           export DB_USER=admin
           export DB_PASSWORD=admin
@@ -147,6 +254,7 @@ resources:
           export DB_PORT=5432
           export DB_NAME=asociacionesdb
           cd src/asociaciones_estrategicas
+          pip3 install -r asociaciones-requirements.txt
           flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
 
 # 🔹 Base de datos Postgres - Eventos y Atribución
@@ -154,7 +262,7 @@ resources:
   type: compute.v1.instance
   properties:
     zone: us-central1-b
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-b/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-b/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -165,6 +273,9 @@ resources:
     networkInterfaces:
     - network: global/networks/default
       networkIP: 10.128.0.23
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
     tags:
       items: [postgres]
     metadata:
@@ -172,17 +283,59 @@ resources:
       - key: startup-script
         value: |
           #!/bin/bash
+          set -e
+
+          # instalar postgres
           apt-get update
-          apt-get install -y postgresql
-          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
-          sudo -u postgres psql -c "CREATE DATABASE eventosdb OWNER admin;"
+          DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
+
+          # asegurar que postgres arranque en boot
+          systemctl enable postgresql
+          systemctl restart postgresql
+
+          # localizar carpeta de configuración
+          PGDIR=$(ls -d /etc/postgresql/*/main | head -n1)
+          PG_CONF="$PGDIR/postgresql.conf"
+          PG_HBA="$PGDIR/pg_hba.conf"
+
+          # permitir que Postgres escuche en todas las interfaces
+          sed -i "s/^#listen_addresses.*/listen_addresses = '*'/" "$PG_CONF"
+          if ! grep -q "^listen_addresses" "$PG_CONF"; then
+            echo "listen_addresses = '*'" >> "$PG_CONF"
+          fi
+
+          # permitir conexiones desde cualquier IP (confías en firewall de GCP)
+          if ! grep -q "host all all 0.0.0.0/0 md5" "$PG_HBA"; then
+            echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+          fi
+
+          # reiniciar postgres para aplicar cambios
+          systemctl restart postgresql
+
+          # crear usuario admin si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          DO $$
+          BEGIN
+            IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'admin') THEN
+              CREATE ROLE admin WITH LOGIN PASSWORD 'admin';
+            END IF;
+          END
+          $$;
+          EOF
+
+          # crear base de datos si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          SELECT 'CREATE DATABASE eventosdb OWNER admin ENCODING "UTF8"' 
+          WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'eventosdb')\gexec
+          EOF
+
 
 # 🔹 App Eventos y Atribución
-- name: eventos-y-atribucion-vm
+- name: eventos-app
   type: compute.v1.instance
   properties:
     zone: us-central1-b
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-b/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-b/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
