@@ -1,9 +1,6 @@
 import pulsar
 from pulsar.schema import *
 
-from eventos_y_atribucion.modulos.comision_recompensa.infraestructura.schema.v1.eventos import EventoReservaCreada, ReservaCreadaPayload
-from eventos_y_atribucion.modulos.comision_recompensa.infraestructura.schema.v1.comandos import ComandoCrearReserva, ComandoCrearReservaPayload
-from eventos_y_atribucion.seedwork.infraestructura import utils
 
 import datetime
 

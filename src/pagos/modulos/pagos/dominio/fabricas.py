@@ -5,35 +5,24 @@ objetos complejos del dominio de publicaciones y eventos
 
 """
 
-from .entidades import Comision, Recompensa
-from .excepciones import TipoObjetoNoExisteEnDominioVuelosExcepcion
-from eventos_y_atribucion.seedwork.dominio.repositorios import Mapeador
-from eventos_y_atribucion.seedwork.dominio.fabricas import Fabrica
-from eventos_y_atribucion.seedwork.dominio.entidades import Entidad
+from .entidades import Pago
+from .excepciones import TipoObjetoNoExisteEnDominioPagosExcepcion
+from pagos.seedwork.dominio.repositorios import Mapeador
+from pagos.seedwork.dominio.fabricas import Fabrica
+from pagos.seedwork.dominio.entidades import Entidad
 from dataclasses import dataclass
 
 
 
 @dataclass
-class FabricaComisiones(Fabrica):
+class FabricaPagos(Fabrica):
     def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:
-        if mapeador.obtener_tipo() == Comision.__class__:
+        if mapeador.obtener_tipo() == Pago.__class__:
             if isinstance(obj, Entidad):
                 return mapeador.entidad_a_dto(obj)
             else:
-                comision: Comision = mapeador.dto_a_entidad(obj)
-                return comision
+                pago: Pago = mapeador.dto_a_entidad(obj)
+                return pago
         else:
-            raise TipoObjetoNoExisteEnDominioVuelosExcepcion()
+            raise TipoObjetoNoExisteEnDominioPagosExcepcion()
         
-@dataclass
-class FabricaRecompensas(Fabrica):
-    def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:
-        if mapeador.obtener_tipo() == Recompensa.__class__:
-            if isinstance(obj, Entidad):
-                return mapeador.entidad_a_dto(obj)
-            else:
-                recompensa: Recompensa = mapeador.dto_a_entidad(obj)
-                return recompensa
-        else:
-            raise TipoObjetoNoExisteEnDominioVuelosExcepcion()

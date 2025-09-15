@@ -4,64 +4,36 @@ En este archivo usted encontrará los diferentes mapeadores
 encargados de la transformación entre formatos de dominio y DTOs
 """
 
-from eventos_y_atribucion.seedwork.dominio.repositorios import Mapeador
-import eventos_y_atribucion.modulos.comision_recompensa.dominio.objetos_valor as ov
-from eventos_y_atribucion.modulos.comision_recompensa.dominio.entidades import Comision, Recompensa 
-from eventos_y_atribucion.modulos.comision_recompensa.infraestructura.dto import (
-    ComisionDTO,
-    RecompensaDTO
-)
+
+from pagos.seedwork.dominio.repositorios import Mapeador
+from pagos.modulos.pagos.dominio.entidades import Pago
+from pagos.modulos.pagos.infraestructura.dto import PagoDTO
 
 
-class MapeadorRecompensa(Mapeador):
+class MapeadorPago(Mapeador):
     def obtener_tipo(self) -> type:
-        return Recompensa.__class__
+        return Pago.__class__
 
-    def entidad_a_dto(self, entidad: Recompensa) -> RecompensaDTO:
-        dto = RecompensaDTO(
-            id = str(entidad.id),
-            fecha_creacion = entidad.fecha_creacion,
-            fecha_actualizacion = entidad.fecha_actualizacion,
-            descripcion = entidad.descripcion,
-            id_evento = entidad.id_evento
+    def entidad_a_dto(self, entidad: Pago) -> PagoDTO:
+        dto = PagoDTO(
+            id=str(entidad.id),
+            fecha_creacion=entidad.fecha_creacion,
+            fecha_actualizacion=entidad.fecha_actualizacion,
+            monto=entidad.monto,
+            moneda=entidad.moneda,
+            id_comision=entidad.id_comision,
+            estado=entidad.estado
         )
-
         return dto
 
-    def dto_a_entidad(self, dto: RecompensaDTO) -> Recompensa:
-        entidad = Recompensa(
+    def dto_a_entidad(self, dto: PagoDTO) -> Pago:
+        entidad = Pago(
             id=dto.id,
             fecha_creacion=dto.fecha_creacion,
             fecha_actualizacion=dto.fecha_actualizacion,
-            descripcion = dto.descripcion,
-            id_evento=dto.id_evento
+            monto=dto.monto,
+            moneda=dto.moneda,
+            id_comision=dto.id_comision,
+            estado=dto.estado
         )
         return entidad
-
-
-class MapeadorComision(Mapeador):
-    def obtener_tipo(self) -> type:
-        return Comision.__class__
-
-    def entidad_a_dto(self, entidad: Comision) -> ComisionDTO:
-        dto = ComisionDTO(
-            id = str(entidad.id),
-            fecha_creacion = entidad.fecha_creacion,
-            fecha_actualizacion = entidad.fecha_actualizacion,
-            valor = entidad.monto_comision.valor,
-            id_evento = entidad.id_evento
-        )
-
-        return dto
-
-    def dto_a_entidad(self, dto: ComisionDTO) -> Comision:
-        entidad = Comision(
-            id=dto.id,
-            fecha_creacion=dto.fecha_creacion,
-            fecha_actualizacion=dto.fecha_actualizacion,
-            descripcion = dto.descripcion,
-            id_evento=dto.id_evento,
-            valor = ov.MontoComision(dto.valor),
-        )
-        return entidad
-

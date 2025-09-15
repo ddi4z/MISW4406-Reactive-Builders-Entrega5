@@ -1,43 +1,36 @@
+from pagos.seedwork.infraestructura.uow import UnidadTrabajo
 from sqlalchemy.orm import Session
-from eventos_y_atribucion.seedwork.infraestructura.uow import UnidadTrabajo, Batch
 
 class UnidadTrabajoSQLAlchemy(UnidadTrabajo):
     def __init__(self, session: Session):
-        self._batches: list[Batch] = []
-        self.session = session
+        self._session = session
+        self._batches = []
+        self._savepoints = []
 
-    def __enter__(self) -> UnidadTrabajo:
-        return super().__enter__()
+    @property
+    def batches(self):
+        return self._batches
 
-    def __exit__(self, *args):
-        self.rollback()
+    def savepoints(self):
+        return self._savepoints
 
     def _limpiar_batches(self):
         self._batches = []
 
-    @property
-    def savepoints(self) -> list:
-        return [self.session.get_nested_transaction()]
-
-    @property
-    def batches(self) -> list[Batch]:
-        return self._batches
-
     def commit(self):
-        for batch in self.batches:
-            lock = batch.lock
+        for batch in self._batches:
             batch.operacion(*batch.args, **batch.kwargs)
-
-        self.session.commit()
+        self._session.commit()
         super().commit()
 
     def rollback(self, savepoint=None):
         if savepoint:
-            savepoint.rollback()
+            self._session.rollback()
         else:
-            self.session.rollback()
-        
-        super().rollback()
-    
+            self._session.rollback()
+        super().rollback(savepoint)
+
     def savepoint(self):
-        self.session.begin_nested()
+        sp = self._session.begin_nested()
+        self._savepoints.append(sp)
+        return sp

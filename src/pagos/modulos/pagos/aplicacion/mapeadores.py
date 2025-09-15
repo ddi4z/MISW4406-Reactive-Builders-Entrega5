@@ -1,85 +1,60 @@
-from eventos_y_atribucion.modulos.comision_recompensa.dominio.entidades import Comision, Recompensa
-import eventos_y_atribucion.modulos.comision_recompensa.dominio.objetos_valor as ov
-from eventos_y_atribucion.seedwork.aplicacion.dto import Mapeador as AppMap
-from eventos_y_atribucion.seedwork.dominio.repositorios import Mapeador as RepMap
-from .dto import ComisionDTO, RecompensaDTO
+import uuid
+from pagos.modulos.pagos.dominio.entidades import Pago
+from pagos.modulos.pagos.infraestructura.dto import PagoDTO
+from pagos.seedwork.aplicacion.dto import Mapeador as AppMap
+from pagos.seedwork.dominio.repositorios import Mapeador as RepMap
+
 
 
 from datetime import datetime
 
-class MapeadorComisionDTOJson(AppMap):    
-    def externo_a_dto(self, externo: dict) -> ComisionDTO:
-        fecha_creacion = externo.get('fecha_creacion')
-        fecha_actualizacion = externo.get('fecha_actualizacion')
-        id = externo.get('id')
-        id_evento = externo.get('id_evento')
-        monto_comision = externo.get('monto_comision')
-        return ComisionDTO(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=id, id_evento=id_evento, valor=monto_comision["valor"])
+class MapeadorPagoDTOJson(AppMap):    
+    def externo_a_dto(self, externo: dict) -> PagoDTO:
+        return PagoDTO(
+            id=externo.get("id", str(uuid.uuid4())),
+            id_comision=externo.get("id_comision", str(uuid.uuid4())),
+            fecha_creacion=externo.get("fecha_creacion", datetime.utcnow()),
+            fecha_actualizacion=externo.get("fecha_actualizacion", datetime.utcnow()),
+            id_correlacion=externo.get("id_correlacion", ""),
+            moneda=externo.get("moneda", ""),
+            monto=externo.get("monto", 0.0),
+            metodo_pago=externo.get("metodo_pago", ""),
+            estado=externo.get("estado", ""),
+            pasarela=externo.get("pasarela", ""),
+        )
 
-    def dto_a_externo(self, dto: ComisionDTO) -> dict:
+    def dto_a_externo(self, dto: PagoDTO) -> dict:
         return dto.__dict__
 
-class MapeadorComision(RepMap):
-    _FORMATO_FECHA = '%Y-%m-%dT%H:%M:%SZ'
 
+class MapeadorPago(RepMap):
     def obtener_tipo(self) -> type:
-        return Comision.__class__
-    
+        return Pago.__class__
 
-    def entidad_a_dto(self, entidad: Comision) -> Comision:
+    def entidad_a_dto(self, entidad: Pago) -> PagoDTO:
+        return PagoDTO(
+            id=str(entidad.id),
+            id_comision=str(entidad.id_comision),
+            fecha_creacion=entidad.fecha_creacion,
+            fecha_actualizacion=entidad.fecha_actualizacion,
+            id_correlacion=entidad.id_correlacion,
+            moneda=entidad.moneda,
+            monto=entidad.monto,
+            metodo_pago=entidad.metodo_pago,
+            estado=entidad.estado,
+            pasarela=entidad.pasarela,
+        )
 
-        fecha_creacion = entidad.fecha_creacion.strftime(self._FORMATO_FECHA)
-        fecha_actualizacion = entidad.fecha_actualizacion.strftime(self._FORMATO_FECHA)
-        _id = str(entidad.id)
-        valor = entidad.valor
-        id_evento = entidad.id_evento
-
-
-        return Comision(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=_id, valor=valor, id_evento=id_evento)
-
-    def dto_a_entidad(self, dto: RecompensaDTO) -> Recompensa:
-        fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
-        fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
-        _id = dto.id
-        valor = dto.valor
-        id_evento = dto.id_evento
-
-        return Comision(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=_id, monto_comision=ov.MontoComision(valor), id_evento=id_evento)
-
-class MapeadorRecompensaDTOJson(AppMap):    
-    def externo_a_dto(self, externo: dict) -> RecompensaDTO:
-        fecha_creacion = externo.get('fecha_creacion')
-        fecha_actualizacion = externo.get('fecha_actualizacion')
-        id = externo.get('id')
-        id_evento = externo.get('id_evento')
-        descripcion = externo.get('descripcion')
-        return RecompensaDTO(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=id, id_evento=id_evento, descripcion=descripcion)
-
-    def dto_a_externo(self, dto: RecompensaDTO) -> dict:
-        return dto.__dict__
-
-class MapeadorRecompensa(RepMap):
-    _FORMATO_FECHA = '%Y-%m-%dT%H:%M:%SZ'
-
-    def obtener_tipo(self) -> type:
-        return Recompensa.__class__
-
-    def entidad_a_dto(self, entidad: Recompensa) -> RecompensaDTO:
-
-        fecha_creacion = entidad.fecha_creacion.strftime(self._FORMATO_FECHA)
-        fecha_actualizacion = entidad.fecha_actualizacion.strftime(self._FORMATO_FECHA)
-        _id = str(entidad.id)
-        descripcion = entidad.descripcion
-        id_evento = entidad.id_evento
-
-
-        return RecompensaDTO(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=_id, descripcion=descripcion, id_evento=id_evento)
-
-    def dto_a_entidad(self, dto: RecompensaDTO) -> Recompensa:
-        fecha_creacion = datetime.strptime(dto.fecha_creacion, self._FORMATO_FECHA)
-        fecha_actualizacion = datetime.strptime(dto.fecha_actualizacion, self._FORMATO_FECHA)
-        _id = dto.id
-        descripcion = dto.descripcion
-        id_evento = dto.id_evento
-
-        return Recompensa(fecha_creacion=fecha_creacion, fecha_actualizacion=fecha_actualizacion, id=_id, descripcion=descripcion, id_evento=id_evento)
+    def dto_a_entidad(self, dto: PagoDTO) -> Pago:
+        return Pago(
+            id=dto.id,
+            id_comision=dto.id_comision,
+            fecha_creacion=dto.fecha_creacion,
+            fecha_actualizacion=dto.fecha_actualizacion,
+            id_correlacion=dto.id_correlacion,
+            moneda=dto.moneda,
+            monto=dto.monto,
+            metodo_pago=dto.metodo_pago,
+            estado=dto.estado,
+            pasarela=dto.pasarela,
+        )
