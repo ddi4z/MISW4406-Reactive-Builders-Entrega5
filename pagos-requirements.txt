@@ -7,3 +7,4 @@ requests==2.32.4
 pydantic-settings==2.10.1
 sqlalchemy
 psycopg2
+PyDispatcher==2.0.6
