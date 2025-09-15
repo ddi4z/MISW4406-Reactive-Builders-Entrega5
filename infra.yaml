@@ -129,7 +129,8 @@ resources:
         value: |
           #!/bin/bash
           sudo apt-get update
-          sudo apt-get install -y python3-pip git
+          sudo apt-get install -y python3.10 python3.10-venv python3.10-dev python3-pip git
+          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
@@ -242,12 +243,12 @@ resources:
         value: |
           #!/bin/bash
           sudo apt-get update
-          sudo apt-get install -y python3-pip git
+          sudo apt-get install -y python3.10 python3.10-venv python3.10-dev python3-pip git
+          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
           sudo apt install lsof -y
-          pip3 install -r requirements.txt
           export PATH=$PATH:$HOME/.local/bin
           export DB_USER=admin
           export DB_PASSWORD=admin
@@ -255,6 +256,7 @@ resources:
           export DB_PORT=5432
           export DB_NAME=asociacionesdb
           cd src/asociaciones_estrategicas
+          pip3 install -r asociaciones-requirements.txt
           flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
 
 # 🔹 Base de datos Postgres - Eventos y Atribución
@@ -354,7 +356,8 @@ resources:
         value: |
           #!/bin/bash
           sudo apt-get update
-          sudo apt-get install -y python3-pip git
+          sudo apt-get install -y python3.10 python3.10-venv python3.10-dev python3-pip git
+          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
