@@ -78,21 +78,21 @@ def map_asociacion(dto: dict) -> Asociacion:
     )
 
 # ===== Llamadas usadas por Query/Mutation =====
-
+'''
 def obtener_asociaciones() -> List[Asociacion]:
     data = _get("/asociaciones")
     if isinstance(data, dict) and "items" in data:
         data = data["items"]
     return [map_asociacion(x) for x in data]
-
+'''
 def obtener_asociaciones_por_marca(id_marca: str) -> List[Asociacion]:
     data = _get(f"/asociaciones/marca/{id_marca}")
     return [map_asociacion(x) for x in data]
-
+'''
 def obtener_asociacion(id_asociacion: str) -> Asociacion:
     data = _get(f"/asociaciones/{id_asociacion}")
     return map_asociacion(data)
-
+'''
 def crear_asociacion(payload: dict) -> Respuesta:
     resp = _post("/asociaciones", json=payload)
     body = resp["body"] or {}

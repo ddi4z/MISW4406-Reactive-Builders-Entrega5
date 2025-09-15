@@ -9,14 +9,14 @@ from .esquemas import (
 
 @strawberry.type
 class Query:
-    @strawberry.field
+    '''@strawberry.field
     def asociaciones(self) -> List[Asociacion]:
         return obtener_asociaciones()
 
     @strawberry.field
     def asociacion(self, id: str) -> Asociacion:
         return obtener_asociacion(id)
-
+'''
     @strawberry.field
     def asociacionesPorMarca(self, idMarca: str) -> List[Asociacion]:
         return obtener_asociaciones_por_marca(idMarca)
