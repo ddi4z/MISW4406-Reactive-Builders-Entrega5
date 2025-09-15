@@ -4,7 +4,7 @@ Este documento explica cómo levantar los servicios del proyecto **AlpesPartners
 
 ---
 
-## 🚀 1. Levantar Docker Compose con Microservicio de Asociaciones y BFF
+## 1. Levantar Docker Compose con Microservicio de Asociaciones y BFF
 
 Este comando levanta el microservicio **Asociaciones Estratégicas**, junto con su infraestructura de **Pulsar** y el servicio **BFF**.
 
@@ -14,7 +14,7 @@ docker compose --profile asociaciones_estrategicas --profile pulsar --profile bf
 
 ---
 
-## 🗄️ 2. Levantar Base de Datos Asociaciones
+## 2. Levantar Base de Datos Asociaciones
 
 Si necesitas levantar únicamente la base de datos MySQL del microservicio de **Asociaciones Estratégicas**, puedes usar:
 
@@ -24,7 +24,7 @@ docker-compose --profile db_asociaciones_estrategicas up
 
 ---
 
-## 📌 3. Funcionalidad del BFF
+## 3. Funcionalidad del BFF
 
 El microservicio de **Asociaciones Estratégicas** expone **5 endpoints REST principales**:
 
@@ -34,7 +34,7 @@ El microservicio de **Asociaciones Estratégicas** expone **5 endpoints REST pri
 4. `GET /asociaciones` (con filtros) → Listar Asociaciones  
 5. `GET /asociaciones/analitica` → Obtener Analítica de Asociaciones  
 
-### 🎯 Rol del BFF
+### Rol del BFF
 El **BFF** actúa como una capa intermedia entre la **UI** y el **microservicio de Asociaciones**.  
 De los 5 endpoints disponibles, el **BFF** implementa y expone únicamente **2 funcionalidades clave**:
 
@@ -46,7 +46,7 @@ De los 5 endpoints disponibles, el **BFF** implementa y expone únicamente **2 f
 
 Una vez levantado el BFF (expuesto en `http://localhost:8003/v1`), se puede interactuar con el servicio mediante consultas y mutaciones GraphQL.
 
-### 馃敼 Mutation: Crear Asociaci贸n
+Mutación: Crear Asociación
 ```graphql
 mutation {
   crearAsociacion(
@@ -67,7 +67,7 @@ mutation {
 }
 ```
 
-### 馃敼 Query: Consultar Asociaciones por Marca
+Query: Consultar Asociaciones por Marca
 ```graphql
 query {
   asociacionesPorMarca(idMarca: "111e4567-e89b-12d3-a456-426614174100") {
@@ -87,11 +87,3 @@ query {
 ```
 
 De esta forma, el BFF **simplifica** y **adapta** la comunicación de la UI con el backend, reduciendo la complejidad de llamadas REST y entregando solo la información que necesita el frontend.
-
----
-
-## ✅ Conclusión
-
-- El levantamiento completo de las aplicaciones se logra con el comando que combina perfiles (`asociaciones_estrategicas`, `pulsar` y `bff`).  
-- El BFF no expone todos los endpoints del microservicio, sino que selecciona los más relevantes para la experiencia de usuario: **registro** y **consulta por marca**.  
-- Esto permite tener una arquitectura más limpia y enfocada en las necesidades del **frontend**.
