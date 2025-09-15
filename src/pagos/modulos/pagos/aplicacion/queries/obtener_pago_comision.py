@@ -4,10 +4,11 @@ from pagos.seedwork.aplicacion.queries import ejecutar_query as query
 from dataclasses import dataclass
 from .base import PagoComisionQueryBaseHandler
 from pagos.modulos.pagos.aplicacion.mapeadores import MapeadorPago
+from typing import Optional
 
 @dataclass
 class ObtenerPagoComision(Query):
-    id: str | None
+    id: Optional[str]
 
 class ObtenerPagoComisionHandler(PagoComisionQueryBaseHandler):
 

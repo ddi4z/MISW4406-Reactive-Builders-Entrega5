@@ -129,8 +129,7 @@ resources:
         value: |
           #!/bin/bash
           sudo apt-get update
-          sudo apt-get install -y python3.10 python3.10-venv python3.10-dev python3-pip git
-          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+          sudo apt-get install -y python3-pip git
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
@@ -243,8 +242,7 @@ resources:
         value: |
           #!/bin/bash
           sudo apt-get update
-          sudo apt-get install -y python3.10 python3.10-venv python3.10-dev python3-pip git
-          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+          sudo apt-get install -y python3-pip git
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
@@ -356,8 +354,7 @@ resources:
         value: |
           #!/bin/bash
           sudo apt-get update
-          sudo apt-get install -y python3.10 python3.10-venv python3.10-dev python3-pip git
-          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+          sudo apt-get install -y python3-pip git
           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
           cd MISW4406-Reactive-Builders-Entrega4
           sudo apt-get install -y python3-dev libpq-dev gcc
