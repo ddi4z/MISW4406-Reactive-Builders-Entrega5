@@ -1,3 +1,21 @@
+
+Levantar por docker-compose micro asociaciones 
+docker compose --profile asociaciones_estrategicas --profile pulsar up --force-recreate --build
+
+
+
+Base de datos asociaciones
+docker-compose --profile db_asociaciones_estrategicas up
+
+Broker
+docker-compose --profile pulsar up
+
+Subir la app
+flask --app src/asociaciones_estrategicas/api --debug run --host=0.0.0.0 --port=5000
+
+
+
+
 NOTA:
 Una cosa que no menciono en el video es que como se usa Event Sourcing 
 en el docker-compose deje un nuevo componente que fija la retención en -1 de los topicos para que persistan
@@ -111,3 +129,22 @@ class ComandoIniciarTrackingPayload(Record):
 # Comando: metadatos + payload
 class ComandoIniciarTracking(ComandoIntegracion):
     data = ComandoIniciarTrackingPayload()    
+	
+	
+	
+# Comando: Crear Asociacion estrategica
+TOPICO 	comandos-asociaciones.crear_asociacion
+class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
+    id_usuario = String()
+    id_marca = String()
+    id_socio = String()
+    tipo = String()
+    descripcion = String()
+    fecha_inicio = String()
+    fecha_fin = String()
+
+
+class ComandoCrearAsociacionEstrategica(ComandoIntegracion):
+    data = ComandoCrearAsociacionEstrategicaPayload()
+
+
