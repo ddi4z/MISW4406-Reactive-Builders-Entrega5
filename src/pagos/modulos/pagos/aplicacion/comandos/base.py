@@ -1,30 +1,16 @@
-from eventos_y_atribucion.seedwork.aplicacion.comandos import ComandoHandler
-from eventos_y_atribucion.modulos.comision_recompensa.infraestructura.fabricas import FabricaRepositorio
-from eventos_y_atribucion.modulos.comision_recompensa.dominio.fabricas import FabricaComisiones, FabricaRecompensas
+from pagos.seedwork.aplicacion.comandos import ComandoHandler
+from pagos.modulos.pagos.infraestructura.fabricas import FabricaRepositorio
+from pagos.modulos.pagos.dominio.fabricas import FabricaPagos
 
-class CrearComisionBaseHandler(ComandoHandler):
+class CrearPagoBaseHandler(ComandoHandler):
     def __init__(self):
         self._fabrica_repositorio: FabricaRepositorio = FabricaRepositorio()
-        self._fabrica_comisiones: FabricaComisiones = FabricaComisiones()
+        self._fabrica_pagos: FabricaPagos = FabricaPagos()
 
     @property
     def fabrica_repositorio(self):
         return self._fabrica_repositorio
     
     @property
-    def fabrica_comisiones(self):
-        return self._fabrica_comisiones
-    
-class CrearRecompensaBaseHandler(ComandoHandler):
-    def __init__(self):
-        self._fabrica_repositorio: FabricaRepositorio = FabricaRepositorio()
-        self._fabrica_recompensas: FabricaRecompensas = FabricaRecompensas()
-
-    @property
-    def fabrica_repositorio(self):
-        return self._fabrica_repositorio
-    
-    @property
-    def fabrica_recompensas(self):
-        return self._fabrica_recompensas
-    
+    def fabrica_pagos(self):
+        return self._fabrica_pagos
