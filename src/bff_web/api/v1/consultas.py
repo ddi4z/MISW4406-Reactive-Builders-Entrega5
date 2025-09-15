@@ -2,8 +2,6 @@ import strawberry
 from typing import List
 from .esquemas import (
     Asociacion,
-    obtener_asociaciones,
-    obtener_asociacion,
     obtener_asociaciones_por_marca,
 )
 
