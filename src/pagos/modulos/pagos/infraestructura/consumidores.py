@@ -5,9 +5,9 @@ import time
 import logging
 import traceback
 
-from eventos_y_atribucion.modulos.comision_recompensa.infraestructura.schema.v1.eventos import EventoReservaCreada
-from eventos_y_atribucion.modulos.comision_recompensa.infraestructura.schema.v1.comandos import ComandoCrearReserva
-from eventos_y_atribucion.seedwork.infraestructura import utils
+from pagos.modulos.pagos.infraestructura.schema.v1.eventos import EventoReservaCreada
+from pagos.modulos.pagos.infraestructura.schema.v1.comandos import ComandoCrearReserva
+from pagos.seedwork.infraestructura import utils
 
 def suscribirse_a_eventos():
     ...

@@ -1,5 +1,5 @@
 from pulsar.schema import *
-from eventos_y_atribucion.seedwork.infraestructura.schema.v1.eventos import EventoIntegracion
+from pagos.seedwork.infraestructura.schema.v1.eventos import EventoIntegracion
 
 class ReservaCreadaPayload(Record):
     id_reserva = String()

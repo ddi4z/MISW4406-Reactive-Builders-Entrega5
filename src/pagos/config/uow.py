@@ -1,43 +1,34 @@
+from pagos.seedwork.infraestructura.uow import UnidadTrabajo, Batch
 from sqlalchemy.orm import Session
-from eventos_y_atribucion.seedwork.infraestructura.uow import UnidadTrabajo, Batch
 
 class UnidadTrabajoSQLAlchemy(UnidadTrabajo):
     def __init__(self, session: Session):
+        self._session = session
         self._batches: list[Batch] = []
-        self.session = session
-
-    def __enter__(self) -> UnidadTrabajo:
-        return super().__enter__()
-
-    def __exit__(self, *args):
-        self.rollback()
-
-    def _limpiar_batches(self):
-        self._batches = []
+        self._savepoints: list[str] = []
 
     @property
-    def savepoints(self) -> list:
-        return [self.session.get_nested_transaction()]
+    def session(self) -> Session:
+        return self._session
 
     @property
     def batches(self) -> list[Batch]:
         return self._batches
 
-    def commit(self):
-        for batch in self.batches:
-            lock = batch.lock
-            batch.operacion(*batch.args, **batch.kwargs)
+    def savepoint(self):
+        self._session.begin_nested()
+        self._savepoints.append("savepoint")
 
-        self.session.commit()
-        super().commit()
+    def savepoints(self) -> list:
+        return self._savepoints
 
     def rollback(self, savepoint=None):
-        if savepoint:
-            savepoint.rollback()
-        else:
-            self.session.rollback()
-        
-        super().rollback()
-    
-    def savepoint(self):
-        self.session.begin_nested()
+        self._session.rollback()
+        self._limpiar_batches()
+
+    def _limpiar_batches(self):
+        self._batches = []
+
+    def commit(self):
+        self._session.commit()
+        super().commit()

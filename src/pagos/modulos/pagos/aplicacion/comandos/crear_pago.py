@@ -10,7 +10,7 @@ from pagos.seedwork.infraestructura.uow import UnidadTrabajoPuerto
 from pagos.modulos.pagos.aplicacion.mapeadores import MapeadorPago
 
 @dataclass
-class PagarComision(Comando):
+class CrearPago(Comando):
     id: str
     fecha_creacion: str
     fecha_actualizacion: str
@@ -22,9 +22,9 @@ class PagarComision(Comando):
     estado: str
     pasarela: str
 
-class PagarComisionHandler(CrearPagoBaseHandler):
+class CrearPagoHandler(CrearPagoBaseHandler):
 
-      def handle(self, comando: PagarComision):
+      def handle(self, comando: CrearPago):
 
         pago_dto = PagoDTO(
             fecha_actualizacion = comando.fecha_actualizacion,
@@ -48,8 +48,8 @@ class PagarComisionHandler(CrearPagoBaseHandler):
         UnidadTrabajoPuerto.commit()
 
 
-@comando.register(PagarComision)
-def ejecutar_comando_pagar_comision(comando: PagarComision):
-    handler = PagarComisionHandler()
+@comando.register(CrearPago)
+def ejecutar_comando_crear_pago(comando: CrearPago):
+    handler = CrearPagoHandler()
     handler.handle(comando)
     

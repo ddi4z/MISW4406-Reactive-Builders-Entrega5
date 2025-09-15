@@ -2,19 +2,17 @@ from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 import uuid
-from eventos_y_atribucion.seedwork.dominio.eventos import (EventoDominio)
+from pagos.seedwork.dominio.eventos import (EventoDominio)
 from datetime import datetime
 
 @dataclass
-class RecompensaCreada(EventoDominio):
-    id_recompensa: uuid.UUID = None
-    descripcion: str = None
-    id_evento: uuid.UUID = None
-    fecha_creacion: datetime = None
-
-@dataclass
-class ComisionCreada(EventoDominio):
+class PagoCreado(EventoDominio):
     id_comision: uuid.UUID = None
-    valor: int = None
-    id_evento: uuid.UUID = None
+    fecha_actualizacion: datetime = None
     fecha_creacion: datetime = None
+    id_correlacion: str = None
+    moneda: str = None
+    monto: float = None
+    metodo_pago: str = None
+    estado: str = None
+    pasarela: str = None

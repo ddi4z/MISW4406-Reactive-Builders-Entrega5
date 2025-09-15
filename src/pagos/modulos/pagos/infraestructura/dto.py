@@ -1,50 +1,26 @@
-"""DTOs para la capa de infrastructura del dominio de vuelos
-
-En este archivo usted encontrará los DTOs (modelos anémicos) de
-la infraestructura del dominio de vuelos
-
+"""
+DTOs para la capa de infraestructura del dominio de pagos
 """
 
-from eventos_y_atribucion.config.db import db
-from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, ForeignKey, Integer, Table
-
-import uuid
-
-Base = db.declarative_base()
-
-"""DTOs para la capa de infraestructura del dominio de externo
-
-En este archivo usted encontrará los DTOs (modelos anémicos)
-para la persistencia con SQLAlchemy
-"""
-
-from eventos_y_atribucion.config.db import db
 import uuid
 from datetime import datetime
+from sqlalchemy import Column, String, DateTime, Float
+from pagos.config.db import Base
 
 
-class RecompensaDTO(db.Model):
-    __tablename__ = "recompensas"
+class PagoDTO(Base):
+    __tablename__ = "pagos"
 
-    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    fecha_actualizacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id_comision = Column(String, nullable=False, default=lambda: str(uuid.uuid4()))
 
-    descripcion = db.Column(db.String, nullable=False)
+    fecha_creacion = Column(DateTime, nullable=False, default=datetime.utcnow)
+    fecha_actualizacion = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    id_evento = db.Column(db.String, db.ForeignKey("eventos.id"), nullable=True)
-    evento = db.relationship("EventoDTO", back_populates="recompensa", uselist=False)
-
-
-class ComisionDTO(db.Model):
-    __tablename__ = "comisiones"
-
-
-    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    fecha_creacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    fecha_actualizacion = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    valor = db.Column(db.Integer , nullable=False)
-    id_evento = db.Column(db.String, db.ForeignKey("eventos.id"), nullable=True)
-    evento = db.relationship("EventoDTO", back_populates="comision", uselist=False)
+    id_correlacion = Column(String, nullable=False, default="")
+    moneda = Column(String, nullable=False, default="")
+    monto = Column(Float, nullable=False, default=0.0)
+    metodo_pago = Column(String, nullable=False, default="")
+    estado = Column(String, nullable=False, default="")
+    pasarela = Column(String, nullable=False, default="")
+    descripcion = Column(String, nullable=True, default="")

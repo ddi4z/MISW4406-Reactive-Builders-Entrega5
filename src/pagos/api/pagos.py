@@ -1,22 +1,22 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 import asyncio
 from contextlib import asynccontextmanager
 
+from pagos.modulos.pagos.aplicacion.comandos.crear_pago import CrearPago
+from pagos.modulos.pagos.aplicacion.comandos.revertir_pago import RevertirPago
+from pagos.modulos.pagos.aplicacion.mapeadores import MapeadorPagoDTOJson
+from pagos.seedwork.aplicacion.comandos import ejecutar_commando
+from pagos.seedwork.dominio.excepciones import ExcepcionDominio
 from pydantic_settings import BaseSettings
 from typing import Any
 
-from ..eventos import EventoPago, PagoRevertido, ReservaPagada
-from ..comandos import ComandoPagarReserva, ComandoRevertirPago, RevertirPagoPayload, PagarReservaPayload
-from ..consumidores import suscribirse_a_topico
-from ..despachadores import Despachador
 
 from ..config.db import Base, engine
 from ..config.db_dependencies import get_db
 
-from .. import utils
 
 class Config(BaseSettings):
     APP_VERSION: str = "1"
@@ -41,84 +41,57 @@ async def lifespan(app: FastAPI):
     
 app = FastAPI(lifespan=lifespan, **app_configs)
 
-@app.get("/prueba-reserva-pagada", include_in_schema=False)
-async def prueba_reserva_pagada() -> dict[str, str]:
-    payload = ReservaPagada(
-        id = "1232321321",
-        id_correlacion = "389822434",
-        reserva_id = "6463454",
-        monto = 23412.12,
-        monto_vat = 234.0,
-        fecha_creacion = utils.time_millis()
-    )
 
-    evento = EventoPago(
-        time=utils.time_millis(),
-        ingestion=utils.time_millis(),
-        datacontenttype=ReservaPagada.__name__,
-        reserva_pagada = payload
-    )
-    despachador = Despachador()
-    despachador.publicar_mensaje(evento, "evento-pago")
-    return {"status": "ok"}
 
-@app.get("/prueba-pago-revertido", include_in_schema=False)
-async def prueba_pago_revertido() -> dict[str, str]:
-    payload = PagoRevertido(
-        id = "1232321321",
-        id_correlacion = "389822434",
-        reserva_id = "6463454",
-        fecha_actualizacion = utils.time_millis()
-    )
-
-    evento = EventoPago(
-        time=utils.time_millis(),
-        ingestion=utils.time_millis(),
-        datacontenttype=PagoRevertido.__name__,
-        pago_revertido = payload
-    )
-    despachador = Despachador()
-    despachador.publicar_mensaje(evento, "evento-pago")
-    return {"status": "ok"}
-    
-@app.get("/prueba-pagar-reserva", include_in_schema=False)
-async def prueba_pagar_reserva() -> dict[str, str]:
-    payload = PagarReservaPayload(
-        id_correlacion = "389822434",
-        reserva_id = "6463454",
-        monto = 23412.12,
-        monto_vat = 234.0,
-    )
-
-    comando = ComandoPagarReserva(
-        time=utils.time_millis(),
-        ingestion=utils.time_millis(),
-        datacontenttype=ReservaPagada.__name__,
-        data = payload
-    )
-    despachador = Despachador()
-    despachador.publicar_mensaje(comando, "comando-pagar-reserva")
-    return {"status": "ok"}
-
-@app.get("/prueba-revertir-pago", include_in_schema=False)
-async def prueba_revertir_pago() -> dict[str, str]:
-    payload = RevertirPagoPayload(
-        id = "1232321321",
-        id_correlacion = "389822434",
-        reserva_id = "6463454",
-    )
-
-    comando = ComandoRevertirPago(
-        time=utils.time_millis(),
-        ingestion=utils.time_millis(),
-        datacontenttype=RevertirPagoPayload.__name__,
-        data = payload
-    )
-    despachador = Despachador()
-    despachador.publicar_mensaje(comando, "comando-revertir-pago")
-    return {"status": "ok"}
-
-@app.get("/ping")
+@app.get("/pagos/ping")
 def ping(db: Session = Depends(get_db)):
     result = db.execute(text("SELECT 1")).scalar()
     return {"pong": result}
+
+
+
+
+    
+@app.post("/pagos", include_in_schema=False)
+async def prueba_pagar_reserva(request: Request) -> dict[str, str]:
+    try:
+        pago_dict = await request.json()
+
+        map_evento = MapeadorPagoDTOJson()
+        pago_dto = map_evento.externo_a_dto(pago_dict)
+
+        comando = CrearPago(            
+            pago_dto.id,
+            pago_dto.fecha_creacion,
+            pago_dto.fecha_actualizacion,
+            pago_dto.id_correlacion,
+            pago_dto.id_comision,
+            pago_dto.moneda,
+            pago_dto.monto,
+            pago_dto.metodo_pago,
+            pago_dto.estado,
+            pago_dto.pasarela
+        )
+
+        ejecutar_commando(comando)
+        
+        return {"status": "accepted"}
+    except ExcepcionDominio as e:
+        return {"error": str(e)}
+
+@app.post("/pagos/revertir", include_in_schema=False)
+async def prueba_revertir_pago(request: Request) -> dict[str, str]:
+    try:
+        pago_dict = await request.json()
+
+        map_evento = MapeadorPagoDTOJson()
+        pago_dto = map_evento.externo_a_dto(pago_dict)
+
+
+        comando = RevertirPago(pago_dto.id)
+
+        ejecutar_commando(comando)
+        
+        return {"status": "accepted"} 
+    except ExcepcionDominio as e:
+        return {"error": str(e)}

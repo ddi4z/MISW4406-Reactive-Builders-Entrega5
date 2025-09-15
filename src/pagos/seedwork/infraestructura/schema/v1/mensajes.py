@@ -1,7 +1,7 @@
 import uuid
 
 from pulsar.schema import *
-from eventos_y_atribucion.seedwork.infraestructura.utils import time_millis
+from pagos.seedwork.infraestructura.utils import time_millis
 
 class Mensaje(Record):
     id = String(default=str(uuid.uuid4()))

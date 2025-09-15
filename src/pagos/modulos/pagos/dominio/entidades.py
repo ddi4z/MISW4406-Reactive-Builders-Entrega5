@@ -7,45 +7,47 @@ En este archivo usted encontrará las entidades del dominio de recompensas y com
 from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass, field
+from datetime import datetime
 import uuid
 
-
-
-import eventos_y_atribucion.modulos.comision_recompensa.dominio.objetos_valor as ov
-from eventos_y_atribucion.modulos.comision_recompensa.dominio.eventos import ComisionCreada, RecompensaCreada
-from eventos_y_atribucion.seedwork.dominio.entidades import AgregacionRaiz
-
-"""
-    RECOMPENSA   
-"""
+from pagos.seedwork.dominio.entidades import AgregacionRaiz
+from pagos.modulos.pagos.dominio.eventos import PagoCreado
 
 
 @dataclass
-class Recompensa(AgregacionRaiz):
-    id_evento: uuid = field(default_factory=uuid)
-    descripcion: str = field(default_factory=str)
+class Pago(AgregacionRaiz):
+    id_comision: uuid = field(default_factory=uuid)
+    fecha_creacion: datetime = field(default_factory=datetime.now)
+    fecha_actualizacion: datetime = field(default_factory=datetime.now)
+    id_correlacion: str = field(default_factory=str)
+    moneda: str = field(default_factory=str)
+    monto: float = field(default_factory=float)
+    metodo_pago: str = field(default_factory=str)
+    estado: str = field(default_factory=str)
+    pasarela: str = field(default_factory=str)
 
-    def crear_recompensa(self, recompensa: Recompensa):
-        self.id_evento = recompensa.id_evento
-        self.descripcion = recompensa.descripcion
-        self.agregar_evento(RecompensaCreada(id_recompensa=self.id, fecha_creacion=self.fecha_creacion, id_evento=self.id_evento, descripcion=self.descripcion))
-
-
-
-
-"""
-    COMISIONES
-"""
-@dataclass
-class Comision(AgregacionRaiz, ABC):
-    id_evento: uuid.UUID = field(hash=True, default=None)
-    monto_comision: ov.MontoComision = field(default_factory=ov.MontoComision)
-    
-    def crear_comision(self, comision: Comision):
-        self.id_evento = comision.id_evento
-        self.monto_comision = comision.monto_comision
-
-        self.agregar_evento(ComisionCreada(id=self.id, id_evento=self.id_evento, valor=self.monto_comision.valor, fecha_creacion=self.fecha_creacion ))
+    def crear_pago(self, pago: Pago):
+        self.id_comision = uuid.uuid4()
+        self.fecha_creacion = datetime.now()
+        self.fecha_actualizacion = self.fecha_creacion
+        self.id_correlacion = pago.id_correlacion
+        self.moneda = pago.moneda
+        self.monto = pago.monto
+        self.metodo_pago = pago.metodo_pago
+        self.estado = pago.estado
+        self.pasarela = pago.pasarela
+ 
+        self.agregar_evento(PagoCreado( 
+            id_comision = self.id_comision,
+            fecha_actualizacion =  self.fecha_actualizacion,
+            fecha_creacion = self.fecha_creacion,
+            id_correlacion =  self.id_correlacion,
+            moneda = self.moneda,
+            monto = self.monto,
+            metodo_pago = self.metodo_pago,
+            estado = self.estado,
+            pasarela = self.pasarela
+            ))
 
 
 

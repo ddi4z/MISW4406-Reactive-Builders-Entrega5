@@ -6,11 +6,8 @@ del dominio de vuelos
 """
 
 from abc import ABC
-from eventos_y_atribucion.seedwork.dominio.repositorios import Repositorio
+from pagos.seedwork.dominio.repositorios import Repositorio
 
-class RepositorioComisiones(Repositorio, ABC):
-    ...
-    
-class RepositorioRecompensas(Repositorio, ABC):
+class RepositorioPagos(Repositorio, ABC):
     ...
     
