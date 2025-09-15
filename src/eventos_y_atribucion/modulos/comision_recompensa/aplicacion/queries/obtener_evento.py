@@ -5,10 +5,11 @@ from dataclasses import dataclass
 from .base import EventoQueryBaseHandler
 from eventos_y_atribucion.modulos.comision_recompensa.aplicacion.mapeadores import MapeadorEvento
 import uuid
+from typing import Optional
 
 @dataclass
 class ObtenerEvento(Query):
-    id: str | None
+    id: Optional[str]
 
 class ObtenerEventoHandler(EventoQueryBaseHandler):
 
