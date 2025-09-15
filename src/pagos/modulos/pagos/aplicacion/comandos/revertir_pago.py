@@ -16,19 +16,11 @@ class RevertirPago(Comando):
 class RevertirPagoHandler(RevertirPagoBaseHandler):
 
       def handle(self, comando: RevertirPago):
-
-        pago_dto = PagoDTO(
-            id = comando.id,
-        )
-
-        pago: Pago = self.fabrica_pagos.crear_objeto(pago_dto, MapeadorPago())
-        pago.crear_pago(pago)
         repositorio = self.fabrica_repositorio.crear_objeto(RepositorioPagos)
-
-        UnidadTrabajoPuerto.registrar_batch(repositorio.eliminar, pago)
+        
+        UnidadTrabajoPuerto.registrar_batch(repositorio.eliminar, comando.id)
         UnidadTrabajoPuerto.savepoint()
         UnidadTrabajoPuerto.commit()
-
 
 @comando.register(RevertirPago)
 def ejecutar_comando_crear_pago(comando: RevertirPago):

@@ -21,7 +21,6 @@ class MapeadorPagoDTOJson(AppMap):
             metodo_pago=externo.get("metodo_pago", ""),
             estado=externo.get("estado", ""),
             pasarela=externo.get("pasarela", ""),
-            descripcion=externo.get("descripcion", "")
         )
 
     def dto_a_externo(self, dto: PagoDTO) -> dict:
@@ -30,7 +29,7 @@ class MapeadorPagoDTOJson(AppMap):
 
 class MapeadorPago(RepMap):
     def obtener_tipo(self) -> type:
-        return Pago
+        return Pago.__class__
 
     def entidad_a_dto(self, entidad: Pago) -> PagoDTO:
         return PagoDTO(

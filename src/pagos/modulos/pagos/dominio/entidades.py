@@ -48,6 +48,8 @@ class Pago(AgregacionRaiz):
             estado = self.estado,
             pasarela = self.pasarela
             ))
+        
+ 
 
 
 

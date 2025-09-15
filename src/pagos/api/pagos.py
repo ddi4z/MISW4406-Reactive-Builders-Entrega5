@@ -86,8 +86,6 @@ async def prueba_revertir_pago(request: Request) -> dict[str, str]:
 
         map_evento = MapeadorPagoDTOJson()
         pago_dto = map_evento.externo_a_dto(pago_dict)
-
-
         comando = RevertirPago(pago_dto.id)
 
         ejecutar_commando(comando)

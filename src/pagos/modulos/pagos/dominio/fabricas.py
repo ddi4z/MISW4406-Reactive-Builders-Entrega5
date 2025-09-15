@@ -17,7 +17,7 @@ from dataclasses import dataclass
 @dataclass
 class FabricaPagos(Fabrica):
     def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:
-        if mapeador.obtener_tipo() == Pago:
+        if mapeador.obtener_tipo() == Pago.__class__:
             if isinstance(obj, Entidad):
                 return mapeador.entidad_a_dto(obj)
             else:

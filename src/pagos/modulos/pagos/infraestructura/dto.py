@@ -23,4 +23,4 @@ class PagoDTO(Base):
     metodo_pago = Column(String, nullable=False, default="")
     estado = Column(String, nullable=False, default="")
     pasarela = Column(String, nullable=False, default="")
-    descripcion = Column(String, nullable=True, default="")
+

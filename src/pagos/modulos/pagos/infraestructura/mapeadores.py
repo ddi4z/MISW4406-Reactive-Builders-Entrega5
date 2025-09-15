@@ -16,13 +16,14 @@ class MapeadorPago(Mapeador):
 
     def entidad_a_dto(self, entidad: Pago) -> PagoDTO:
         dto = PagoDTO(
-            id = str(entidad.id),
-            fecha_creacion = entidad.fecha_creacion,
-            fecha_actualizacion = entidad.fecha_actualizacion,
-            descripcion = entidad.descripcion,
-            id_evento = entidad.id_evento
+            id=str(entidad.id),
+            fecha_creacion=entidad.fecha_creacion,
+            fecha_actualizacion=entidad.fecha_actualizacion,
+            monto=entidad.monto,
+            moneda=entidad.moneda,
+            id_comision=entidad.id_comision,
+            estado=entidad.estado
         )
-
         return dto
 
     def dto_a_entidad(self, dto: PagoDTO) -> Pago:
@@ -30,8 +31,9 @@ class MapeadorPago(Mapeador):
             id=dto.id,
             fecha_creacion=dto.fecha_creacion,
             fecha_actualizacion=dto.fecha_actualizacion,
-            descripcion = dto.descripcion,
-            id_evento=dto.id_evento
+            monto=dto.monto,
+            moneda=dto.moneda,
+            id_comision=dto.id_comision,
+            estado=dto.estado
         )
         return entidad
-
