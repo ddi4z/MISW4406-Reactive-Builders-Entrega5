@@ -1,4 +1,4 @@
-# Guía de Levantamiento de Aplicaciones
+# Guía de servicio BFF
 
 Este documento explica cómo levantar los servicios del proyecto **AlpesPartners** con Docker Compose y cómo funciona el **Backend For Frontend (BFF)** en relación al microservicio de **Asociaciones Estratégicas**.
 
