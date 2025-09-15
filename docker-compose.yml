@@ -80,9 +80,9 @@ services:
       - managedLedgerDefaultAckQuorum=1
       - advertisedAddress=broker
       #Si se realiza una ejecución manual del microservicio desde el IDE, se debe usar esta línea:
-      - advertisedListeners=external:pulsar://127.0.0.1:6650
+      #- advertisedListeners=external:pulsar://127.0.0.1:6650
       #Si se realiza una ejecución completa de todo (incluido el microservicio) con docker compose, se debería usar esta línea en lugar de la anterior para que se comunique con el contenedor broker dentro de una misma ejecución
-      #- advertisedListeners=internal:pulsar://broker:6650
+      - advertisedListeners=internal:pulsar://broker:6650
       #- internalListenerName=internal
       #- advertisedListeners=internal:pulsar://broker:6650,external:pulsar://192.168.0.10:6650
       
@@ -196,3 +196,26 @@ services:
       FLASK_ENV: production
     ports:
       - "5001:5000"
+    
+  bff:
+    build:
+      context: .                 # raíz del repo
+      dockerfile: bff.Dockerfile # ver abajo
+    container_name: bff_web
+    hostname: bff
+    profiles: ["bff"]
+    environment:
+      # IMPORTANTE: dentro de la red de Docker NO uses localhost
+      # Usa el nombre del servicio del micro: "asociaciones"
+      - ASSOCIATIONS_HOST=asociaciones
+      - ASSOCIATIONS_PORT=5000   # puerto interno del micro (no el publicado 5001)
+      - BFF_PORT=8003
+    networks:
+      - pulsar                   # misma red que "asociaciones"
+    ports:
+      - "8003:8003"              # expone el BFF para tu navegador/Front
+    depends_on:
+      - asociaciones
+    # (opcional para desarrollo con autoreload)
+    # volumes:
+    #   - ./src/bff_web:/app/src/bff_web
