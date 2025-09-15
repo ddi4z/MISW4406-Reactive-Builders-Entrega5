@@ -118,6 +118,8 @@ El flag `--quiet` evita confirmaciones interactivas.
 
 ## Video de la ejecución
 
-Se encuentra en el directorio principal, con el nombre `video.mp4`
+https://www.canva.com/design/DAGzAbrq3tQ/_sg78z7WpYrdPNSeRpp21g/edit?utm_content=DAGzAbrq3tQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
+También se encuentra en el directorio principal, con el nombre `video.mp4`
 
 [Link video](https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega3/blob/main/video.mp4)
