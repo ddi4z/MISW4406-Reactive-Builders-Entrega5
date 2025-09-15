@@ -1,92 +1,26 @@
 resources:
-# ================= FIREWALL RULES =================
-- name: allow-flask
+# 🔹 Regla de firewall global para apps
+- name: allow-8080
   type: compute.v1.firewall
   properties:
-    network: global/networks/default
-    sourceRanges: ["0.0.0.0/0"]
+    network: https://www.googleapis.com/compute/v1/projects/no-monoliticas/global/networks/default
+    priority: 1000
+    direction: INGRESS
+    sourceRanges: 
+    - 0.0.0.0/0
+    targetTags:
+    - app-server
     allowed:
     - IPProtocol: TCP
-      ports: ["8080"]
+      ports: 
+      - 8080
 
-- name: allow-pulsar
-  type: compute.v1.firewall
-  properties:
-    network: global/networks/default
-    sourceRanges: ["0.0.0.0/0"]
-    allowed:
-    - IPProtocol: TCP
-      ports: ["6650","8080"]
-
-- name: allow-postgres
-  type: compute.v1.firewall
-  properties:
-    network: global/networks/default
-    sourceRanges: ["10.128.0.0/20"]
-    allowed:
-    - IPProtocol: TCP
-      ports: ["5432"]
-
-# ================= VM: PULSAR =================
-- name: pulsar-vm
-  type: compute.v1.instance
-  properties:
-    zone: us-central1-a
-    machineType: zones/us-central1-a/machineTypes/e2-medium
-    disks:
-    - deviceName: boot
-      type: PERSISTENT
-      boot: true
-      autoDelete: true
-      initializeParams:
-        sourceImage: projects/debian-cloud/global/images/family/debian-11
-    networkInterfaces:
-    - network: global/networks/default
-      networkIP: 10.128.0.12
-      accessConfigs:
-      - name: External NAT
-        type: ONE_TO_ONE_NAT
-    metadata:
-      items:
-      - key: startup-script
-        value: |
-          #!/bin/bash
-          apt-get update
-          apt-get install -y docker.io
-          docker run -d -p 6650:6650 -p 8080:8080 \
-            --name pulsar apachepulsar/pulsar:2.11.0 bin/pulsar standalone
-
-# ================= BASES DE DATOS =================
-- name: postgres-tracking
-  type: compute.v1.instance
-  properties:
-    zone: us-central1-b
-    machineType: zones/us-central1-b/machineTypes/e2-small
-    disks:
-    - deviceName: boot
-      type: PERSISTENT
-      boot: true
-      autoDelete: true
-      initializeParams:
-        sourceImage: projects/debian-cloud/global/images/family/debian-11
-    networkInterfaces:
-    - network: global/networks/default
-      networkIP: 10.128.0.20
-    metadata:
-      items:
-      - key: startup-script
-        value: |
-          #!/bin/bash
-          apt-get update
-          apt-get install -y postgresql postgresql-contrib
-          sudo -u postgres psql -c "CREATE USER tracking WITH PASSWORD 'trackingpass';"
-          sudo -u postgres psql -c "CREATE DATABASE trackingdb OWNER tracking;"
-
+# 🔹 Base de datos Postgres - Pagos
 - name: postgres-pagos
   type: compute.v1.instance
   properties:
     zone: us-central1-c
-    machineType: zones/us-central1-c/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-c/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -97,21 +31,63 @@ resources:
     networkInterfaces:
     - network: global/networks/default
       networkIP: 10.128.0.21
+    tags:
+      items: [postgres]
     metadata:
       items:
       - key: startup-script
         value: |
           #!/bin/bash
           apt-get update
-          apt-get install -y postgresql postgresql-contrib
-          sudo -u postgres psql -c "CREATE USER pagos WITH PASSWORD 'pagospass';"
-          sudo -u postgres psql -c "CREATE DATABASE pagosdb OWNER pagos;"
+          apt-get install -y postgresql
+          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
+          sudo -u postgres psql -c "CREATE DATABASE pagosdb OWNER admin;"
 
+# 🔹 App Pagos
+- name: pagos-fq3n
+  type: compute.v1.instance
+  properties:
+    zone: us-central1-c
+    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-c/machineTypes/e2-small
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: projects/debian-cloud/global/images/family/debian-11
+    networkInterfaces:
+    - network: global/networks/default
+      accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
+    tags:
+      items: [app-server]
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt-get install -y python3-pip git
+          git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
+          cd MISW4406-Reactive-Builders-Entrega4
+          sudo apt-get install -y python3-dev libpq-dev gcc
+          sudo apt install lsof -y
+          pip3 install -r requirements.txt
+          export PATH=$PATH:$HOME/.local/bin
+          export DB_USER=admin
+          export DB_PASSWORD=admin
+          export DB_HOST=10.128.0.21
+          export DB_PORT=5432
+          export DB_NAME=pagosdb
+          cd src/pagos
+          flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
+
+# 🔹 Base de datos Postgres - Asociaciones
 - name: postgres-asociaciones
   type: compute.v1.instance
   properties:
     zone: us-central1-f
-    machineType: zones/us-central1-f/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-f/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -122,149 +98,120 @@ resources:
     networkInterfaces:
     - network: global/networks/default
       networkIP: 10.128.0.22
+    tags:
+      items: [postgres]
     metadata:
       items:
       - key: startup-script
         value: |
           #!/bin/bash
           apt-get update
-          apt-get install -y postgresql postgresql-contrib
-          sudo -u postgres psql -c "CREATE USER asociaciones WITH PASSWORD 'asocpass';"
-          sudo -u postgres psql -c "CREATE DATABASE asociacionesdb OWNER asociaciones;"
+          apt-get install -y postgresql
+          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
+          sudo -u postgres psql -c "CREATE DATABASE asociacionesdb OWNER admin;"
 
-# ================= INSTANCE TEMPLATES =================
-- name: tracking-template
-  type: compute.v1.instanceTemplate
+# 🔹 App Asociaciones
+- name: asociaciones-sxtw
+  type: compute.v1.instance
   properties:
-    properties:
-      machineType: e2-small
-      disks:
-      - deviceName: boot
-        type: PERSISTENT
-        boot: true
-        autoDelete: true
-        initializeParams:
-          sourceImage: projects/debian-cloud/global/images/family/debian-11
-      networkInterfaces:
-      - network: global/networks/default
-        accessConfigs:
-        - name: External NAT
-          type: ONE_TO_ONE_NAT
-      metadata:
-        items:
-        - key: startup-script
-          value: |
-            #!/bin/bash
-            apt-get update
-            apt-get install -y python3 python3-pip git
-            # Variables de entorno
-            echo "export DB_USER=tracking" >> /etc/profile
-            echo "export DB_PASSWORD=trackingpass" >> /etc/profile
-            echo "export DB_HOST=10.128.0.20" >> /etc/profile
-            echo "export DB_PORT=5432" >> /etc/profile
-            echo "export DB_NAME=trackingdb" >> /etc/profile
-            source /etc/profile
-            # Clonar y correr app
-            git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
-            cd MISW4406-Reactive-Builders-Entrega4/src/eventos_y_atribucion
-            pip3 install -r requirements.txt
-            nohup flask --app src/alpespartners/api run --host=0.0.0.0 --port=8080 &
-
-- name: pagos-template
-  type: compute.v1.instanceTemplate
-  properties:
-    properties:
-      machineType: e2-small
-      disks:
-      - deviceName: boot
-        type: PERSISTENT
-        boot: true
-        autoDelete: true
-        initializeParams:
-          sourceImage: projects/debian-cloud/global/images/family/debian-11
-      networkInterfaces:
-      - network: global/networks/default
-        accessConfigs:
-        - name: External NAT
-          type: ONE_TO_ONE_NAT
-      metadata:
-        items:
-        - key: startup-script
-          value: |
-            #!/bin/bash
-            apt-get update
-            apt-get install -y python3 python3-pip git
-            # Variables de entorno
-            echo "export DB_USER=pagos" >> /etc/profile
-            echo "export DB_PASSWORD=pagospass" >> /etc/profile
-            echo "export DB_HOST=10.128.0.21" >> /etc/profile
-            echo "export DB_PORT=5432" >> /etc/profile
-            echo "export DB_NAME=pagosdb" >> /etc/profile
-            source /etc/profile
-            # Clonar y correr app
-            git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
-            cd MISW4406-Reactive-Builders-Entrega4/src/pagos
-            pip3 install -r requirements.txt
-            nohup flask --app src/alpespartners/api run --host=0.0.0.0 --port=8080 &
-
-- name: asociaciones-template
-  type: compute.v1.instanceTemplate
-  properties:
-    properties:
-      machineType: e2-small
-      disks:
-      - deviceName: boot
-        type: PERSISTENT
-        boot: true
-        autoDelete: true
-        initializeParams:
-          sourceImage: projects/debian-cloud/global/images/family/debian-11
-      networkInterfaces:
-      - network: global/networks/default
-        accessConfigs:
-        - name: External NAT
-          type: ONE_TO_ONE_NAT
-      metadata:
-        items:
-        - key: startup-script
-          value: |
-            #!/bin/bash
-            apt-get update
-            apt-get install -y python3 python3-pip git
-            # Variables de entorno
-            echo "export DB_USER=asociaciones" >> /etc/profile
-            echo "export DB_PASSWORD=asocpass" >> /etc/profile
-            echo "export DB_HOST=10.128.0.22" >> /etc/profile
-            echo "export DB_PORT=5432" >> /etc/profile
-            echo "export DB_NAME=asociacionesdb" >> /etc/profile
-            source /etc/profile
-            # Clonar y correr app
-            git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
-            cd MISW4406-Reactive-Builders-Entrega4/src/asociaciones_estrategicas
-            pip3 install -r requirements.txt
-            nohup flask --app src/alpespartners/api run --host=0.0.0.0 --port=8080 &
-
-# ================= MANAGED INSTANCE GROUPS =================
-- name: tracking-mig
-  type: compute.v1.instanceGroupManager
-  properties:
-    baseInstanceName: tracking
-    instanceTemplate: $(ref.tracking-template.selfLink)
-    targetSize: 1
-    zone: us-central1-b
-
-- name: pagos-mig
-  type: compute.v1.instanceGroupManager
-  properties:
-    baseInstanceName: pagos
-    instanceTemplate: $(ref.pagos-template.selfLink)
-    targetSize: 1
-    zone: us-central1-c
-
-- name: asociaciones-mig
-  type: compute.v1.instanceGroupManager
-  properties:
-    baseInstanceName: asociaciones
-    instanceTemplate: $(ref.asociaciones-template.selfLink)
-    targetSize: 1
     zone: us-central1-f
+    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-f/machineTypes/e2-small
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: projects/debian-cloud/global/images/family/debian-11
+    networkInterfaces:
+    - network: global/networks/default
+      accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
+    tags:
+      items: [app-server]
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt-get install -y python3-pip git
+          git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
+          cd MISW4406-Reactive-Builders-Entrega4
+          sudo apt-get install -y python3-dev libpq-dev gcc
+          sudo apt install lsof -y
+          pip3 install -r requirements.txt
+          export PATH=$PATH:$HOME/.local/bin
+          export DB_USER=admin
+          export DB_PASSWORD=admin
+          export DB_HOST=10.128.0.22
+          export DB_PORT=5432
+          export DB_NAME=asociacionesdb
+          cd src/asociaciones_estrategicas
+          flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
+
+# 🔹 Base de datos Postgres - Eventos y Atribución
+- name: postgres-eventos
+  type: compute.v1.instance
+  properties:
+    zone: us-central1-b
+    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-b/machineTypes/e2-small
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: projects/debian-cloud/global/images/family/debian-11
+    networkInterfaces:
+    - network: global/networks/default
+      networkIP: 10.128.0.23
+    tags:
+      items: [postgres]
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          apt-get update
+          apt-get install -y postgresql
+          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
+          sudo -u postgres psql -c "CREATE DATABASE eventosdb OWNER admin;"
+
+# 🔹 App Eventos y Atribución
+- name: eventos-y-atribucion-vm
+  type: compute.v1.instance
+  properties:
+    zone: us-central1-b
+    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-b/machineTypes/e2-small
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: projects/debian-cloud/global/images/family/debian-11
+    networkInterfaces:
+    - network: global/networks/default
+      accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
+    tags:
+      items: [app-server]
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt-get install -y python3-pip git
+          git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
+          cd MISW4406-Reactive-Builders-Entrega4
+          sudo apt-get install -y python3-dev libpq-dev gcc
+          sudo apt install lsof -y
+          pip3 install -r requirements.txt
+          export PATH=$PATH:$HOME/.local/bin
+          export DB_USER=admin
+          export DB_PASSWORD=admin
+          export DB_HOST=10.128.0.23
+          export DB_PORT=5432
+          export DB_NAME=eventosdb
+          cd src/eventos_y_atribucion
+          flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
