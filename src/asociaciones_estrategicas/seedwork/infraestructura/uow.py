@@ -1,3 +1,8 @@
+# --- imports de arriba ---
+from contextvars import ContextVar
+# UoW actual (por thread / task)
+_current_uow: ContextVar = ContextVar("_current_uow", default=None)
+
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -7,6 +12,7 @@ from pydispatch import dispatcher
 import pickle
 import logging
 import traceback
+from flask import has_request_context, session
 
 
 class Lock(Enum):
@@ -120,16 +126,27 @@ def flask_uow():
     return uow_serialized
 
 def unidad_de_trabajo() -> UnidadTrabajo:
-    if is_flask():
+    if has_request_context():
         return pickle.loads(flask_uow())
     else:
-        raise Exception('No hay unidad de trabajo')
+        # ↓↓↓ mantener la MISMA UoW en el hilo del consumer
+        uow = _current_uow.get()
+        if uow is None:
+            from asociaciones_estrategicas.config.uow import UnidadTrabajoHibrida
+            uow = UnidadTrabajoHibrida()
+            _current_uow.set(uow)
+        return uow
 
 def guardar_unidad_trabajo(uow: UnidadTrabajo):
-    if is_flask():
+    if has_request_context():
         registrar_unidad_de_trabajo(pickle.dumps(uow))
     else:
-        raise Exception('No hay unidad de trabajo')
+        # fuera de Flask: guarda en thread-local
+        _current_uow.set(uow)
+
+def _clear_nonflask_uow():
+    if not has_request_context():
+        _current_uow.set(None)        
 
 
 class UnidadTrabajoPuerto:
@@ -139,13 +156,15 @@ class UnidadTrabajoPuerto:
         uow = unidad_de_trabajo()
         uow.commit()
         guardar_unidad_trabajo(uow)
+        _clear_nonflask_uow()
 
     @staticmethod
     def rollback(savepoint=None):
         uow = unidad_de_trabajo()
         uow.rollback(savepoint=savepoint)
         guardar_unidad_trabajo(uow)
-
+        _clear_nonflask_uow()
+        
     @staticmethod
     def savepoint():
         uow = unidad_de_trabajo()
