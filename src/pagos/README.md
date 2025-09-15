@@ -68,3 +68,7 @@ Desde el directorio `src` ejecute el siguiente comando
 ```bash
 uvicorn pagos.api.pagos:app --host localhost --port 8001 --reload
 ```
+
+Puede acceder a la documentación interactiva, la cual le permite hacer requests, en:
+
+http://localhost:8001/docs
