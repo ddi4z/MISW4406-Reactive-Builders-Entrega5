@@ -1,3 +1,5 @@
+gcloud config set project reactive-builders
+
 # enable apis
 gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com
 

@@ -3,7 +3,7 @@ resources:
 - name: allow-8080
   type: compute.v1.firewall
   properties:
-    network: https://www.googleapis.com/compute/v1/projects/no-monoliticas/global/networks/default
+    network: https://www.googleapis.com/compute/v1/projects/reactive-builders/global/networks/default
     priority: 1000
     direction: INGRESS
     sourceRanges: 
@@ -15,12 +15,29 @@ resources:
       ports: 
       - 8080
 
+# 🔹 Regla de firewall global para Postgres
+- name: allow-postgres-internal
+  type: compute.v1.firewall
+  properties:
+    network: https://www.googleapis.com/compute/v1/projects/reactive-builders/global/networks/default
+    priority: 1000
+    direction: INGRESS
+    sourceTags:
+    - app-server
+    targetTags:
+    - postgres
+    allowed:
+    - IPProtocol: TCP
+      ports:
+      - "5432"
+
+
 # 🔹 Base de datos Postgres - Pagos
 - name: postgres-pagos
   type: compute.v1.instance
   properties:
     zone: us-central1-c
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-c/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-c/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -31,6 +48,9 @@ resources:
     networkInterfaces:
     - network: global/networks/default
       networkIP: 10.128.0.21
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
     tags:
       items: [postgres]
     metadata:
@@ -38,17 +58,59 @@ resources:
       - key: startup-script
         value: |
           #!/bin/bash
+          set -e
+
+          # instalar postgres
           apt-get update
-          apt-get install -y postgresql
-          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
-          sudo -u postgres psql -c "CREATE DATABASE pagosdb OWNER admin;"
+          DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
+
+          # asegurar que postgres arranque en boot
+          systemctl enable postgresql
+          systemctl restart postgresql
+
+          # localizar carpeta de configuración
+          PGDIR=$(ls -d /etc/postgresql/*/main | head -n1)
+          PG_CONF="$PGDIR/postgresql.conf"
+          PG_HBA="$PGDIR/pg_hba.conf"
+
+          # permitir que Postgres escuche en todas las interfaces
+          sed -i "s/^#listen_addresses.*/listen_addresses = '*'/" "$PG_CONF"
+          if ! grep -q "^listen_addresses" "$PG_CONF"; then
+            echo "listen_addresses = '*'" >> "$PG_CONF"
+          fi
+
+          # permitir conexiones desde cualquier IP (confías en firewall de GCP)
+          if ! grep -q "host all all 0.0.0.0/0 md5" "$PG_HBA"; then
+            echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+          fi
+
+          # reiniciar postgres para aplicar cambios
+          systemctl restart postgresql
+
+          # crear usuario admin si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          DO $$
+          BEGIN
+            IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'admin') THEN
+              CREATE ROLE admin WITH LOGIN PASSWORD 'admin';
+            END IF;
+          END
+          $$;
+          EOF
+
+          # crear base de datos pagosdb si no existe
+          sudo -u postgres psql -v ON_ERROR_STOP=1 <<'EOF'
+          SELECT 'CREATE DATABASE pagosdb OWNER admin ENCODING "UTF8"' 
+          WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'pagosdb')\gexec
+          EOF
+
 
 # 🔹 App Pagos
 - name: pagos-fq3n
   type: compute.v1.instance
   properties:
     zone: us-central1-c
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-c/machineTypes/e2-small
+    machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-c/machineTypes/e2-small
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -82,136 +144,192 @@ resources:
           cd src/pagos
           uvicorn pagos.api.pagos:app --host 0.0.0.0 --port 8080
 
-# 🔹 Base de datos Postgres - Asociaciones
-- name: postgres-asociaciones
-  type: compute.v1.instance
-  properties:
-    zone: us-central1-f
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-f/machineTypes/e2-small
-    disks:
-    - deviceName: boot
-      type: PERSISTENT
-      boot: true
-      autoDelete: true
-      initializeParams:
-        sourceImage: projects/debian-cloud/global/images/family/debian-11
-    networkInterfaces:
-    - network: global/networks/default
-      networkIP: 10.128.0.22
-    tags:
-      items: [postgres]
-    metadata:
-      items:
-      - key: startup-script
-        value: |
-          #!/bin/bash
-          apt-get update
-          apt-get install -y postgresql
-          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
-          sudo -u postgres psql -c "CREATE DATABASE asociacionesdb OWNER admin;"
+# # 🔹 Base de datos Postgres - Asociaciones
+# - name: postgres-asociaciones
+#   type: compute.v1.instance
+#   properties:
+#     zone: us-central1-f
+#     machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-f/machineTypes/e2-small
+#     disks:
+#     - deviceName: boot
+#       type: PERSISTENT
+#       boot: true
+#       autoDelete: true
+#       initializeParams:
+#         sourceImage: projects/debian-cloud/global/images/family/debian-11
+#     networkInterfaces:
+#     - network: global/networks/default
+#       networkIP: 10.128.0.22
+#     tags:
+#       items: [postgres]
+#     metadata:
+#       items:
+#       - key: startup-script
+#         value: |
+#           #!/bin/bash
 
-# 🔹 App Asociaciones
-- name: asociaciones-sxtw
-  type: compute.v1.instance
-  properties:
-    zone: us-central1-f
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-f/machineTypes/e2-small
-    disks:
-    - deviceName: boot
-      type: PERSISTENT
-      boot: true
-      autoDelete: true
-      initializeParams:
-        sourceImage: projects/debian-cloud/global/images/family/debian-11
-    networkInterfaces:
-    - network: global/networks/default
-      accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
-    tags:
-      items: [app-server]
-    metadata:
-      items:
-      - key: startup-script
-        value: |
-          #!/bin/bash
-          sudo apt-get update
-          sudo apt-get install -y python3-pip git
-          git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
-          cd MISW4406-Reactive-Builders-Entrega4
-          sudo apt-get install -y python3-dev libpq-dev gcc
-          sudo apt install lsof -y
-          pip3 install -r requirements.txt
-          export PATH=$PATH:$HOME/.local/bin
-          export DB_USER=admin
-          export DB_PASSWORD=admin
-          export DB_HOST=10.128.0.22
-          export DB_PORT=5432
-          export DB_NAME=asociacionesdb
-          cd src/asociaciones_estrategicas
-          flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
+#           apt-get update
+#           apt-get install -y postgresql
 
-# 🔹 Base de datos Postgres - Eventos y Atribución
-- name: postgres-eventos
-  type: compute.v1.instance
-  properties:
-    zone: us-central1-b
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-b/machineTypes/e2-small
-    disks:
-    - deviceName: boot
-      type: PERSISTENT
-      boot: true
-      autoDelete: true
-      initializeParams:
-        sourceImage: projects/debian-cloud/global/images/family/debian-11
-    networkInterfaces:
-    - network: global/networks/default
-      networkIP: 10.128.0.23
-    tags:
-      items: [postgres]
-    metadata:
-      items:
-      - key: startup-script
-        value: |
-          #!/bin/bash
-          apt-get update
-          apt-get install -y postgresql
-          sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'admin';"
-          sudo -u postgres psql -c "CREATE DATABASE eventosdb OWNER admin;"
+#           # asegurar que postgres esté corriendo
+#           systemctl enable postgresql
+#           systemctl start postgresql
 
-# 🔹 App Eventos y Atribución
-- name: eventos-y-atribucion-vm
-  type: compute.v1.instance
-  properties:
-    zone: us-central1-b
-    machineType: https://www.googleapis.com/compute/v1/projects/no-monoliticas/zones/us-central1-b/machineTypes/e2-small
-    disks:
-    - deviceName: boot
-      type: PERSISTENT
-      boot: true
-      autoDelete: true
-      initializeParams:
-        sourceImage: projects/debian-cloud/global/images/family/debian-11
-    networkInterfaces:
-    - network: global/networks/default
-      accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
-    tags:
-      items: [app-server]
-    metadata:
-      items:
-      - key: startup-script
-        value: |
-          #!/bin/bash
-          sudo apt-get update
-          sudo apt-get install -y python3-pip git
-          git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
-          cd MISW4406-Reactive-Builders-Entrega4
-          sudo apt-get install -y python3-dev libpq-dev gcc
-          sudo apt install lsof -y
-          pip3 install -r requirements.txt
-          export PATH=$PATH:$HOME/.local/bin
-          export DB_USER=admin
-          export DB_PASSWORD=admin
-          export DB_HOST=10.128.0.23
-          export DB_PORT=5432
-          export DB_NAME=eventosdb
-          cd src/eventos_y_atribucion
-          flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
+#           # localizar carpeta de configuración (Debian/Ubuntu packaging)
+#           PGDIR=$(ls -d /etc/postgresql/*/main | head -n1)
+#           PG_CONF="$PGDIR/postgresql.conf"
+#           PG_HBA="$PGDIR/pg_hba.conf"
+
+#           # permitir que Postgres escuche en todas las interfaces
+#           if grep -q "^#listen_addresses" "$PG_CONF" ; then
+#             sed -i "s/^#listen_addresses.*/listen_addresses = '*'/" "$PG_CONF"
+#           else
+#             sed -i "s/^listen_addresses.*/listen_addresses = '*'/" "$PG_CONF" || echo "listen_addresses = '*'" >> "$PG_CONF"
+#           fi
+
+#           # permitir conexiones desde cualquier origen (la seguridad la limita el firewall con sourceTags)
+#           if ! grep -q "host all all 0.0.0.0/0 md5" "$PG_HBA"; then
+#             echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+#           fi
+
+#           # reiniciar para aplicar cambios
+#           systemctl restart postgresql
+
+#           # crear usuario y BD (si no existen)
+#           sudo -u postgres psql -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='admin') THEN CREATE USER admin WITH PASSWORD 'admin'; END IF; END \$\$;"
+#           sudo -u postgres psql -c "CREATE DATABASE asociacionesdb OWNER admin;" || true
+
+
+# # 🔹 App Asociaciones
+# - name: asociaciones-sxtw
+#   type: compute.v1.instance
+#   properties:
+#     zone: us-central1-f
+#     machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-f/machineTypes/e2-small
+#     disks:
+#     - deviceName: boot
+#       type: PERSISTENT
+#       boot: true
+#       autoDelete: true
+#       initializeParams:
+#         sourceImage: projects/debian-cloud/global/images/family/debian-11
+#     networkInterfaces:
+#     - network: global/networks/default
+#       accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
+#     tags:
+#       items: [app-server]
+#     metadata:
+#       items:
+#       - key: startup-script
+#         value: |
+#           #!/bin/bash
+#           sudo apt-get update
+#           sudo apt-get install -y python3-pip git
+#           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
+#           cd MISW4406-Reactive-Builders-Entrega4
+#           sudo apt-get install -y python3-dev libpq-dev gcc
+#           sudo apt install lsof -y
+#           pip3 install -r requirements.txt
+#           export PATH=$PATH:$HOME/.local/bin
+#           export DB_USER=admin
+#           export DB_PASSWORD=admin
+#           export DB_HOST=10.128.0.22
+#           export DB_PORT=5432
+#           export DB_NAME=asociacionesdb
+#           cd src/asociaciones_estrategicas
+#           flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
+
+# # 🔹 Base de datos Postgres - Eventos y Atribución
+# - name: postgres-eventos
+#   type: compute.v1.instance
+#   properties:
+#     zone: us-central1-b
+#     machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-b/machineTypes/e2-small
+#     disks:
+#     - deviceName: boot
+#       type: PERSISTENT
+#       boot: true
+#       autoDelete: true
+#       initializeParams:
+#         sourceImage: projects/debian-cloud/global/images/family/debian-11
+#     networkInterfaces:
+#     - network: global/networks/default
+#       networkIP: 10.128.0.23
+#     tags:
+#       items: [postgres]
+#     metadata:
+#       items:
+#       - key: startup-script
+#         value: |
+#           #!/bin/bash
+
+#           apt-get update
+#           apt-get install -y postgresql
+
+#           # asegurar que postgres esté corriendo
+#           systemctl enable postgresql
+#           systemctl start postgresql
+
+#           # localizar carpeta de configuración (Debian/Ubuntu packaging)
+#           PGDIR=$(ls -d /etc/postgresql/*/main | head -n1)
+#           PG_CONF="$PGDIR/postgresql.conf"
+#           PG_HBA="$PGDIR/pg_hba.conf"
+
+#           # permitir que Postgres escuche en todas las interfaces
+#           if grep -q "^#listen_addresses" "$PG_CONF" ; then
+#             sed -i "s/^#listen_addresses.*/listen_addresses = '*'/" "$PG_CONF"
+#           else
+#             sed -i "s/^listen_addresses.*/listen_addresses = '*'/" "$PG_CONF" || echo "listen_addresses = '*'" >> "$PG_CONF"
+#           fi
+
+#           # permitir conexiones desde cualquier origen (la seguridad la limita el firewall con sourceTags)
+#           if ! grep -q "host all all 0.0.0.0/0 md5" "$PG_HBA"; then
+#             echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+#           fi
+
+#           # reiniciar para aplicar cambios
+#           systemctl restart postgresql
+
+#           # crear usuario y BD (si no existen)
+#           sudo -u postgres psql -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='admin') THEN CREATE USER admin WITH PASSWORD 'admin'; END IF; END \$\$;"
+#           sudo -u postgres psql -c "CREATE DATABASE eventosdb OWNER admin;" || true
+
+
+# # 🔹 App Eventos y Atribución
+# - name: eventos-y-atribucion-vm
+#   type: compute.v1.instance
+#   properties:
+#     zone: us-central1-b
+#     machineType: https://www.googleapis.com/compute/v1/projects/reactive-builders/zones/us-central1-b/machineTypes/e2-small
+#     disks:
+#     - deviceName: boot
+#       type: PERSISTENT
+#       boot: true
+#       autoDelete: true
+#       initializeParams:
+#         sourceImage: projects/debian-cloud/global/images/family/debian-11
+#     networkInterfaces:
+#     - network: global/networks/default
+#       accessConfigs: [{name: External NAT, type: ONE_TO_ONE_NAT}]
+#     tags:
+#       items: [app-server]
+#     metadata:
+#       items:
+#       - key: startup-script
+#         value: |
+#           #!/bin/bash
+#           sudo apt-get update
+#           sudo apt-get install -y python3-pip git
+#           git clone https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega4.git
+#           cd MISW4406-Reactive-Builders-Entrega4
+#           sudo apt-get install -y python3-dev libpq-dev gcc
+#           sudo apt install lsof -y
+#           pip3 install -r requirements.txt
+#           export PATH=$PATH:$HOME/.local/bin
+#           export DB_USER=admin
+#           export DB_PASSWORD=admin
+#           export DB_HOST=10.128.0.23
+#           export DB_PORT=5432
+#           export DB_NAME=eventosdb
+#           cd src/eventos_y_atribucion
+#           flask --app api:create_app --debug run --host=0.0.0.0 --port=8080
