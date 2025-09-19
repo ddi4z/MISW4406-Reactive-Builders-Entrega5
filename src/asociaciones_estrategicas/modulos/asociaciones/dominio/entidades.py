@@ -28,6 +28,7 @@ class AsociacionEstrategica(AgregacionRaiz):
             self.vigencia = asociacion_estrategica.vigencia
             self.descripcion = asociacion_estrategica.descripcion
             self.fecha_creacion = datetime.datetime.now()
+            
 
             self.agregar_evento(OnboardingIniciado(
                 id_correlacion=in_id_correlacion,

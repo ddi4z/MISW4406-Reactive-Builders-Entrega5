@@ -64,7 +64,7 @@ def suscribirse_a_eventos(app=None):
                         app=app,
                     )
 
-                elif mensaje_evento.type == "AsociacionFinalizada":
+                elif mensaje_evento.type == "OnboardingFallido":
                     # TODO: implementar actualización de proyecciones si aplica
                     pass
 

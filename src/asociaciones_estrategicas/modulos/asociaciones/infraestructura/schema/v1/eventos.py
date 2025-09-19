@@ -25,12 +25,14 @@ class OnboardingFallidoPayload(Record):
     id_correlacion = String()
     id_asociacion = String()
     motivo = String()
+    fecha_creacion = Long()
 
 
 class OnboardingCanceladoPayload(Record):
     id_correlacion = String()
     id_asociacion = String()
     fecha_cancelacion = Long()
+    fecha_creacion = Long()
 
 
 # ======================

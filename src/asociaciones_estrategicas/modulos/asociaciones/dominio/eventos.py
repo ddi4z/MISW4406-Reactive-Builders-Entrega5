@@ -42,10 +42,15 @@ class OnboardingFallido(EventoAsociacionEstrategica):
     id_correlacion: str = None
     id_asociacion: uuid.UUID = None
     motivo: str = None
+    fecha_creacion: datetime = None
+    fecha_evento: datetime = field(default_factory=datetime.now)    
+    
 
 @dataclass
 class OnboardingCancelado(EventoAsociacionEstrategica):
     id_correlacion: str = None
     id_asociacion: uuid.UUID = None
     fecha_cancelacion: datetime = None    
+    fecha_creacion: datetime = None
+    fecha_evento: datetime = field(default_factory=datetime.now)    
 
