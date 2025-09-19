@@ -22,6 +22,7 @@ from asociaciones_estrategicas.modulos.asociaciones.aplicacion.servicios import 
 @dataclass
 class CrearAsociacion(Comando):
     id: str
+    id_correlacion: str
     id_marca: str
     id_socio: str
     tipo: str
@@ -37,8 +38,9 @@ class CrearAsociacion(Comando):
 # ==========
 
 class CrearAsociacionHandler(CrearAsociacionBaseHandler):
-    
+
     def handle(self, comando: CrearAsociacion):
+        # 1. Crear el DTO desde el comando
         asociacion_dto = AsociacionDTO(
             id=comando.id,
             id_marca=comando.id_marca,
@@ -47,17 +49,21 @@ class CrearAsociacionHandler(CrearAsociacionBaseHandler):
             descripcion=comando.descripcion,
             vigencia=VigenciaDTO(
                 fecha_inicio=comando.fecha_inicio,
-                fecha_fin=comando.fecha_fin
+                fecha_fin=comando.fecha_fin,
             ),
             fecha_creacion=comando.fecha_creacion,
             fecha_actualizacion=comando.fecha_actualizacion,
         )
 
+        # 2. Convertir a entidad de dominio
         asociacion: AsociacionEstrategica = self.fabrica_asociaciones.crear_objeto(
             asociacion_dto, MapeadorAsociacion()
         )
-        asociacion.crear_asociacion(asociacion)
 
+        # 3. Ejecutar lógica de creación con id_correlacion de la saga
+        asociacion.crear_asociacion(asociacion, id_correlacion=comando.id_correlacion)
+
+        # 4. Persistir asociación + eventos
         repositorio = self.fabrica_repositorio.crear_objeto(RepositorioAsociacionEstrategica)
         repositorio_eventos = self.fabrica_repositorio.crear_objeto(RepositorioEventosAsociacionEstrategica)
 
@@ -68,8 +74,9 @@ class CrearAsociacionHandler(CrearAsociacionBaseHandler):
         )
         UnidadTrabajoPuerto.commit()
 
-        # Publicar comando a Tracking al microservicio eventos y tracking
-        ServicioTracking().iniciar_tracking(asociacion)
+        # 5. Disparar Tracking (parte de la saga en paso 2)
+        # Será responsabilidad de la saga en orquestación
+        ##ServicioTracking().iniciar_tracking(asociacion)
 
 
 # ==========

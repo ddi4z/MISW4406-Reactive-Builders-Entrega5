@@ -40,7 +40,7 @@ def suscribirse_a_eventos(app=None):
                 print(f"Evento recibido: {datos}")
                 logging.info(f"Evento recibido: {datos}")
 
-                if mensaje_evento.type == "AsociacionCreada":
+                if mensaje_evento.type == "OnboardingIniciado":
                     ejecutar_proyeccion(
                         ProyeccionAsociacionesTotales(
                             datos.fecha_creacion,
@@ -110,6 +110,7 @@ def suscribirse_a_comandos(app=None):
 
             comando = CrearAsociacion(
                 id="",
+                id_correlacion=datos.id_correlacion,
                 id_marca=datos.id_marca,
                 id_socio=datos.id_socio,
                 tipo=datos.tipo,
