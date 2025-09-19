@@ -1,4 +1,3 @@
-
 # 🏗️ Microservicio de Asociaciones Estratégicas
 
 ## 👥 Integrantes - Reactive Builders
@@ -9,7 +8,7 @@
 | Martín Flores Arango | r.floresa@uniandes.edu.co |
 | Sara Sofía Cárdenas Rodríguez | ss.cardenas@uniandes.edu.co |
 | Daniel Felipe Díaz Moreno | d.diazm@uniandes.edu.co |
-
+
 ---
 
 ## 🚀 Ejecución del microservicio
@@ -45,7 +44,7 @@ flask --app src/asociaciones_estrategicas/api --debug run --host=0.0.0.0 --port=
 
 ## 🗂️ Modelo de dominio
 
-El microservicio gestiona la creación y finalización de **asociaciones estratégicas** entre marcas y socios.  
+El microservicio gestiona la creación, cancelación y finalización de **asociaciones estratégicas** entre marcas y socios.  
 
 Tipos de asociación disponibles (`TipoAsociacion`):  
 - `PROGRAMA_AFILIADOS`  
@@ -118,6 +117,65 @@ class ComandoIniciarTrackingPayload(Record):
 
 ---
 
+## 📜 Comandos y Eventos de la Saga
+
+La saga de asociaciones estratégicas coordina la creación y cancelación de asociaciones, garantizando consistencia mediante eventos de compensación.
+
+### 📩 Comandos de la saga
+
+1. **Cancelar asociación estratégica**  
+   - **Tópico:** `comandos-asociaciones.cancelar_asociacion`  
+   - **Payload:**
+   ```python
+   class ComandoCancelarAsociacionEstrategicaPayload(ComandoIntegracion):
+       id_correlacion = String()
+       id_asociacion = String()
+       motivo = String()
+   ```
+
+---
+
+### 🔔 Eventos de la saga
+
+1. **OnboardingIniciado**  
+   - Se emite al crear una nueva asociación.  
+   - **Payload:**
+   ```python
+   class OnboardingIniciadoPayload(Record):
+       id_asociacion = String()
+       id_marca = String()
+       id_socio = String()
+       tipo = String()
+       descripcion = String()
+       fecha_inicio = Long()
+       fecha_fin = Long()
+       fecha_creacion = Long()
+   ```
+
+2. **OnboardingCancelado**  
+   - Se emite al cancelar una asociación ya creada.  
+   - **Payload:**
+   ```python
+   class OnboardingCanceladoPayload(Record):
+       id_asociacion = String()
+       id_correlacion = String()
+       motivo = String()
+       fecha_cancelacion = Long()
+   ```
+
+3. **OnboardingFallido**  
+   - Se emite si ocurre un error en la creación o validación de la asociación.  
+   - **Payload:**
+   ```python
+   class OnboardingFallidoPayload(Record):
+       id_asociacion = String()
+       id_correlacion = String()
+       motivo = String()
+       fecha_evento = Long()
+   ```
+
+---
+
 ## 👂 Consumir mensajes manualmente
 
 Se pueden escuchar los tópicos directamente en el contenedor de Pulsar:
@@ -128,6 +186,7 @@ docker exec -it broker bash
 ./bin/pulsar-client consume -s "sub-datos" public/default/eventos-asociacion -n 0
 ./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
 ./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.crear_asociacion -n 0
+./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.cancelar_asociacion -n 0
 ```
 
 ---
@@ -157,12 +216,18 @@ docker exec -it broker bash
 - **Escalabilidad y resiliencia en el consumo**:  
   Uso de suscripción `Shared` en Pulsar permite que múltiples instancias procesen mensajes en paralelo.  
 
+- **Consistencia eventual en proyecciones**:  
+  Las proyecciones (analítica y lista) se actualizan de manera asíncrona, lo que garantiza resiliencia aunque pueda haber ligeros retrasos.
+
 ---
 
 ## 🛠️ Endpoints principales
 
 - **Crear asociación estratégica**  
   `POST /asociaciones`  
+
+- **Cancelar asociación estratégica**  
+  `POST /asociaciones/cancelar`  
 
 - **Obtener asociación por id**  
   `GET /asociaciones/<id>`  
@@ -177,6 +242,6 @@ docker exec -it broker bash
 
 ## 📽️ Demo
 
-Se incluyó un video de ejecución en el repositorio (`videoFinalMicroAsociaciones.mp4` ).
+Se incluyó un video de ejecución en el repositorio (`videoFinalMicroAsociaciones.mp4`).
 
 ---
