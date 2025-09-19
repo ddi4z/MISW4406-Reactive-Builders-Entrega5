@@ -4,78 +4,38 @@ from asociaciones_estrategicas.seedwork.infraestructura.utils import time_millis
 import uuid
 
 
-# ======================
-# Payloads
-# ======================
-
-
-class OnboardingIniciadoPayload(Record):
-    id_correlacion = String()          # Saga tracking
-    id_asociacion = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-    descripcion = String()
-    fecha_inicio = Long()
-    fecha_fin = Long()
-    fecha_creacion = Long()
-
-
-class OnboardingFallidoPayload(Record):
+# ========== Payload único (campos opcionales) ==========
+class AsociacionPayload(Record):
     id_correlacion = String()
     id_asociacion = String()
-    motivo = String()
-    fecha_creacion = Long()
+
+    # datos para "INICIADO"
+    id_marca = String(default=None)
+    id_socio = String(default=None)
+    tipo = String(default=None)
+    descripcion = String(default=None)
+    fecha_inicio = Long(default=0)
+    fecha_fin = Long(default=0)
+    fecha_creacion = Long(default=0)
+
+    # datos para "FALLIDO"
+    motivo = String(default=None)
+
+    # datos para "CANCELADO"
+    fecha_cancelacion = Long(default=0)
 
 
-class OnboardingCanceladoPayload(Record):
-    id_correlacion = String()
-    id_asociacion = String()
-    fecha_cancelacion = Long()
-    fecha_creacion = Long()
-
-
-# ======================
-# Eventos de integración
-# ======================
-
-class EventoOnboardingIniciado(EventoIntegracion):
+# ========== Evento unificado ==========
+class EventoAsociacion(EventoIntegracion):
     id = String(default=str(uuid.uuid4()))
     time = Long()
     ingestion = Long(default=time_millis())
     specversion = String()
-    type = String()
+    type = String()        # siempre "Asociacion"
+    estado = String()      # "INICIADO" | "FALLIDO" | "CANCELADO"
     datacontenttype = String()
     service_name = String()
-    data = OnboardingIniciadoPayload()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class EventoOnboardingFallido(EventoIntegracion):
-    id = String(default=str(uuid.uuid4()))
-    time = Long()
-    ingestion = Long(default=time_millis())
-    specversion = String()
-    type = String()
-    datacontenttype = String()
-    service_name = String()
-    data = OnboardingFallidoPayload()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class EventoOnboardingCancelado(EventoIntegracion):
-    id = String(default=str(uuid.uuid4()))
-    time = Long()
-    ingestion = Long(default=time_millis())
-    specversion = String()
-    type = String()
-    datacontenttype = String()
-    service_name = String()
-    data = OnboardingCanceladoPayload()
+    data = AsociacionPayload()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -6,9 +6,7 @@ import traceback
 from asociaciones_estrategicas.config.uow import UnidadTrabajoPulsar
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.comandos.crear_asociacion import CrearAsociacion, CrearAsociacionHandler
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import ComandoCrearAsociacionEstrategica
-from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.eventos import (
-    EventoOnboardingIniciado,
-)
+
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.proyecciones import (
     ProyeccionAsociacionesTotales,
     ProyeccionAsociacionesLista,
@@ -18,6 +16,10 @@ from asociaciones_estrategicas.seedwork.infraestructura.proyecciones import ejec
 from asociaciones_estrategicas.seedwork.infraestructura import utils
 from asociaciones_estrategicas.seedwork.infraestructura.uow import guardar_unidad_trabajo
 from asociaciones_estrategicas.config.uow import UnidadTrabajoHibrida
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.eventos import (
+    EventoAsociacion,
+)
+
 
 
 def suscribirse_a_eventos(app=None):
@@ -28,7 +30,7 @@ def suscribirse_a_eventos(app=None):
             "eventos-asociacion",
             consumer_type=_pulsar.ConsumerType.Shared,
             subscription_name="alpes-partners-sub-eventos",
-            schema=AvroSchema(EventoOnboardingIniciado),
+            schema=AvroSchema(EventoAsociacion),
         )
 
         while True:
@@ -36,10 +38,10 @@ def suscribirse_a_eventos(app=None):
             try:
                 datos = mensaje.value().data
                 mensaje_evento = mensaje.value()
-                print(f"Evento recibido:{mensaje_evento.type} {datos}")
-                logging.info(f"Evento recibido:{mensaje_evento.type} {datos}")
+                print(f"Evento recibido:{mensaje_evento.estado} {datos}")
+                logging.info(f"Evento recibido:{mensaje_evento.estado} {datos}")
 
-                if mensaje_evento.type == "OnboardingIniciado":
+                if mensaje_evento.estado == "OnboardingIniciado":
                     ejecutar_proyeccion(
                         ProyeccionAsociacionesTotales(
                             datos.fecha_creacion,
@@ -64,7 +66,7 @@ def suscribirse_a_eventos(app=None):
                         app=app,
                     )
 
-                elif mensaje_evento.type == "OnboardingFallido":
+                elif mensaje_evento.estado == "OnboardingFallido":
                     # TODO: implementar actualización de proyecciones si aplica
                     pass
 

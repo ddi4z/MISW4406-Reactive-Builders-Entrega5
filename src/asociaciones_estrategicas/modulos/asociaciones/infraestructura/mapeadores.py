@@ -40,94 +40,67 @@ class MapeadorEventosAsociacionEstrategica(Mapeador):
     def es_version_valida(self, version):
         return version in self.versions
 
-   
-    
-    # ===============================
-    # OnboardingIniciado
-    # ===============================
     def _entidad_a_onboarding_iniciado(self, entidad: OnboardingIniciado, version=LATEST_VERSION):
-        def v1(evento):
-            from .schema.v1.eventos import OnboardingIniciadoPayload, EventoOnboardingIniciado
+        from .schema.v1.eventos import EventoAsociacion, AsociacionPayload
+        payload = AsociacionPayload(
+            id_correlacion=entidad.id_correlacion,
+            id_asociacion=str(entidad.id_asociacion),
+            id_marca=str(entidad.id_marca),
+            id_socio=str(entidad.id_socio),
+            tipo=str(entidad.tipo),
+            descripcion=entidad.descripcion,
+            fecha_inicio=int(unix_time_millis(entidad.fecha_inicio)),
+            fecha_fin=int(unix_time_millis(entidad.fecha_fin)),
+            fecha_creacion=int(unix_time_millis(entidad.fecha_creacion)),
+        )
+        evento = EventoAsociacion(id=str(entidad.id_asociacion))
+        evento.time = int(unix_time_millis(entidad.fecha_creacion))
+        evento.specversion = str(version)
+        evento.type = "Asociacion"
+        evento.estado = "OnboardingIniciado"
+        evento.datacontenttype = "AVRO"
+        evento.service_name = "asociaciones"
+        evento.data = payload
+        return evento
 
-            payload = OnboardingIniciadoPayload(
-                id_correlacion=evento.id_correlacion,
-                id_asociacion=str(evento.id_asociacion),
-                id_marca=str(evento.id_marca),
-                id_socio=str(evento.id_socio),
-                tipo=str(evento.tipo),
-                descripcion=evento.descripcion,
-                fecha_inicio=int(unix_time_millis(evento.fecha_inicio)),
-                fecha_fin=int(unix_time_millis(evento.fecha_fin)),
-                fecha_creacion=int(unix_time_millis(evento.fecha_creacion)),
-            )
 
-            evento_integracion = EventoOnboardingIniciado(id=str(evento.id_asociacion))
-            evento_integracion.time = int(unix_time_millis(evento.fecha_creacion))
-            evento_integracion.specversion = str(version)
-            evento_integracion.type = "OnboardingIniciado"
-            evento_integracion.datacontenttype = "AVRO"
-            evento_integracion.service_name = "asociaciones"
-            evento_integracion.data = payload
-
-            return evento_integracion
-
-        if not self.es_version_valida(version):
-            raise Exception(f"No se sabe procesar la version {version}")
-        return v1(entidad)
-
-    # ===============================
-    # OnboardingFallido
-    # ===============================
     def _entidad_a_onboarding_fallido(self, entidad: OnboardingFallido, version=LATEST_VERSION):
-        def v1(evento):
-            from .schema.v1.eventos import OnboardingFallidoPayload, EventoOnboardingFallido
+        from .schema.v1.eventos import EventoAsociacion, AsociacionPayload
+        payload = AsociacionPayload(
+            id_correlacion=entidad.id_correlacion,
+            id_asociacion=str(entidad.id_asociacion),
+            motivo=entidad.motivo,
+            fecha_creacion=int(unix_time_millis(entidad.fecha_evento)),
+        )
+        evento = EventoAsociacion(id=str(entidad.id_asociacion))
+        evento.time = int(unix_time_millis(entidad.fecha_evento))
+        evento.specversion = str(version)
+        evento.type = "Asociacion"
+        evento.estado = "OnboardingFallido"
+        evento.datacontenttype = "AVRO"
+        evento.service_name = "asociaciones"
+        evento.data = payload
+        return evento
 
-            payload = OnboardingFallidoPayload(
-                id_correlacion=evento.id_correlacion,
-                id_asociacion=str(evento.id_asociacion),
-                motivo=evento.motivo,
-            )
 
-            evento_integracion = EventoOnboardingFallido(id=str(evento.id_asociacion))
-            evento_integracion.time = int(unix_time_millis(evento.fecha_evento))
-            evento_integracion.specversion = str(version)
-            evento_integracion.type = "OnboardingFallido"
-            evento_integracion.datacontenttype = "AVRO"
-            evento_integracion.service_name = "asociaciones"
-            evento_integracion.data = payload
-
-            return evento_integracion
-
-        if not self.es_version_valida(version):
-            raise Exception(f"No se sabe procesar la version {version}")
-        return v1(entidad)
-
-    # ===============================
-    # OnboardingCancelado
-    # ===============================
     def _entidad_a_onboarding_cancelado(self, entidad: OnboardingCancelado, version=LATEST_VERSION):
-        def v1(evento):
-            from .schema.v1.eventos import OnboardingCanceladoPayload, EventoOnboardingCancelado
-
-            payload = OnboardingCanceladoPayload(
-                id_correlacion=evento.id_correlacion,
-                id_asociacion=str(evento.id_asociacion),
-                fecha_cancelacion=int(unix_time_millis(evento.fecha_cancelacion)),
-            )
-
-            evento_integracion = EventoOnboardingCancelado(id=str(evento.id_asociacion))
-            evento_integracion.time = int(unix_time_millis(evento.fecha_cancelacion))
-            evento_integracion.specversion = str(version)
-            evento_integracion.type = "OnboardingCancelado"
-            evento_integracion.datacontenttype = "AVRO"
-            evento_integracion.service_name = "asociaciones"
-            evento_integracion.data = payload
-
-            return evento_integracion
-
-        if not self.es_version_valida(version):
-            raise Exception(f"No se sabe procesar la version {version}")
-        return v1(entidad)    
+        from .schema.v1.eventos import EventoAsociacion, AsociacionPayload
+        payload = AsociacionPayload(
+            id_correlacion=entidad.id_correlacion,
+            id_asociacion=str(entidad.id_asociacion),
+            fecha_cancelacion=int(unix_time_millis(entidad.fecha_cancelacion)),
+            fecha_creacion=int(unix_time_millis(entidad.fecha_evento)),
+        )
+        evento = EventoAsociacion(id=str(entidad.id_asociacion))
+        evento.time = int(unix_time_millis(entidad.fecha_cancelacion))
+        evento.specversion = str(version)
+        evento.type = "Asociacion"
+        evento.estado = "OnboardingCancelado"
+        evento.datacontenttype = "AVRO"
+        evento.service_name = "asociaciones"
+        evento.data = payload
+        return evento
+  
 
     def entidad_a_dto(self, entidad: EventoAsociacionEstrategica, version=LATEST_VERSION):
         if not entidad:
