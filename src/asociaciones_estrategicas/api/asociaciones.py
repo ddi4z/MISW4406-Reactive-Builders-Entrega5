@@ -1,3 +1,4 @@
+import uuid
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_analitica import ObtenerAnaliticaAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_lista import ObtenerAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_por_marca import ObtenerAsociacionesPorMarca
@@ -30,6 +31,9 @@ def crear_asociacion_usando_comando():
         map_asociacion = MapeadorAsociacionDTOJson()
         asociacion_dto = map_asociacion.externo_a_dto(asociacion_dict)
 
+        # Tomar id_correlacion del request si viene, si no generar uno nuevo
+        id_correlacion = asociacion_dict.get("id_correlacion", str(uuid.uuid4()))        
+
         #comando = CrearAsociacion(
         #    id=asociacion_dto.id,
         #    id_marca=asociacion_dto.id_marca,
@@ -47,7 +51,7 @@ def crear_asociacion_usando_comando():
         #ejecutar_commando(comando)
 
         #se pasa la petición al servicio que publica el comando en el broker
-        ServicioAsociacion().crear_asociacion(asociacion_dto)
+        ServicioAsociacion().crear_asociacion(asociacion_dto,id_correlacion)
 
         return Response("{}", status=202, mimetype='application/json')
     except ExcepcionDominio as e:

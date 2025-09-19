@@ -1,10 +1,6 @@
 import pulsar
 from pulsar.schema import AvroSchema
 
-from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.eventos import (
-    EventoAsociacionCreada,
-    EventoAsociacionFinalizada,
-)
 from asociaciones_estrategicas.seedwork.infraestructura import utils
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.mapeadores import MapeadorEventosAsociacionEstrategica
 

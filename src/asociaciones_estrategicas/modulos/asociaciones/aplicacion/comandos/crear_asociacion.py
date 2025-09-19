@@ -61,7 +61,7 @@ class CrearAsociacionHandler(CrearAsociacionBaseHandler):
         )
 
         # 3. Ejecutar lógica de creación con id_correlacion de la saga
-        asociacion.crear_asociacion(asociacion, id_correlacion=comando.id_correlacion)
+        asociacion.crear_asociacion(asociacion, in_id_correlacion=comando.id_correlacion)
 
         # 4. Persistir asociación + eventos
         repositorio = self.fabrica_repositorio.crear_objeto(RepositorioAsociacionEstrategica)

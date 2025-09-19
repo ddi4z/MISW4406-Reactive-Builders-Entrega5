@@ -7,8 +7,7 @@ from asociaciones_estrategicas.config.uow import UnidadTrabajoPulsar
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.comandos.crear_asociacion import CrearAsociacion, CrearAsociacionHandler
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import ComandoCrearAsociacionEstrategica
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.eventos import (
-    EventoAsociacionCreada,
-    EventoAsociacionFinalizada,
+    EventoOnboardingIniciado,
 )
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.proyecciones import (
     ProyeccionAsociacionesTotales,
@@ -29,7 +28,7 @@ def suscribirse_a_eventos(app=None):
             "eventos-asociacion",
             consumer_type=_pulsar.ConsumerType.Shared,
             subscription_name="alpes-partners-sub-eventos",
-            schema=AvroSchema(EventoAsociacionCreada),
+            schema=AvroSchema(EventoOnboardingIniciado),
         )
 
         while True:
@@ -37,8 +36,8 @@ def suscribirse_a_eventos(app=None):
             try:
                 datos = mensaje.value().data
                 mensaje_evento = mensaje.value()
-                print(f"Evento recibido: {datos}")
-                logging.info(f"Evento recibido: {datos}")
+                print(f"Evento recibido:{mensaje_evento.type} {datos}")
+                logging.info(f"Evento recibido:{mensaje_evento.type} {datos}")
 
                 if mensaje_evento.type == "OnboardingIniciado":
                     ejecutar_proyeccion(
@@ -105,8 +104,9 @@ def suscribirse_a_comandos(app=None):
             comando_integracion = mensaje.value()
             datos = comando_integracion.data
 
-            logging.info(f"Comando recibido: {datos}")
-            print(f"Comando recibido: {datos}")
+    
+            logging.info(f"Comando recibido CrearAsociacion: {datos}")
+            print(f"Comando recibido CrearAsociacion: {datos}")
 
             comando = CrearAsociacion(
                 id="",

@@ -2,14 +2,13 @@ from pydispatch import dispatcher
 
 from .handlers import HandlerAsociacionIntegracion
 
-from asociaciones_estrategicas.modulos.asociaciones.dominio.eventos import (    AsociacionCreada   , AsociacionFinalizada
-                                                                            , OnboardingIniciado, OnboardingFallido, OnboardingCancelado)
+from asociaciones_estrategicas.modulos.asociaciones.dominio.eventos import ( OnboardingIniciado, OnboardingFallido, OnboardingCancelado)
 
 # Registrar handlers para publicar eventos de integración
-dispatcher.connect(
-    HandlerAsociacionIntegracion.handle_asociacion_creada,
-    signal=f"{AsociacionCreada.__name__}Integracion",
-)
+#dispatcher.connect(
+#    HandlerAsociacionIntegracion.handle_asociacion_creada,
+#    signal=f"{AsociacionCreada.__name__}Integracion",
+#)
 
 
 

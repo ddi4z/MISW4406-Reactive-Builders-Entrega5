@@ -25,9 +25,10 @@ class ServicioTracking:
 
 
 class ServicioAsociacion:
-    def crear_asociacion(self, asociacion_dto):
+    def crear_asociacion(self, asociacion_dto,in_id_correlacion: str):
         payload = ComandoCrearAsociacionEstrategicaPayload(
             #id_usuario="",  # opcional, podrías pasarlo desde la sesión
+            id_correlacion=in_id_correlacion,
             id_marca=asociacion_dto.id_marca,
             id_socio=asociacion_dto.id_socio,
             tipo=asociacion_dto.tipo,

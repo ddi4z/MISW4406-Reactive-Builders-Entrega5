@@ -1,7 +1,3 @@
-from asociaciones_estrategicas.modulos.asociaciones.dominio.eventos import (
-    AsociacionCreada,
-    AsociacionFinalizada,
-)
 from asociaciones_estrategicas.seedwork.aplicacion.handlers import Handler
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.despachadores import Despachador
 from asociaciones_estrategicas.modulos.asociaciones.dominio.eventos import (
