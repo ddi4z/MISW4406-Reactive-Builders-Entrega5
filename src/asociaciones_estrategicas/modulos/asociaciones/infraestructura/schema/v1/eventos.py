@@ -4,60 +4,38 @@ from asociaciones_estrategicas.seedwork.infraestructura.utils import time_millis
 import uuid
 
 
-# ======================
-# Payloads
-# ======================
-
-class AsociacionCreadaPayload(Record):
+# ========== Payload único (campos opcionales) ==========
+class AsociacionPayload(Record):
+    id_correlacion = String()
     id_asociacion = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-    descripcion = String()      
-    fecha_inicio = Long()       
-    fecha_fin = Long()          
-    fecha_creacion = Long()
+
+    # datos para "OnboardingIniciado"
+    id_marca = String(default=None)
+    id_socio = String(default=None)
+    tipo = String(default=None)
+    descripcion = String(default=None)
+    fecha_inicio = Long(default=0)
+    fecha_fin = Long(default=0)
+    fecha_creacion = Long(default=0)
+
+    # datos para "OnboardingFallido"
+    motivo = String(default=None)
+
+    # datos para "OnboardingCancelado"
+    fecha_cancelacion = Long(default=0)
 
 
-
-class AsociacionFinalizadaPayload(Record):
-    id_asociacion = String()
-    fecha_actualizacion = Long()
-
-
-# ======================
-# Eventos de integración
-# ======================
-
-class EventoAsociacionCreada(EventoIntegracion):
-    # NOTE La librería Record de Pulsar no es capaz de reconocer campos heredados, 
-    # por lo que los mensajes al ser codificados pierden sus valores
-    # Dupliqué el los cambios que ya se encuentran en la clase Mensaje
+# ========== Evento unificado ==========
+class EventoAsociacion(EventoIntegracion):
     id = String(default=str(uuid.uuid4()))
     time = Long()
     ingestion = Long(default=time_millis())
     specversion = String()
-    type = String()
+    type = String()        # siempre "Asociacion"
+    estado = String()      # "OnboardingIniciado" | "OnboardingFallido" | "OnboardingCancelado"
     datacontenttype = String()
     service_name = String()
-    data = AsociacionCreadaPayload()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class EventoAsociacionFinalizada(EventoIntegracion):
-    # NOTE La librería Record de Pulsar no es capaz de reconocer campos heredados, 
-    # por lo que los mensajes al ser codificados pierden sus valores
-    # Dupliqué el los cambios que ya se encuentran en la clase Mensaje
-    id = String(default=str(uuid.uuid4()))
-    time = Long()
-    ingestion = Long(default=time_millis())
-    specversion = String()
-    type = String()
-    datacontenttype = String()
-    service_name = String()
-    data = AsociacionFinalizadaPayload()
+    data = AsociacionPayload()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

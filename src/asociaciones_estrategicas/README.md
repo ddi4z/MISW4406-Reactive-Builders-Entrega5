@@ -1,4 +1,3 @@
-
 # 🏗️ Microservicio de Asociaciones Estratégicas
 
 ## 👥 Integrantes - Reactive Builders
@@ -9,7 +8,7 @@
 | Martín Flores Arango | r.floresa@uniandes.edu.co |
 | Sara Sofía Cárdenas Rodríguez | ss.cardenas@uniandes.edu.co |
 | Daniel Felipe Díaz Moreno | d.diazm@uniandes.edu.co |
-
+
 ---
 
 ## 🚀 Ejecución del microservicio
@@ -45,7 +44,7 @@ flask --app src/asociaciones_estrategicas/api --debug run --host=0.0.0.0 --port=
 
 ## 🗂️ Modelo de dominio
 
-El microservicio gestiona la creación y finalización de **asociaciones estratégicas** entre marcas y socios.  
+El microservicio gestiona la creación, cancelación y finalización de **asociaciones estratégicas** entre marcas y socios.  
 
 Tipos de asociación disponibles (`TipoAsociacion`):  
 - `PROGRAMA_AFILIADOS`  
@@ -63,29 +62,47 @@ Cada asociación estratégica se representa como una **agregación raíz** en el
 Este microservicio sigue un patrón **Event-Driven Architecture (EDA)** usando **Apache Pulsar** como broker.  
 Los mensajes usan **Avro** como esquema y se dividen en **eventos** y **comandos**.
 
-### 🔔 Eventos de integración
+### 🔔 Eventos unificados de integración y saga
 
-**Tópico:** `public/default/eventos-asociacion`
+**Tópico único:** `public/default/eventos-asociacion`  
 
-- **EventoAsociacionCreada**
+Todos los eventos se publican en un solo tópico mediante **composición**.  
+El campo `estado` diferencia el tipo de evento:  
+
+- `OnboardingIniciado`  
+- `OnboardingCancelado`  
+- `OnboardingFallido`  
+
+**Esquema:**
 ```python
-class AsociacionCreadaPayload(Record):
+class EventoAsociacion(EventoIntegracion):
+    id = String()
+    time = Long()
+    specversion = String()
+    type = String()   # siempre "Asociacion"
+    estado = String() # "OnboardingIniciado" | "OnboardingFallido" | "OnboardingCancelado"
+    data = AsociacionPayload()
+```
+
+**Payload (AsociacionPayload):**
+```python
+class AsociacionPayload(Record):
     id_asociacion = String()
+    id_correlacion = String()
     id_marca = String()
     id_socio = String()
     tipo = String()
     descripcion = String()
+    motivo = String()
     fecha_inicio = Long()
     fecha_fin = Long()
     fecha_creacion = Long()
+    fecha_actualizacion = Long()
+    fecha_cancelacion = Long()
+    fecha_evento = Long()
 ```
 
-- **EventoAsociacionFinalizada**
-```python
-class AsociacionFinalizadaPayload(Record):
-    id_asociacion = String()
-    fecha_actualizacion = Long()
-```
+👉 Este diseño simplifica la integración: todos los consumidores escuchan un solo tópico y reaccionan según el `estado`.  
 
 ---
 
@@ -94,27 +111,37 @@ class AsociacionFinalizadaPayload(Record):
 1. **Crear asociación estratégica**  
    - **Tópico:** `comandos-asociaciones.crear_asociacion`  
    - **Payload:**
-```python
-class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
-    id_usuario = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-    descripcion = String()
-    fecha_inicio = String()
-    fecha_fin = String()
-```
+   ```python
+   class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
+       id_usuario = String()
+       id_marca = String()
+       id_socio = String()
+       tipo = String()
+       descripcion = String()
+       fecha_inicio = String()
+       fecha_fin = String()
+   ```
 
-2. **Iniciar tracking**  
+2. **Cancelar asociación estratégica**  
+   - **Tópico:** `comandos-asociaciones.cancelar_asociacion`  
+   - **Payload:**
+   ```python
+   class ComandoCancelarAsociacionPayload(ComandoIntegracion):
+       id_correlacion = String()
+       id_asociacion = String()
+       motivo = String()
+   ```
+
+3. **Iniciar tracking**  
    - **Tópico:** `comandos-eventos_y_atribucion.iniciar_tracking`  
    - **Payload:**
-```python
-class ComandoIniciarTrackingPayload(Record):
-    id_asociacion_estrategica = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-```
+   ```python
+   class ComandoIniciarTrackingPayload(Record):
+       id_asociacion_estrategica = String()
+       id_marca = String()
+       id_socio = String()
+       tipo = String()
+   ```
 
 ---
 
@@ -126,8 +153,9 @@ Se pueden escuchar los tópicos directamente en el contenedor de Pulsar:
 docker exec -it broker bash
 
 ./bin/pulsar-client consume -s "sub-datos" public/default/eventos-asociacion -n 0
-./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
 ./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.crear_asociacion -n 0
+./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.cancelar_asociacion -n 0
+./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
 ```
 
 ---
@@ -142,8 +170,9 @@ docker exec -it broker bash
   Coordina en una sola transacción lógica la persistencia en BD y la publicación de eventos en el broker.  
   Asegura consistencia y evita inconsistencias.  
 
-- **Eventos gordos de integración**:  
-  Los eventos incluyen toda la información relevante, evitando dependencias adicionales entre microservicios.  
+- **Eventos compuestos de integración**:  
+  Se usa un único esquema (`EventoAsociacion`) con `estado` y `payload` flexible.  
+  Esto simplifica el consumo y reduce la complejidad de gestión de tópicos.  
 
 - **Persistencia de eventos en Pulsar**:  
   Configuración de retención infinita permite reprocesar eventos y reconstruir proyecciones.  
@@ -157,12 +186,18 @@ docker exec -it broker bash
 - **Escalabilidad y resiliencia en el consumo**:  
   Uso de suscripción `Shared` en Pulsar permite que múltiples instancias procesen mensajes en paralelo.  
 
+- **Consistencia eventual en proyecciones**:  
+  Las proyecciones (analítica y lista) se actualizan de manera asíncrona, lo que garantiza resiliencia aunque pueda haber ligeros retrasos.
+
 ---
 
 ## 🛠️ Endpoints principales
 
 - **Crear asociación estratégica**  
   `POST /asociaciones`  
+
+- **Cancelar asociación estratégica**  
+  `POST /asociaciones/cancelar`  
 
 - **Obtener asociación por id**  
   `GET /asociaciones/<id>`  
@@ -177,6 +212,6 @@ docker exec -it broker bash
 
 ## 📽️ Demo
 
-Se incluyó un video de ejecución en el repositorio (`videoFinalMicroAsociaciones.mp4` ).
+Se incluyó un video de ejecución en el repositorio (`videoFinalMicroAsociaciones.mp4`).
 
 ---

@@ -3,12 +3,12 @@
     "info": {
       "name": "Microservicio Asociaciones",
       "_postman_id": "new-uuid",
-      "description": "Colección para probar el microservicio de Asociaciones Estratégicas",
+      "description": "Colecci\u00f3n para probar el microservicio de Asociaciones Estrat\u00e9gicas",
       "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
       {
-        "name": "Crear Asociación",
+        "name": "Crear Asociaci\u00f3n",
         "request": {
           "method": "POST",
           "header": [
@@ -33,10 +33,35 @@
         }
       },
       {
-        "name": "Obtener Asociación por ID",
+        "name": "Cancelar Asociaci\u00f3n",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "url": {
+            "raw": "{{base_url}}/asociaciones/cancelar",
+            "host": [
+              "{{base_url}}"
+            ],
+            "path": [
+              "asociaciones",
+              "cancelar"
+            ]
+          },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id_correlacion\": \"{{id_correlacion}}\",\n  \"id_asociacion\": \"df1fa5db-ae22-4765-9079-3a9841bc1a5e\",\n  \"motivo\": \"El socio cancel\u00f3 el acuerdo\"\n}"
+          }
+        }
+      },
+      {
+        "name": "Obtener Asociaci\u00f3n por ID",
         "request": {
           "method": "GET",
-          "header": [],
           "url": {
             "raw": "{{base_url}}/asociaciones/df1fa5db-ae22-4765-9079-3a9841bc1a5e",
             "host": [
@@ -53,7 +78,6 @@
         "name": "Obtener Asociaciones por Marca",
         "request": {
           "method": "GET",
-          "header": [],
           "url": {
             "raw": "{{base_url}}/asociaciones/marca/c80c323c-aa79-4ae4-9038-a36f7b2eb685",
             "host": [
@@ -71,7 +95,6 @@
         "name": "Listar Asociaciones (con filtros)",
         "request": {
           "method": "GET",
-          "header": [],
           "url": {
             "raw": "{{base_url}}/asociaciones/lista?id_marca=c80c323c-aa79-4ae4-9038-a36f7b2eb685&id_socio=9c21eb6b-4171-41d1-a6c8-438aae01f857&tipo=campania",
             "host": [
@@ -85,10 +108,9 @@
         }
       },
       {
-        "name": "Obtener Analítica Asociaciones",
+        "name": "Obtener Anal\u00edtica Asociaciones",
         "request": {
           "method": "GET",
-          "header": [],
           "url": {
             "raw": "{{base_url}}/asociaciones/analitica",
             "host": [
@@ -111,10 +133,12 @@
         "key": "base_url",
         "value": "http://localhost:5000",
         "enabled": true
+      },
+      {
+        "key": "id_correlacion",
+        "value": "123e4567-e89b-12d3-a456-426614174000",
+        "enabled": true
       }
-    ],
-    "_postman_variable_scope": "environment",
-    "_postman_exported_at": "2025-09-13T00:00:00Z",
-    "_postman_exported_using": "ChatGPT"
+    ]
   }
 }

@@ -7,8 +7,8 @@ db = None
 DB_USER = os.getenv('DB_USER', default="root")
 DB_PASSWORD = os.getenv('DB_PASSWORD', default="pwdadmin")
 DB_HOST = os.getenv('DB_HOST', default="localhost")
-DB_PORT = os.getenv('DB_PORT', default="5432")
-DB_NAME = os.getenv('DB_NAME', default="asociacionesdb")
+DB_PORT = os.getenv('DB_PORT', default="3306")
+DB_NAME = os.getenv('DB_NAME', default="asociaciones_estrategicas")
 
 class DatabaseConfigException(Exception):
     def __init__(self, message='Configuration file is Null or malformed'):
@@ -23,7 +23,7 @@ def database_connection(config, basedir=os.path.abspath(os.path.dirname(__file__
     if config.get('TESTING', False) == True:
         return f'sqlite:///{os.path.join(basedir, "database.db")}'
     else:
-        return f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+        return f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 
 def init_db(app: Flask):

@@ -1,13 +1,9 @@
 import pulsar
 from pulsar.schema import AvroSchema
 
-from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.eventos import (
-    EventoAsociacionCreada,
-    EventoAsociacionFinalizada,
-)
 from asociaciones_estrategicas.seedwork.infraestructura import utils
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.mapeadores import MapeadorEventosAsociacionEstrategica
-
+from .schema.v1.eventos import EventoAsociacion  
 
 class Despachador:
     def __init__(self):
@@ -17,12 +13,12 @@ class Despachador:
         cliente = pulsar.Client(f"pulsar://{utils.broker_host()}:6650")
         publicador = cliente.create_producer(topico, schema=schema)
         publicador.send(mensaje)
-        cliente.close()
+        #cliente.close()
 
     def publicar_evento(self, evento, topico):
-        # Convertir evento de dominio a evento de integración
         evento_integracion = self.mapper.entidad_a_dto(evento)
-        self._publicar_mensaje(evento_integracion, topico, AvroSchema(evento_integracion.__class__))
+        # forzamos el AvroSchema del evento unificado
+        self._publicar_mensaje(evento_integracion, topico, AvroSchema(EventoAsociacion))
 
     def publicar_comando(self, comando, topico, schema=None):
         # Si el comando ya es un Avro Record con schema conocido

@@ -1,3 +1,4 @@
+import uuid
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_analitica import ObtenerAnaliticaAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_lista import ObtenerAsociaciones
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.queries.obtener_asociacion_por_marca import ObtenerAsociacionesPorMarca
@@ -30,6 +31,9 @@ def crear_asociacion_usando_comando():
         map_asociacion = MapeadorAsociacionDTOJson()
         asociacion_dto = map_asociacion.externo_a_dto(asociacion_dict)
 
+        # Tomar id_correlacion del request si viene, si no generar uno nuevo
+        id_correlacion = asociacion_dict.get("id_correlacion", str(uuid.uuid4()))        
+
         #comando = CrearAsociacion(
         #    id=asociacion_dto.id,
         #    id_marca=asociacion_dto.id_marca,
@@ -47,7 +51,7 @@ def crear_asociacion_usando_comando():
         #ejecutar_commando(comando)
 
         #se pasa la petición al servicio que publica el comando en el broker
-        ServicioAsociacion().crear_asociacion(asociacion_dto)
+        ServicioAsociacion().crear_asociacion(asociacion_dto,id_correlacion)
 
         return Response("{}", status=202, mimetype='application/json')
     except ExcepcionDominio as e:
@@ -57,6 +61,45 @@ def crear_asociacion_usando_comando():
             mimetype='application/json',
         )
 
+@bp.route('/cancelar', methods=('POST',))
+def cancelar_asociacion_usando_comando():
+    try:
+        session['uow_metodo'] = 'pulsar'
+
+        asociacion_dict = request.json
+
+        # Tomar id_correlacion del request si viene, si no generar uno nuevo
+        id_correlacion = asociacion_dict.get("id_correlacion")        
+        id_asociacion = asociacion_dict.get("id_asociacion")        
+        motivo = asociacion_dict.get("motivo")                
+        
+
+        #comando = CrearAsociacion(
+        #    id=asociacion_dto.id,
+        #    id_marca=asociacion_dto.id_marca,
+        #    id_socio=asociacion_dto.id_socio,
+        #    tipo=asociacion_dto.tipo,
+        #    descripcion=asociacion_dto.descripcion,
+        #    fecha_inicio=asociacion_dto.vigencia.fecha_inicio,
+        #    fecha_fin=asociacion_dto.vigencia.fecha_fin,
+        #    fecha_creacion=asociacion_dto.fecha_creacion,
+        #    fecha_actualizacion=asociacion_dto.fecha_actualizacion,
+        #)
+
+        # TODO Reemplaze es todo código sincrono y use el broker de eventos para propagar este comando de forma asíncrona
+        # Revise la clase Despachador de la capa de infraestructura
+        #ejecutar_commando(comando)
+
+        #se pasa la petición al servicio que publica el comando en el broker
+        ServicioAsociacion().cancelar_asociacion(id_asociacion,motivo,id_correlacion)
+
+        return Response("{}", status=202, mimetype='application/json')
+    except ExcepcionDominio as e:
+        return Response(
+            json.dumps(dict(error=str(e))),
+            status=400,
+            mimetype='application/json',
+        )
 
 # ==========
 # GET: obtener asociación

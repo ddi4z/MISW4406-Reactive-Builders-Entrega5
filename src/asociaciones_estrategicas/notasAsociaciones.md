@@ -1,9 +1,11 @@
 
+Formas de levantar:
+1. DOCKER-COMPOSE: Por ahora no funciona
 Levantar por docker-compose micro asociaciones 
 docker compose --profile asociaciones_estrategicas --profile pulsar up --force-recreate --build
 
 
-
+2. Applicaciones individuales
 Base de datos asociaciones
 docker-compose --profile db_asociaciones_estrategicas up
 

@@ -71,7 +71,12 @@ class RepositorioEventosAsociacionesSQLAlchemy(RepositorioEventosAsociacionEstra
         evento_dto = EventosAsociacion()
         evento_dto.id = str(evento.id)
         evento_dto.id_entidad = str(evento.id_asociacion)
-        evento_dto.fecha_evento = evento.fecha_creacion
+        
+        #evento_dto.fecha_evento = evento.fecha_creacion
+        # 👇 Usa fecha_evento si no tiene fecha_creacion
+        evento_dto.fecha_evento = getattr(evento, "fecha_creacion", None) or getattr(evento, "fecha_evento")
+
+
         evento_dto.version = str(evento_integracion.specversion)
         evento_dto.tipo_evento = evento.__class__.__name__
         evento_dto.formato_contenido = "JSON"

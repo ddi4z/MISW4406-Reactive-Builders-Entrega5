@@ -80,11 +80,11 @@ services:
       - managedLedgerDefaultAckQuorum=1
       - advertisedAddress=broker
       #Si se realiza una ejecución manual del microservicio desde el IDE, se debe usar esta línea:
-      #- advertisedListeners=external:pulsar://127.0.0.1:6650
+      - advertisedListeners=external:pulsar://127.0.0.1:6650
       #Si se realiza una ejecución completa de todo (incluido el microservicio) con docker compose, se debería usar esta línea en lugar de la anterior para que se comunique con el contenedor broker dentro de una misma ejecución
-      - advertisedListeners=internal:pulsar://broker:6650
+      #- advertisedListeners=internal:pulsar://broker:6650
       #- internalListenerName=internal
-      #- advertisedListeners=internal:pulsar://broker:6650,external:pulsar://192.168.0.10:6650
+      #- advertisedListeners=internal:pulsar://broker:6650,external:pulsar://192.168.181.105:6650
       
     depends_on:
       zookeeper:
@@ -189,11 +189,12 @@ services:
       - broker
       - db_asociaciones_estrategicas
     environment:
-      DB_USERNAME: root
+      DB_USER: root
       DB_PASSWORD: pwdadmin
-      DB_HOSTNAME: db_asociaciones_estrategicas
+      DB_HOST: db_asociaciones_estrategicas
       BROKER_HOST: broker
       FLASK_ENV: production
+      DB_NAME: asociaciones_estrategicas
     ports:
       - "5001:5000"
     
