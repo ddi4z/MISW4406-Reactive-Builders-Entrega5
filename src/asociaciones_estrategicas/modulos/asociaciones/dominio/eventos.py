@@ -52,5 +52,6 @@ class OnboardingCancelado(EventoAsociacionEstrategica):
     id_asociacion: uuid.UUID = None
     fecha_cancelacion: datetime = None    
     fecha_creacion: datetime = None
-    fecha_evento: datetime = field(default_factory=datetime.now)    
+    fecha_evento: datetime = field(default_factory=datetime.now)   
+    motivo: str = None 
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 import pulsar, _pulsar
 from pulsar.schema import AvroSchema
 import logging
@@ -5,7 +6,10 @@ import traceback
 
 from asociaciones_estrategicas.config.uow import UnidadTrabajoPulsar
 from asociaciones_estrategicas.modulos.asociaciones.aplicacion.comandos.crear_asociacion import CrearAsociacion, CrearAsociacionHandler
-from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import ComandoCrearAsociacionEstrategica
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import (
+    ComandoCrearAsociacionEstrategica,
+    ComandoCancelarAsociacionEstrategica,
+)
 
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.proyecciones import (
     ProyeccionAsociacionesTotales,
@@ -19,6 +23,10 @@ from asociaciones_estrategicas.config.uow import UnidadTrabajoHibrida
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.eventos import (
     EventoAsociacion,
 )
+from asociaciones_estrategicas.modulos.asociaciones.aplicacion.comandos.cancelar_asociacion import (
+    CancelarAsociacionEstrategica,
+)
+from asociaciones_estrategicas.modulos.asociaciones.infraestructura.dto import AsociacionEstrategica
 
 
 
@@ -66,10 +74,32 @@ def suscribirse_a_eventos(app=None):
                         app=app,
                     )
 
+                elif mensaje_evento.estado == "OnboardingCancelado":
+                    with app.app_context():
+                        asociacion = AsociacionEstrategica.query.filter_by(id=datos.id_asociacion).first()
+                        if asociacion:
+                            ejecutar_proyeccion(
+                                ProyeccionAsociacionesTotales(
+                                    asociacion.fecha_creacion,
+                                    asociacion.tipo,
+                                    ProyeccionAsociacionesTotales.DELETE
+                                ),
+                                app=app,
+                            )
+                            ejecutar_proyeccion(
+                                ProyeccionAsociacionesLista(
+                                    datos.id_asociacion,
+                                    operacion=ProyeccionAsociacionesLista.DELETE
+                                ),
+                                app=app,
+                            )                            
+                        else:
+                            logging.warning(f"No se encontró asociación con id {datos.id_asociacion} para cancelar")
+                                                    
+
                 elif mensaje_evento.estado == "OnboardingFallido":
                     # TODO: implementar actualización de proyecciones si aplica
                     pass
-
                 else:
                     logging.warning(f"Evento desconocido: {mensaje_evento.type}")
 
@@ -90,14 +120,14 @@ def suscribirse_a_eventos(app=None):
             cliente.close()
 
 
-def suscribirse_a_comandos(app=None):
+def suscribirse_a_comandos_crear(app=None):
     cliente = None
     try:
         cliente = pulsar.Client(f"pulsar://{utils.broker_host()}:6650")
         consumidor = cliente.subscribe(
             "comandos-asociaciones.crear_asociacion",
             consumer_type=_pulsar.ConsumerType.Shared,
-            subscription_name="asociaciones-sub-comandos",
+            subscription_name="asociaciones-sub-comandos-crear",
             schema=AvroSchema(ComandoCrearAsociacionEstrategica),
         )
 
@@ -132,6 +162,56 @@ def suscribirse_a_comandos(app=None):
 
             except Exception as e:
                 logging.error(f"Error procesando comando CrearAsociacion: {e}")
+                traceback.print_exc()
+
+                # decisión: descartar o reintentar
+                consumidor.acknowledge(mensaje)   # descartar (ej: error de negocio)
+                # consumidor.negative_acknowledge(mensaje)  # reintentar (ej: error técnico)
+
+        cliente.close()
+
+    except Exception:
+        logging.error("ERROR: Suscribiéndose al tópico de comandos!")
+        traceback.print_exc()
+        if cliente:
+            cliente.close()
+
+
+def suscribirse_a_comandos_cancelar(app=None):
+    cliente = None
+    try:
+        cliente = pulsar.Client(f"pulsar://{utils.broker_host()}:6650")
+        consumidor = cliente.subscribe(
+            "comandos-asociaciones.cancelar_asociacion",
+            consumer_type=_pulsar.ConsumerType.Shared,
+            subscription_name="asociaciones-sub-comandos-cancelar",
+            schema=AvroSchema(ComandoCancelarAsociacionEstrategica),
+        )
+
+        while True:
+            mensaje = consumidor.receive()
+            comando_integracion = mensaje.value()
+            datos = comando_integracion.data
+
+    
+            logging.info(f"Comando recibido CancelarAsociacion: {datos}")
+            print(f"Comando recibido Cancelar: {datos}")
+
+            comando = CancelarAsociacionEstrategica(
+                 id_correlacion= datos.id_correlacion,
+                id_asociacion= datos.id_asociacion,
+                motivo= datos.motivo
+            )
+
+            # Captura errores por cada mensaje
+            try:
+                with app.app_context():
+                    ejecutar_commando(comando)
+
+                consumidor.acknowledge(mensaje)
+
+            except Exception as e:
+                logging.error(f"Error procesando comando Cancelar: {e}")
                 traceback.print_exc()
 
                 # decisión: descartar o reintentar

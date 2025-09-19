@@ -29,10 +29,11 @@ class ComandoIniciarTrackingPayload(ComandoIntegracion):
 class ComandoIniciarTracking(ComandoIntegracion):
     data = ComandoIniciarTrackingPayload()    
 
-class RevertirAsociacionPayload(ComandoIntegracion):
+# --- al final del archivo ---
+class ComandoCancelarAsociacionPayload(ComandoIntegracion):
     id_correlacion = String()
     id_asociacion = String()
     motivo = String()
 
-class ComandoRevertirAsociacion(ComandoIntegracion):
-    data = RevertirAsociacionPayload()
+class ComandoCancelarAsociacionEstrategica(ComandoIntegracion):
+    data = ComandoCancelarAsociacionPayload()

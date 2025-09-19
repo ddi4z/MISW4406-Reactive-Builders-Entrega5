@@ -1,5 +1,5 @@
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import (
-    ComandoIniciarTracking, ComandoIniciarTrackingPayload
+    ComandoCancelarAsociacionEstrategica, ComandoCancelarAsociacionPayload, ComandoIniciarTracking, ComandoIniciarTrackingPayload
 )
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.despachadores import Despachador
 from asociaciones_estrategicas.modulos.asociaciones.infraestructura.schema.v1.comandos import (
@@ -51,3 +51,25 @@ class ServicioAsociacion:
             topico="comandos-asociaciones.crear_asociacion",
             schema=AvroSchema(ComandoCrearAsociacionEstrategica),
         )
+
+    def cancelar_asociacion(self, id_asociacion:str, motivo:str,in_id_correlacion: str):
+        payload = ComandoCancelarAsociacionPayload(
+            id_correlacion=in_id_correlacion,
+            id_asociacion=id_asociacion,
+            motivo=motivo
+        )
+
+        comando = ComandoCancelarAsociacionEstrategica(
+            type="CancelarAsociacionEstrategica",
+            specversion="v1",
+            datacontenttype="AVRO",
+            service_name="api-asociaciones",
+            data=payload,
+        )
+
+        despachador = Despachador()
+        despachador.publicar_comando(
+            comando,
+            topico="comandos-asociaciones.cancelar_asociacion",
+            schema=AvroSchema(ComandoCancelarAsociacionEstrategica),
+        )        

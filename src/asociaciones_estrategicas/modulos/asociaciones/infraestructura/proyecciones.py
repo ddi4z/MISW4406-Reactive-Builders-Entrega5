@@ -67,7 +67,11 @@ class ProyeccionAsociacionesTotales(ProyeccionAsociacion):
 # =====================
 
 class ProyeccionAsociacionesLista(ProyeccionAsociacion):
-    def __init__(self, id_asociacion, id_marca, id_socio, tipo, descripcion, fecha_inicio, fecha_fin, fecha_creacion, fecha_actualizacion):
+    ADD = 1
+    DELETE = 2
+
+    def __init__(self, id_asociacion, id_marca=None, id_socio=None, tipo=None, descripcion=None,
+                 fecha_inicio=None, fecha_fin=None, fecha_creacion=None, fecha_actualizacion=None, operacion=1):
         self.id_asociacion = id_asociacion
         self.id_marca = id_marca
         self.id_socio = id_socio
@@ -77,10 +81,18 @@ class ProyeccionAsociacionesLista(ProyeccionAsociacion):
         self.fecha_fin = millis_a_datetime(fecha_fin)
         self.fecha_creacion = millis_a_datetime(fecha_creacion)
         self.fecha_actualizacion = millis_a_datetime(fecha_actualizacion)
+        self.operacion = operacion
 
     def ejecutar(self, db=None):
         if not db:
             logging.error("ERROR: DB del app no puede ser nula")
+            return
+
+        if self.operacion == self.DELETE:
+            dto = db.session.query(AsociacionDTO).filter_by(id=str(self.id_asociacion)).one_or_none()
+            if dto:
+                db.session.delete(dto)
+                db.session.commit()
             return
 
         # Usamos DTO directamente para la tabla asociaciones
