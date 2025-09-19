@@ -62,29 +62,47 @@ Cada asociación estratégica se representa como una **agregación raíz** en el
 Este microservicio sigue un patrón **Event-Driven Architecture (EDA)** usando **Apache Pulsar** como broker.  
 Los mensajes usan **Avro** como esquema y se dividen en **eventos** y **comandos**.
 
-### 🔔 Eventos de integración
+### 🔔 Eventos unificados de integración y saga
 
-**Tópico:** `public/default/eventos-asociacion`
+**Tópico único:** `public/default/eventos-asociacion`  
 
-- **EventoAsociacionCreada**
+Todos los eventos se publican en un solo tópico mediante **composición**.  
+El campo `estado` diferencia el tipo de evento:  
+
+- `OnboardingIniciado`  
+- `OnboardingCancelado`  
+- `OnboardingFallido`  
+
+**Esquema:**
 ```python
-class AsociacionCreadaPayload(Record):
+class EventoAsociacion(EventoIntegracion):
+    id = String()
+    time = Long()
+    specversion = String()
+    type = String()   # siempre "Asociacion"
+    estado = String() # "OnboardingIniciado" | "OnboardingFallido" | "OnboardingCancelado"
+    data = AsociacionPayload()
+```
+
+**Payload (AsociacionPayload):**
+```python
+class AsociacionPayload(Record):
     id_asociacion = String()
+    id_correlacion = String()
     id_marca = String()
     id_socio = String()
     tipo = String()
     descripcion = String()
+    motivo = String()
     fecha_inicio = Long()
     fecha_fin = Long()
     fecha_creacion = Long()
+    fecha_actualizacion = Long()
+    fecha_cancelacion = Long()
+    fecha_evento = Long()
 ```
 
-- **EventoAsociacionFinalizada**
-```python
-class AsociacionFinalizadaPayload(Record):
-    id_asociacion = String()
-    fecha_actualizacion = Long()
-```
+👉 Este diseño simplifica la integración: todos los consumidores escuchan un solo tópico y reaccionan según el `estado`.  
 
 ---
 
@@ -93,85 +111,36 @@ class AsociacionFinalizadaPayload(Record):
 1. **Crear asociación estratégica**  
    - **Tópico:** `comandos-asociaciones.crear_asociacion`  
    - **Payload:**
-```python
-class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
-    id_usuario = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-    descripcion = String()
-    fecha_inicio = String()
-    fecha_fin = String()
-```
-
-2. **Iniciar tracking**  
-   - **Tópico:** `comandos-eventos_y_atribucion.iniciar_tracking`  
-   - **Payload:**
-```python
-class ComandoIniciarTrackingPayload(Record):
-    id_asociacion_estrategica = String()
-    id_marca = String()
-    id_socio = String()
-    tipo = String()
-```
-
----
-
-## 📜 Comandos y Eventos de la Saga
-
-La saga de asociaciones estratégicas coordina la creación y cancelación de asociaciones, garantizando consistencia mediante eventos de compensación.
-
-### 📩 Comandos de la saga
-
-1. **Cancelar asociación estratégica**  
-   - **Tópico:** `comandos-asociaciones.cancelar_asociacion`  
-   - **Payload:**
    ```python
-   class ComandoCancelarAsociacionEstrategicaPayload(ComandoIntegracion):
-       id_correlacion = String()
-       id_asociacion = String()
-       motivo = String()
-   ```
-
----
-
-### 🔔 Eventos de la saga
-
-1. **OnboardingIniciado**  
-   - Se emite al crear una nueva asociación.  
-   - **Payload:**
-   ```python
-   class OnboardingIniciadoPayload(Record):
-       id_asociacion = String()
+   class ComandoCrearAsociacionEstrategicaPayload(ComandoIntegracion):
+       id_usuario = String()
        id_marca = String()
        id_socio = String()
        tipo = String()
        descripcion = String()
-       fecha_inicio = Long()
-       fecha_fin = Long()
-       fecha_creacion = Long()
+       fecha_inicio = String()
+       fecha_fin = String()
    ```
 
-2. **OnboardingCancelado**  
-   - Se emite al cancelar una asociación ya creada.  
+2. **Cancelar asociación estratégica**  
+   - **Tópico:** `comandos-asociaciones.cancelar_asociacion`  
    - **Payload:**
    ```python
-   class OnboardingCanceladoPayload(Record):
-       id_asociacion = String()
+   class ComandoCancelarAsociacionPayload(ComandoIntegracion):
        id_correlacion = String()
+       id_asociacion = String()
        motivo = String()
-       fecha_cancelacion = Long()
    ```
 
-3. **OnboardingFallido**  
-   - Se emite si ocurre un error en la creación o validación de la asociación.  
+3. **Iniciar tracking**  
+   - **Tópico:** `comandos-eventos_y_atribucion.iniciar_tracking`  
    - **Payload:**
    ```python
-   class OnboardingFallidoPayload(Record):
-       id_asociacion = String()
-       id_correlacion = String()
-       motivo = String()
-       fecha_evento = Long()
+   class ComandoIniciarTrackingPayload(Record):
+       id_asociacion_estrategica = String()
+       id_marca = String()
+       id_socio = String()
+       tipo = String()
    ```
 
 ---
@@ -184,9 +153,9 @@ Se pueden escuchar los tópicos directamente en el contenedor de Pulsar:
 docker exec -it broker bash
 
 ./bin/pulsar-client consume -s "sub-datos" public/default/eventos-asociacion -n 0
-./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
 ./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.crear_asociacion -n 0
 ./bin/pulsar-client consume -s "sub-datos" comandos-asociaciones.cancelar_asociacion -n 0
+./bin/pulsar-client consume -s "sub-datos" comandos-eventos_y_atribucion.iniciar_tracking -n 0
 ```
 
 ---
@@ -201,8 +170,9 @@ docker exec -it broker bash
   Coordina en una sola transacción lógica la persistencia en BD y la publicación de eventos en el broker.  
   Asegura consistencia y evita inconsistencias.  
 
-- **Eventos gordos de integración**:  
-  Los eventos incluyen toda la información relevante, evitando dependencias adicionales entre microservicios.  
+- **Eventos compuestos de integración**:  
+  Se usa un único esquema (`EventoAsociacion`) con `estado` y `payload` flexible.  
+  Esto simplifica el consumo y reduce la complejidad de gestión de tópicos.  
 
 - **Persistencia de eventos en Pulsar**:  
   Configuración de retención infinita permite reprocesar eventos y reconstruir proyecciones.  

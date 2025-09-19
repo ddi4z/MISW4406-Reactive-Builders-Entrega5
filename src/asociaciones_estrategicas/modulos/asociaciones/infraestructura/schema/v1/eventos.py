@@ -9,7 +9,7 @@ class AsociacionPayload(Record):
     id_correlacion = String()
     id_asociacion = String()
 
-    # datos para "INICIADO"
+    # datos para "OnboardingIniciado"
     id_marca = String(default=None)
     id_socio = String(default=None)
     tipo = String(default=None)
@@ -18,10 +18,10 @@ class AsociacionPayload(Record):
     fecha_fin = Long(default=0)
     fecha_creacion = Long(default=0)
 
-    # datos para "FALLIDO"
+    # datos para "OnboardingFallido"
     motivo = String(default=None)
 
-    # datos para "CANCELADO"
+    # datos para "OnboardingCancelado"
     fecha_cancelacion = Long(default=0)
 
 
@@ -32,7 +32,7 @@ class EventoAsociacion(EventoIntegracion):
     ingestion = Long(default=time_millis())
     specversion = String()
     type = String()        # siempre "Asociacion"
-    estado = String()      # "INICIADO" | "FALLIDO" | "CANCELADO"
+    estado = String()      # "OnboardingIniciado" | "OnboardingFallido" | "OnboardingCancelado"
     datacontenttype = String()
     service_name = String()
     data = AsociacionPayload()
