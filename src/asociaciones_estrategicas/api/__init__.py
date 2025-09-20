@@ -52,7 +52,7 @@ def create_app(configuracion={}):
     registrar_handlers()
 
     with app.app_context():
-        db.create_all()
+        db.create_all() #No crea las tablas si ya existen
         if not app.config.get('TESTING'):
             comenzar_consumidor(app)
 
