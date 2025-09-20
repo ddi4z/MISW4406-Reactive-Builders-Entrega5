@@ -12,5 +12,10 @@ RUN pip install --no-cache-dir -r /app/asociaciones_estrategicas/asociaciones-re
 # añadimos src al PYTHONPATH
 ENV PYTHONPATH=/app
 
+# Variable de entorno para Cloud Run
+ENV PORT=8080
+
+
 # arrancamos con Gunicorn apuntando al factory de Flask
-CMD ["gunicorn", "-w", "1", "--bind", "0.0.0.0:5000", "asociaciones_estrategicas.api:create_app()"]
+CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:8080", "asociaciones_estrategicas.api:create_app()"]
+
