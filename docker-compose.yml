@@ -159,46 +159,68 @@ services:
 
       
   # MySQL8
-  db_asociaciones_estrategicas:
-    image: mysql:8.0.28
-    hostname: mysqldb
-    container_name: mysqldb
-    cap_add:
-      - SYS_NICE
+  #db_asociaciones_estrategicas:
+  #  image: mysql:8.0.28
+  #  hostname: mysqldb
+  ##  container_name: mysqldb
+  #  cap_add:
+  #    - SYS_NICE
+  #  restart: always
+  #  environment:
+  #    MYSQL_DATABASE: asociaciones_estrategicas
+  #    MYSQL_ROOT_PASSWORD: pwdadmin
+  #    TZ: UTC
+  #  command: --default-time-zone='+00:00'
+  #  profiles: ["asociaciones_estrategicas", "db_asociaciones_estrategicas"]
+  #  networks:
+  #    - pulsar
+  #  ports:
+  #    - "3306:3306"
+  #  volumes:
+  #    - ./data/mysql:/var/lib/mysql
+
+
+  postgresdb:
+    image: postgres:15
+    hostname: postgresdb
+    container_name: postgresdb
     restart: always
-    environment:
-      MYSQL_DATABASE: asociaciones_estrategicas
-      MYSQL_ROOT_PASSWORD: pwdadmin
-      TZ: UTC
-    command: --default-time-zone='+00:00'
     profiles: ["asociaciones_estrategicas", "db_asociaciones_estrategicas"]
+    environment:
+      POSTGRES_DB: alpes_partners
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwdadmin
     networks:
-      - pulsar
+      - pulsar      
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+
   asociaciones:
     build:
       context: ./src/asociaciones_estrategicas
       dockerfile: Dockerfile
     container_name: asociaciones_service
     hostname: asociaciones
-    profiles: ["asociaciones_estrategicas"]
+    profiles: ["asociaciones_estrategicas","aplicacion_asociaciones", "monolito"]
     networks:
       - pulsar
     depends_on:
       broker:
         condition: service_healthy
-      db_asociaciones_estrategicas:
+      postgresdb:
         condition: service_started
     environment:
-      DB_USER: root
+      DB_USER: postgres
       DB_PASSWORD: pwdadmin
-      DB_HOST: db_asociaciones_estrategicas
+      DB_HOST: postgresdb
+      DB_PORT : 5432
+      DB_NAME: alpes_partners
+      DB_SCHEMA: db_asociaciones_estrategicas
       BROKER_HOST: broker
       FLASK_ENV: production
-      DB_NAME: asociaciones_estrategicas
     ports:
       - "5001:5000"
     

@@ -16,6 +16,7 @@ Base = db.declarative_base()
 
 class AsociacionEstrategica(db.Model):
     __tablename__ = "asociacion_estrategica"
+    __table_args__ = {"schema": "db_asociaciones_estrategicas"}
 
     id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
     id_marca = db.Column(db.String(40), nullable=False)
@@ -30,6 +31,7 @@ class AsociacionEstrategica(db.Model):
 
 class EventosAsociacion(db.Model):
     __tablename__ = "eventos_asociacion"
+    __table_args__ = {"schema": "db_asociaciones_estrategicas"}    
 
     id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
     id_entidad = db.Column(db.String(40), nullable=False)  # referencia a Asociacion.id
@@ -43,6 +45,7 @@ class EventosAsociacion(db.Model):
 
 class AsociacionesAnalitica(db.Model):
     __tablename__ = "analitica_asociaciones"
+    __table_args__ = {"schema": "db_asociaciones_estrategicas"}    
     fecha_creacion = db.Column(db.Date, primary_key=True)
     tipo_asociacion = db.Column(db.String(50), primary_key=True)   # Agrupamiento por tipo de asociacion
     total = db.Column(db.Integer, nullable=False, default=0)

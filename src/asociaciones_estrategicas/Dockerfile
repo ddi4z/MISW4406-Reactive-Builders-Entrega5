@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir -r /app/asociaciones_estrategicas/asociaciones-re
 ENV PYTHONPATH=/app
 
 # arrancamos con Gunicorn apuntando al factory de Flask
-CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:5000", "asociaciones_estrategicas.api:create_app()"]
+CMD ["gunicorn", "-w", "1", "--bind", "0.0.0.0:5000", "asociaciones_estrategicas.api:create_app()"]
