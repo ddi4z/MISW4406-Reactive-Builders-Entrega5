@@ -51,7 +51,7 @@ docker-compose --profile db up
 
 **Host:** 127.0.0.1 (localhost)
 
-**Port:** 5433
+**Port:** 5432
 
 **Database:** alpespartners
 

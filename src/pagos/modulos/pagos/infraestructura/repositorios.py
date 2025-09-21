@@ -42,3 +42,12 @@ class RepositorioPagosPostgres(RepositorioPagos):
         if dto:
             self._session.delete(dto)
             self._session.commit()
+
+    def revertir(self, entity_id: UUID):
+        dto = self._session.query(PagoDTO).filter_by(id=str(entity_id)).first()
+        if not dto:
+            return None
+        dto.estado = "REVERTIDO"
+        self._session.commit()
+        self._session.refresh(dto)
+        return self._fabrica_pagos.crear_objeto(dto, MapeadorPago())

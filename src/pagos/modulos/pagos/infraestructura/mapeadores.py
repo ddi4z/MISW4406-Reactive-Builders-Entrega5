@@ -14,26 +14,31 @@ class MapeadorPago(Mapeador):
     def obtener_tipo(self) -> type:
         return Pago.__class__
 
-    def entidad_a_dto(self, entidad: Pago) -> PagoDTO:
+    def entidad_a_dto(self, entidad: Pago) -> PagoDTO:        
         dto = PagoDTO(
             id=str(entidad.id),
+            id_comision=entidad.id_comision,
+            id_correlacion = entidad.id_correlacion,
             fecha_creacion=entidad.fecha_creacion,
             fecha_actualizacion=entidad.fecha_actualizacion,
             monto=entidad.monto,
             moneda=entidad.moneda,
-            id_comision=entidad.id_comision,
-            estado=entidad.estado
+            metodo_pago=entidad.metodo_pago,
+            estado=entidad.estado,
+            pasarela = entidad.pasarela
         )
         return dto
 
     def dto_a_entidad(self, dto: PagoDTO) -> Pago:
         entidad = Pago(
             id=dto.id,
+            id_comision=dto.id_comision,
+            id_correlacion=dto.id_correlacion,
             fecha_creacion=dto.fecha_creacion,
             fecha_actualizacion=dto.fecha_actualizacion,
             monto=dto.monto,
             moneda=dto.moneda,
-            id_comision=dto.id_comision,
-            estado=dto.estado
+            estado=dto.estado,
+            pasarela=dto.pasarela
         )
         return entidad
