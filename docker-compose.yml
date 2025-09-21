@@ -294,7 +294,7 @@ services:
       BROKER_HOST: broker
       FLASK_ENV: production
     ports:
-      - "5002:5000"
+      - "5010:8080"
 
   postgres_pagos:
     image: postgres:15
