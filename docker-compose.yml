@@ -246,23 +246,29 @@ services:
     #   - ./src/bff_web:/app/src/bff_web
 
 
+ 
   postgres_eventos:
     image: postgres:15
-    hostname: postgres_eventos
     container_name: postgres_eventos
-    restart: always
-    profiles: ["eventos", "db_eventos"]
-    environment:
-      POSTGRES_DB: alpes_partners
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pwdadmin
+    hostname: postgres_eventos
+    profiles: ["eventos", "db_eventos", "aplicacion_eventos"]
+    restart: on-failure
     networks:
-      - pulsar      
+      - pulsar
+      - sidecar
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: alpespartners
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    volumes:
-      - ./data/postgres_eventos:/var/lib/postgresql/data
-      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d alpespartners"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   eventos:
     build:
@@ -279,11 +285,11 @@ services:
       postgres_eventos:
         condition: service_started
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: pwdadmin
+      DB_USER: admin
+      DB_PASSWORD: admin
       DB_HOST: postgres_eventos
       DB_PORT: 5432
-      DB_NAME: alpes_partners
+      DB_NAME: alpespartners
       DB_SCHEMA: db_eventos
       BROKER_HOST: broker
       FLASK_ENV: production

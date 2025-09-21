@@ -27,11 +27,11 @@ def comenzar_consumidor(app):
 def create_app(configuracion={}):
     app = Flask(__name__, instance_relative_config=True)
 
-    DB_USER = os.getenv("DB_USER", "postgres")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "pwdadmin")
+    DB_USER = os.getenv("DB_USER", "admin")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "admin")
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = os.getenv("DB_PORT", "5432")
-    DB_NAME = os.getenv("DB_NAME", "alpes_partners")
+    DB_NAME = os.getenv("DB_NAME", "alpespartners")
 
 
     app.config['SQLALCHEMY_DATABASE_URI'] = (
