@@ -233,8 +233,9 @@ services:
       # IMPORTANTE: dentro de la red de Docker NO uses localhost
       # Usa el nombre del servicio del micro: "asociaciones"
       - ASSOCIATIONS_HOST=asociaciones
-      - ASSOCIATIONS_PORT=5000   # puerto interno del micro (no el publicado 5001)
+      - ASSOCIATIONS_PORT=8080   # puerto interno del micro (no el publicado 5001)
       - BFF_PORT=8003
+      - BROKER_HOST=broker
     networks:
       - pulsar                   # misma red que "asociaciones"
     ports:
