@@ -5,6 +5,7 @@ objetos complejos del dominio de publicaciones y eventos
 
 """
 
+from eventos_y_atribucion.seedwork.dominio.eventos import EventoDominio
 from .entidades import Evento, MedioMarketing, Publicacion
 from .excepciones import TipoObjetoNoExisteEnDominioVuelosExcepcion
 from eventos_y_atribucion.seedwork.dominio.repositorios import Mapeador
@@ -26,18 +27,13 @@ class FabricaPublicaciones(Fabrica):
         else:
             raise TipoObjetoNoExisteEnDominioVuelosExcepcion()
         
-@dataclass
 class FabricaEventos(Fabrica):
     def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:
-        if mapeador.obtener_tipo() == Evento.__class__:
-            if isinstance(obj, Entidad):
-                return mapeador.entidad_a_dto(obj)
-            else:
-                evento: Evento = mapeador.dto_a_entidad(obj)
-                return evento
+        if isinstance(obj, Entidad) or isinstance(obj, EventoDominio):
+            return mapeador.entidad_a_dto(obj)
         else:
-            raise TipoObjetoNoExisteEnDominioVuelosExcepcion()
-        
+            return mapeador.dto_a_entidad(obj)
+
 @dataclass
 class FabricaMediosMarketing(Fabrica):
     def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:

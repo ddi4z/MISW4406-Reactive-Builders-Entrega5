@@ -17,3 +17,6 @@ class RepositorioEventos(Repositorio, ABC):
 
 class RepositorioMediosMarketing(Repositorio, ABC):
     ...
+    
+class RepositorioEventosEventos(Repositorio, ABC):
+    ...

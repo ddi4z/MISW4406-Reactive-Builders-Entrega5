@@ -19,9 +19,7 @@ class EventoCreado(EventoDominio):
 class EventoFallido(EventoDominio):
     id_correlacion: str = None
     id_evento: uuid.UUID = None
-    tipo_evento: str = None
-    id_publicacion: uuid.UUID = None
-    fecha_creacion: datetime = None
+    fecha_creacion: datetime = field(default_factory=datetime.now)
     fecha_actualizacion: datetime = field(default_factory=datetime.now)
     motivo: str = None
     
@@ -29,9 +27,7 @@ class EventoFallido(EventoDominio):
 class EventoCancelado(EventoDominio):
     id_correlacion: str = None
     id_evento: uuid.UUID = None
-    tipo_evento: str = None
-    id_publicacion: uuid.UUID = None
-    fecha_creacion: datetime = None
+    fecha_creacion: datetime  = field(default_factory=datetime.now)
     fecha_actualizacion: datetime = field(default_factory=datetime.now)
     fecha_cancelacion: datetime = field(default_factory=datetime.now)
     motivo: str = None

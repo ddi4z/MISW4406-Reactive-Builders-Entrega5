@@ -140,8 +140,6 @@ class MapeadorEventosEvento(Mapeador):
         payload = EventoPayload(
             id_correlacion=entidad.id_correlacion,
             id_evento=str(entidad.id_evento),
-            id_publicacion=str(entidad.id_publicacion),
-            tipo_evento=str(entidad.tipo_evento),
             fecha_actualizacion=int(unix_time_millis(entidad.fecha_actualizacion)),
             fecha_creacion=int(unix_time_millis(entidad.fecha_creacion)),
             motivo=entidad.motivo,
@@ -162,8 +160,6 @@ class MapeadorEventosEvento(Mapeador):
         payload = EventoPayload(
             id_correlacion=entidad.id_correlacion,
             id_evento=str(entidad.id_evento),
-            id_publicacion=str(entidad.id_publicacion),
-            tipo_evento=str(entidad.tipo_evento),
             fecha_actualizacion=int(unix_time_millis(entidad.fecha_actualizacion)),
             fecha_creacion=int(unix_time_millis(entidad.fecha_creacion)),
             fecha_cancelacion=int(unix_time_millis(entidad.fecha_cancelacion)),
