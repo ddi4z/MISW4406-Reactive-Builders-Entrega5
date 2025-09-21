@@ -15,7 +15,7 @@ class MapeadorEventoDTOJson(AppMap):
             fecha_actualizacion=externo.get('fecha_actualizacion'),
             id=externo.get('id'),
             tipo_evento=externo.get('tipo_evento'),
-            id_publicacion=externo.get('id_publicacion')
+            id_publicacion=externo.get('id_publicacion'),
         )
         return evento_dto
 

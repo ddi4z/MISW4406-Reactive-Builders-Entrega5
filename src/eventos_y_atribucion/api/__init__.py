@@ -14,15 +14,15 @@ def importar_modelos_alchemy():
     import eventos_y_atribucion.modulos.comision_recompensa.infraestructura.dto
 
 
-def comenzar_consumidor():
+def comenzar_consumidor(app):
     import threading
-    import eventos_y_atribucion.modulos.eventos_medios.infraestructura.consumidores as vuelos
-
+    import eventos_y_atribucion.modulos.eventos_medios.infraestructura.consumidores as eventos
     # Suscripción a eventos
-    threading.Thread(target=vuelos.suscribirse_a_eventos).start()
+    threading.Thread(target=eventos.suscribirse_a_eventos, args=[app]).start()
 
     # Suscripción a comandos
-    threading.Thread(target=vuelos.suscribirse_a_comandos).start()
+    threading.Thread(target=eventos.suscribirse_a_comandos_crear, args=[app]).start()
+    threading.Thread(target=eventos.suscribirse_a_comandos_revertir, args=[app]).start()
 
 def create_app(configuracion={}):
     app = Flask(__name__, instance_relative_config=True)
@@ -53,7 +53,7 @@ def create_app(configuracion={}):
     with app.app_context():
         db.create_all()
         if not app.config.get('TESTING'):
-            comenzar_consumidor()
+            comenzar_consumidor(app)
 
     # Importa Blueprints
     from . import medios_marketing

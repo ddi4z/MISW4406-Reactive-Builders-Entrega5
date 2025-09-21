@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from eventos_y_atribucion.seedwork.aplicacion.dto import DTO
 
 
@@ -40,7 +41,10 @@ class PublicacionDTO(DTO):
 class EventoDTO(DTO):
     id: str = field(default_factory=str)
     tipo_evento: str = field(default_factory=str)
-    fecha_creacion: str = field(default_factory=str)
-    fecha_actualizacion: str = field(default_factory=str)
+    fecha_creacion: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
+    fecha_actualizacion: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
     id_publicacion: str = field(default_factory=str)
-    

@@ -1,3 +1,4 @@
+import logging
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import os
@@ -22,9 +23,23 @@ def database_connection(config, basedir=os.path.abspath(os.path.dirname(__file__
         raise DatabaseConfigException
     
     if config.get('TESTING', False) is True:
-        return f'sqlite:///{os.path.join(basedir, "database.db")}'
+        uri = f'sqlite:///{os.path.join(basedir, "database.db")}'
     else:
-        return f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+        if DB_HOST.startswith("/cloudsql/"):
+            # Caso Cloud SQL con Unix socket
+            uri = (
+                f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}"
+                f"?host={DB_HOST}"
+            )
+        else:
+            # Caso conexión TCP normal
+            uri = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+    # Log seguro: no muestra la contraseña
+    safe_uri = uri.replace(DB_PASSWORD, "****")
+    logging.info(f"Database connection string in use: {safe_uri}")
+
+    return uri
 
 
 

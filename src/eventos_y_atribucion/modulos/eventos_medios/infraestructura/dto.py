@@ -37,6 +37,8 @@ class MedioMarketingDTO(db.Model):
     publicaciones = db.relationship("PublicacionDTO", back_populates="medio_marketing")
 
 
+
+
 class PublicacionDTO(db.Model):
     __tablename__ = "publicaciones"
 
@@ -66,3 +68,16 @@ class EventoDTO(db.Model):
     recompensa = db.relationship("RecompensaDTO", back_populates="evento", uselist=False)
 
     comision = db.relationship("ComisionDTO", back_populates="evento", uselist=False)
+
+
+class EventosEventoDTO(db.Model):
+    __tablename__ = "eventos_evento"
+
+    id = db.Column(db.String(40), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id_entidad = db.Column(db.String(40), nullable=False)  # referencia a Evento.id
+    fecha_evento = db.Column(db.DateTime, nullable=False)
+    version = db.Column(db.String(10), nullable=False)
+    tipo_evento = db.Column(db.String(100), nullable=False)
+    formato_contenido = db.Column(db.String(10), nullable=False)
+    nombre_servicio = db.Column(db.String(40), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)
