@@ -5,8 +5,8 @@ from sqlalchemy import text
 import asyncio
 from contextlib import asynccontextmanager
 
-from pagos.modulos.pagos.aplicacion.comandos.crear_pago import CrearPago
-from pagos.modulos.pagos.aplicacion.comandos.revertir_pago import RevertirPago
+from pagos.modulos.pagos.aplicacion.comandos.crear_pago import RealizarPagoComision
+from pagos.modulos.pagos.aplicacion.comandos.revertir_pago import RevertirPagoComision
 from pagos.modulos.pagos.aplicacion.mapeadores import MapeadorPagoDTOJson
 from pagos.seedwork.aplicacion.comandos import ejecutar_commando
 from pagos.seedwork.dominio.excepciones import ExcepcionDominio
@@ -60,7 +60,7 @@ async def prueba_pagar_reserva(request: Request) -> dict[str, str]:
         map_evento = MapeadorPagoDTOJson()
         pago_dto = map_evento.externo_a_dto(pago_dict)
 
-        comando = CrearPago(            
+        comando = RealizarPagoComision(            
             pago_dto.id,
             pago_dto.fecha_creacion,
             pago_dto.fecha_actualizacion,
@@ -86,7 +86,7 @@ async def prueba_revertir_pago(request: Request) -> dict[str, str]:
 
         map_evento = MapeadorPagoDTOJson()
         pago_dto = map_evento.externo_a_dto(pago_dict)
-        comando = RevertirPago(pago_dto.id)
+        comando = RevertirPagoComision(pago_dto.id)
 
         ejecutar_commando(comando)
         

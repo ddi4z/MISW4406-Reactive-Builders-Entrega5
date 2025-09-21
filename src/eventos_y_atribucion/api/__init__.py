@@ -15,12 +15,6 @@ def importar_modelos_alchemy():
 
 
 def comenzar_consumidor():
-    """
-    Este es un código de ejemplo. Aunque esto sea funcional puede ser un poco peligroso tener 
-    threads corriendo por si solos. Mi sugerencia es en estos casos usar un verdadero manejador
-    de procesos y threads como Celery.
-    """
-
     import threading
     import eventos_y_atribucion.modulos.eventos_medios.infraestructura.consumidores as vuelos
 
@@ -31,13 +25,12 @@ def comenzar_consumidor():
     threading.Thread(target=vuelos.suscribirse_a_comandos).start()
 
 def create_app(configuracion={}):
-    # Init la aplicacion de Flask
     app = Flask(__name__, instance_relative_config=True)
 
     DB_USER = os.getenv("DB_USER", "admin")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "admin")
     DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_PORT = os.getenv("DB_PORT", "5433")
+    DB_PORT = os.getenv("DB_PORT", "5432")
     DB_NAME = os.getenv("DB_NAME", "alpespartners")
 
 

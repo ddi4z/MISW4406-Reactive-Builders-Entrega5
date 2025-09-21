@@ -5,6 +5,6 @@ pulsar-client==3.7.0
 pulsar-client[avro]==3.7.0
 requests==2.32.4
 pydantic-settings==2.10.1
-sqlalchemy
-psycopg2
+SQLAlchemy>=2.0.0
+psycopg2-binary>=2.9
 PyDispatcher==2.0.6

@@ -5,9 +5,13 @@ del dominio de vuelos
 
 """
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from pagos.seedwork.dominio.repositorios import Repositorio
 
 class RepositorioPagos(Repositorio, ABC):
-    ...
+    @abstractmethod
+    def revertir(self, entity_id):
+        ...
+    
+
     
