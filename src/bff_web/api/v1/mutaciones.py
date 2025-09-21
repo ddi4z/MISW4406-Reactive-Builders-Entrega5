@@ -33,7 +33,7 @@ class Mutation:
         )
         
         despachador = Despachador()
-        info.context["background_tasks"].add_task(despachador.publicar_mensaje, comando, "comandos-asociaciones.crear_asociacion", "public/default/comando-crear-asociacion-estrategica")
+        info.context["background_tasks"].add_task(despachador.publicar_mensaje, comando, "comandos-asociaciones.crear_asociacion", "public/default/comandos-asociaciones.crear_asociacion")
 
         return Respuesta(mensaje="Procesando Mensaje", codigo=203, idSolicitud=id_correlacion)
 
