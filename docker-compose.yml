@@ -79,10 +79,10 @@ services:
       - managedLedgerDefaultAckQuorum=1
       - advertisedAddress=broker
       #Si se realiza una ejecución manual del microservicio desde el IDE, se debe usar esta línea:
-      #- advertisedListeners=external:pulsar://127.0.0.1:6650
+      - advertisedListeners=external:pulsar://127.0.0.1:6650
       #Si se realiza una ejecución completa de todo (incluido el microservicio) con docker compose, se debería usar esta línea en lugar de la anterior para que se comunique con el contenedor broker dentro de una misma ejecución
-      - advertisedListeners=internal:pulsar://broker:6650
-      - internalListenerName=internal
+      #- advertisedListeners=internal:pulsar://broker:6650
+      #- internalListenerName=internal
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -294,25 +294,31 @@ services:
       BROKER_HOST: broker
       FLASK_ENV: production
     ports:
-      - "5002:5000"
+      - "5010:8080"
 
   postgres_pagos:
     image: postgres:15
     hostname: postgres_pagos
     container_name: postgres_pagos
-    restart: always
     profiles: ["pagos", "db_pagos"]
-    environment:
-      POSTGRES_DB: alpes_pagos
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pwdadmin
+    restart: on-failure
     networks:
       - pulsar
-    ports:
-      - "5434:5432"
+      - sidecar
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: alpespartners
     volumes:
-      - ./data/postgres_pagos:/var/lib/postgresql/data
-      - ./init-schema-pagos.sql:/docker-entrypoint-initdb.d/init-schema.sql
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d alpespartners"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   pagos:
     build:
@@ -329,13 +335,16 @@ services:
       postgres_pagos:
         condition: service_started
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: pwdadmin
+      DB_USER: admin
+      DB_PASSWORD: admin
       DB_HOST: postgres_pagos
       DB_PORT: 5432
-      DB_NAME: alpes_pagos
+      DB_NAME: alpespartners
       DB_SCHEMA: db_pagos
       BROKER_HOST: broker
       FLASK_ENV: production
     ports:
-      - "5003:5000"
+      - "5003:8080"
+
+ 
+

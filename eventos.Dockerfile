@@ -1,12 +1,18 @@
-FROM python:3.12
+FROM python:3.11-slim
 
-EXPOSE 5000/tcp
+WORKDIR /app
 
-COPY eventos-requirements.txt ./
-RUN pip install --upgrade --no-cache-dir "pip<24.1" setuptools wheel
-RUN pip install --no-cache-dir wheel
-RUN pip install --no-cache-dir -r eventos-requirements.txt
 
-COPY . .
+COPY . /app/eventos_y_atribucion
 
-CMD [ "flask", "--app", "./src/eventos_y_atribucion/api", "run", "--host=0.0.0.0"]
+
+RUN pip install --no-cache-dir -r /app/eventos_y_atribucion/eventos-requirements.txt \
+    && pip install --no-cache-dir gunicorn
+
+
+ENV PYTHONPATH=/app
+
+
+ENV PORT=8080
+
+CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:8080", "eventos_y_atribucion.api:create_app()"]
