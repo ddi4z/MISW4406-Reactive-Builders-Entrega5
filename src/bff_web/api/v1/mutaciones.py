@@ -3,7 +3,7 @@ import strawberry
 from bff_web.despachadores import Despachador
 from .esquemas import CrearAsociacionInput, Respuesta
 
-import utils
+from ... import utils
 
 @strawberry.type
 class Mutation:

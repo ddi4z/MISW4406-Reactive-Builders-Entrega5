@@ -235,6 +235,7 @@ services:
       - ASSOCIATIONS_HOST=asociaciones
       - ASSOCIATIONS_PORT=5000   # puerto interno del micro (no el publicado 5001)
       - BFF_PORT=8003
+      - BROKER_HOST=broker
     networks:
       - pulsar                   # misma red que "asociaciones"
     ports:
