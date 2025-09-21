@@ -1,3 +1,12 @@
+import logging
+import sys
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+
 import os
 
 from flask import Flask, render_template, request, url_for, redirect, jsonify, session
