@@ -38,13 +38,10 @@ class RealizarPagoComisionHandler(RealizarPagoComisionBaseHandler):
             estado = comando.estado,
             pasarela = comando.pasarela
         )
-        print("*" * 100)
-        
         pago: Pago = self.fabrica_pagos.crear_objeto(pago_dto, MapeadorPago())
         pago.crear_pago(pago)
         repositorio = self.fabrica_repositorio.crear_objeto(RepositorioPagos)
 
-        print(pago)
         UnidadTrabajoPuerto.registrar_batch(repositorio.agregar, pago)
         UnidadTrabajoPuerto.savepoint()
         UnidadTrabajoPuerto.commit()

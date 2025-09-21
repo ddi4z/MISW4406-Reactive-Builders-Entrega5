@@ -244,3 +244,92 @@ services:
     # (opcional para desarrollo con autoreload)
     # volumes:
     #   - ./src/bff_web:/app/src/bff_web
+
+
+  postgres_eventos:
+    image: postgres:15
+    hostname: postgres_eventos
+    container_name: postgres_eventos
+    restart: always
+    profiles: ["eventos", "db_eventos"]
+    environment:
+      POSTGRES_DB: alpes_partners
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwdadmin
+    networks:
+      - pulsar      
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/postgres_eventos:/var/lib/postgresql/data
+      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+
+  eventos:
+    build:
+      context: . 
+      dockerfile: eventos.Dockerfile
+    container_name: eventos_service
+    hostname: eventos
+    profiles: ["eventos","aplicacion_eventos"]
+    networks:
+      - pulsar
+    depends_on:
+      broker:
+        condition: service_healthy
+      postgres_eventos:
+        condition: service_started
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: pwdadmin
+      DB_HOST: postgres_eventos
+      DB_PORT: 5432
+      DB_NAME: alpes_partners
+      DB_SCHEMA: db_eventos
+      BROKER_HOST: broker
+      FLASK_ENV: production
+    ports:
+      - "5002:5000"
+
+  postgres_pagos:
+    image: postgres:15
+    hostname: postgres_pagos
+    container_name: postgres_pagos
+    restart: always
+    profiles: ["pagos", "db_pagos"]
+    environment:
+      POSTGRES_DB: alpes_pagos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwdadmin
+    networks:
+      - pulsar
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./data/postgres_pagos:/var/lib/postgresql/data
+      - ./init-schema-pagos.sql:/docker-entrypoint-initdb.d/init-schema.sql
+
+  pagos:
+    build:
+      context: .
+      dockerfile: pagos.Dockerfile 
+    container_name: pagos_service
+    hostname: pagos
+    profiles: ["pagos", "aplicacion_pagos"]
+    networks:
+      - pulsar
+    depends_on:
+      broker:
+        condition: service_healthy
+      postgres_pagos:
+        condition: service_started
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: pwdadmin
+      DB_HOST: postgres_pagos
+      DB_PORT: 5432
+      DB_NAME: alpes_pagos
+      DB_SCHEMA: db_pagos
+      BROKER_HOST: broker
+      FLASK_ENV: production
+    ports:
+      - "5003:5000"

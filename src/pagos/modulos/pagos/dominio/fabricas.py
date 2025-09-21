@@ -22,8 +22,6 @@ class FabricaPagos(Fabrica):
                 return mapeador.entidad_a_dto(obj)
             else:
                 pago: Pago = mapeador.dto_a_entidad(obj)
-
-                print(obj,pago)
                 return pago
         else:
             raise TipoObjetoNoExisteEnDominioPagosExcepcion()

@@ -14,8 +14,7 @@ from eventos_y_atribucion.modulos.eventos_medios.aplicacion.mapeadores import Ma
 
 
 @dataclass
-class CrearEvento(Comando):
-    id_correlacion: str
+class RevertirEvento(Comando):
     fecha_creacion: str
     fecha_actualizacion: str
     id: str
@@ -23,10 +22,13 @@ class CrearEvento(Comando):
     id_publicacion:str
 
 
-class CrearEventoHandler(CrearEventoBaseHandler):
+class RevertirEventoHandler(CrearEventoBaseHandler):
 
-    def handle(self, comando: CrearEvento):
+    def handle(self, comando: RevertirEvento):
         evento_dto = EventoDTO(
+            fecha_actualizacion=comando.fecha_actualizacion,
+            fecha_creacion=comando.fecha_creacion,
+            id=comando.id,
             tipo_evento=comando.tipo_evento,
             id_publicacion = comando.id_publicacion
         )
@@ -47,8 +49,8 @@ class CrearEventoHandler(CrearEventoBaseHandler):
             ejecutar_commando(comando)
 
 
-@comando.register(CrearEvento)
-def ejecutar_comando_crear_evento(comando: CrearEvento):
-    handler = CrearEventoHandler()
+@comando.register(RevertirEvento)
+def ejecutar_comando_revertir_evento(comando: RevertirEvento):
+    handler = RevertirEventoHandler()
     handler.handle(comando)
     
