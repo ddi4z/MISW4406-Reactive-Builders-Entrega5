@@ -22,8 +22,20 @@ def broker_host():
     return os.getenv(PULSAR_ENV, default="localhost")
 
 def consultar_schema_registry(topico: str) -> dict:
-    json_registry = requests.get(f'http://{broker_host()}:8080/admin/v2/schemas/{topico}/schema').json()
-    return json.loads(json_registry.get('data',{}))
+    resp = requests.get(
+        f'http://{broker_host()}:8080/admin/v2/schemas/{topico}/schema'
+    )
+    json_registry = resp.json()  # dict
+    data = json_registry.get("data", {})
+
+    # Si 'data' ya es un dict lo devolvemos tal cual, si es str lo convertimos
+    if isinstance(data, str):
+        try:
+            return json.loads(data)
+        except json.JSONDecodeError:
+            # el string no es un JSON válido, devolvemos vacío o lo que necesites
+            return {}
+    return data
 
 def obtener_schema_avro_de_diccionario(json_schema: dict) -> AvroSchema:
     definicion_schema = parse_schema(json_schema)

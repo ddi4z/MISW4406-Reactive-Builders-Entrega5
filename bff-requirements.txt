@@ -4,6 +4,7 @@ uvicorn[standard]==0.30.6
 pulsar-client==3.7.0
 pulsar-client[avro]==3.7.0
 requests==2.32.3
+sse-starlette==2.4.0
 strawberry-graphql==0.240.0
 python-dotenv==1.0.1
 pydantic<2

@@ -8,7 +8,8 @@ from ... import utils
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    def crearAsociacion(self, input: CrearAsociacionInput, id_usuario: str = "default_user", id_correlacion: str = str(uuid.uuid4())) -> Respuesta:
+    def crearAsociacion(self, input: CrearAsociacionInput, info: strawberry.types.Info, id_usuario: str = "default_user", id_correlacion: str = str(uuid.uuid4())) -> Respuesta:
+        print(f"ID Usuario: {id_usuario}, ID Correlación: {id_correlacion}")
         payload = dict(
             id_usuario=id_usuario,
             id_correlacion=id_correlacion,
@@ -32,7 +33,7 @@ class Mutation:
         )
         
         despachador = Despachador()
-        input.context["background_tasks"].add_task(despachador.publicar_mensaje, comando, "comando-crear-asociacion-estrategica", "public/default/comando-crear-asociacion-estrategica")
+        info.context["background_tasks"].add_task(despachador.publicar_mensaje, comando, "comandos-asociaciones.crear_asociacion", "public/default/comando-crear-asociacion-estrategica")
 
         return Respuesta(mensaje="Procesando Mensaje", codigo=203, idSolicitud=id_correlacion)
 
