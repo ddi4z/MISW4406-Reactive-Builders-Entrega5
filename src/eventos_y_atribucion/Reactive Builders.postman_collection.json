@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "65526bb5-c6af-4cd4-a5df-9124f98d000d",
+		"_postman_id": "f7e77797-7dc9-468b-989b-33e6fb059b38",
 		"name": "Reactive Builders",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29104017"
+		"_exporter_id": "47472012"
 	},
 	"item": [
 		{
@@ -61,7 +61,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"id_medio_marketing\": \"3c55836b-01ec-4f09-adca-71dfcc08aae6\",\r\n    \"tipo_publicacion\": \"Tipo 1\"\r\n}",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"id_medio_marketing\": \"58b546d0-5164-4e18-b666-cfdbe0e59b25\",\r\n    \"tipo_publicacion\": \"Tipo 1\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -90,7 +90,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"tipo_evento\":\"Lead\",\r\n    \"id_publicacion\": \"707b0067-e0e7-4b3f-83bc-c1650056e294\"\r\n}",
+					"raw": "{\r\n    \"id_correlacion\": \"corr-12345\",\r\n    \"tipo_evento\":\"Lead\",\r\n    \"id_publicacion\": \"59798ed2-d17b-4e7d-9157-90d29009825e\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -119,7 +119,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"tipo_evento\":\"InteraccionPublicacion\",\r\n    \"id_publicacion\": \"040754d7-af82-488b-bd58-44192785441b\"\r\n}",
+					"raw": "{\r\n    \"id_correlacion\": \"corr-12345\",\r\n    \"tipo_evento\":\"InteraccionPublicacion\",\r\n    \"id_publicacion\": \"59798ed2-d17b-4e7d-9157-90d29009825e\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -191,7 +191,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5000/eventos/evento-query/57b059a9-9843-4d1e-b9a9-34425fc54151",
+					"raw": "http://localhost:5000/eventos/evento-query/27f09082-7aad-47e8-a8c2-2dd0317373be",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -200,7 +200,7 @@
 					"path": [
 						"eventos",
 						"evento-query",
-						"57b059a9-9843-4d1e-b9a9-34425fc54151"
+						"27f09082-7aad-47e8-a8c2-2dd0317373be"
 					]
 				}
 			},
@@ -213,7 +213,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"descripcion\":\"recompensa\",\r\n    \"id_evento\": \"57b059a9-9843-4d1e-b9a9-34425fc54151\"\r\n}",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"descripcion\":\"recompensa\",\r\n    \"id_evento\": \"27f09082-7aad-47e8-a8c2-2dd0317373be\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -231,8 +231,7 @@
 						"prueba",
 						"recompensa-comando"
 					]
-				},
-				"description": "Este endpoint es de prueba para probar directamente el comando de crear recompensa. No obstante, con la ejecución de la creación de eventos (Leads o interacciones con publicaciones) no es necesario ejecutar este endpoint."
+				}
 			},
 			"response": []
 		},
@@ -243,7 +242,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"monto_comision\": {\r\n        \"valor\": 1\r\n    },\r\n    \"id_evento\": \"57b059a9-9843-4d1e-b9a9-34425fc54151\"\r\n}",
+					"raw": "{\r\n    \"id\": \"41733862-af7c-4e83-8674-10d60ed5e18d\",\r\n    \"fecha_creacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"fecha_actualizacion\" : \"2025-09-07T23:55:00Z\",\r\n    \"monto_comision\": {\r\n        \"valor\": 1\r\n    },\r\n    \"id_evento\": \"27f09082-7aad-47e8-a8c2-2dd0317373be\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -261,8 +260,7 @@
 						"prueba",
 						"comision-comando"
 					]
-				},
-				"description": "Este endpoint es de prueba para probar directamente el comando de crear recompensa. No obstante, con la ejecución de la creación de eventos (Leads o interacciones con publicaciones) no es necesario ejecutar este endpoint."
+				}
 			},
 			"response": []
 		}

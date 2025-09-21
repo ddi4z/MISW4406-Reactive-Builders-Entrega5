@@ -259,7 +259,7 @@ services:
     networks:
       - pulsar      
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - ./data/postgres_eventos:/var/lib/postgresql/data
       - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
