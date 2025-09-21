@@ -23,8 +23,16 @@ def database_connection(config, basedir=os.path.abspath(os.path.dirname(__file__
     
     if config.get('TESTING', False) is True:
         return f'sqlite:///{os.path.join(basedir, "database.db")}'
+    
+    # Cloud SQL via unix socket
+    if DB_HOST.startswith("/cloudsql/"):
+        return (
+            f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}"
+            f"?host={DB_HOST}"
+        )
     else:
-        return f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+        # Default TCP connection
+        return f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
 
