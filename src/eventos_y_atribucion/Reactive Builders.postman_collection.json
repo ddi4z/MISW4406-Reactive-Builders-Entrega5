@@ -142,6 +142,64 @@
 			"response": []
 		},
 		{
+			"name": "Crear InteraccionPublicacion erronea",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id_correlacion\": \"corr-12345\",\r\n    \"tipo_evento\":\"Erronea\",\r\n    \"id_publicacion\": \"59798ed2-d17b-4e7d-9157-90d29009825e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/eventos/evento-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"eventos",
+						"evento-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Revertir InteraccionPublicacion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id_correlacion\": \"corr-12345\",\r\n    \"id\": \"05428a88-b633-4ae6-8ace-34ee9a4ba858\",\r\n    \"motivo\": \"se debe cancelar\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/eventos/revertir-comando",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"eventos",
+						"revertir-comando"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Obtener todos",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
