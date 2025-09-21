@@ -27,8 +27,8 @@ class Pago(AgregacionRaiz):
     pasarela: str = field(default_factory=str)
 
     def crear_pago(self, pago: Pago):
-        self.id_comision = uuid.uuid4()
-        self.fecha_creacion = datetime.now()
+        self.fecha_creacion = pago.fecha_creacion
+        self.id_comision = pago.id_comision
         self.fecha_actualizacion = self.fecha_creacion
         self.id_correlacion = pago.id_correlacion
         self.moneda = pago.moneda

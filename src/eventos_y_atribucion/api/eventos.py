@@ -26,8 +26,6 @@ def crear_evento_asincrono():
 
         comando = CrearEvento(evento_dto.fecha_creacion, evento_dto.fecha_actualizacion, evento_dto.id, evento_dto.tipo_evento, evento_dto.id_publicacion)
 
-        # TODO Reemplace es todo código sincrono y use el broker de eventos para propagar este comando de forma asíncrona
-
         ejecutar_commando(comando)
         
         return Response('{}', status=202, mimetype='application/json')
