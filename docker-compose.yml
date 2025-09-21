@@ -193,7 +193,7 @@ services:
     networks:
       - pulsar      
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
@@ -214,7 +214,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: pwdadmin
       DB_HOST: postgresdb
-      DB_PORT : 5432
+      DB_PORT : 5434
       DB_NAME: alpes_partners
       DB_SCHEMA: db_asociaciones_estrategicas
       BROKER_HOST: broker
