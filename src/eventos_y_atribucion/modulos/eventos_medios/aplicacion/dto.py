@@ -48,4 +48,3 @@ class EventoDTO(DTO):
         default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     )
     id_publicacion: str = field(default_factory=str)
-    

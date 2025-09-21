@@ -23,6 +23,7 @@ class EventoFallido(EventoDominio):
     id_publicacion: uuid.UUID = None
     fecha_creacion: datetime = None
     fecha_actualizacion: datetime = field(default_factory=datetime.now)
+    motivo: str = None
     
 @dataclass
 class EventoCancelado(EventoDominio):
@@ -32,6 +33,8 @@ class EventoCancelado(EventoDominio):
     id_publicacion: uuid.UUID = None
     fecha_creacion: datetime = None
     fecha_actualizacion: datetime = field(default_factory=datetime.now)
+    fecha_cancelacion: datetime = field(default_factory=datetime.now)
+    motivo: str = None
    
 @dataclass
 class MedioMarketingCreado(EventoDominio):

@@ -172,14 +172,14 @@ def suscribirse_a_comandos_crear(app=None):
             cliente.close()
 
 
-def suscribirse_a_comandos_cancelar(app=None):
+def suscribirse_a_comandos_revertir(app=None):
     cliente = None
     try:
         cliente = pulsar.Client(f"pulsar://{utils.broker_host()}:6650")
         consumidor = cliente.subscribe(
             "comandos-eventos_y_atribucion.revertir_evento",
             consumer_type=_pulsar.ConsumerType.Shared,
-            subscription_name="eventos-sub-comandos-cancelar",
+            subscription_name="eventos-sub-comandos-revertir",
             schema=AvroSchema(ComandoRevertirEventoTracking),
         )
 
@@ -189,12 +189,14 @@ def suscribirse_a_comandos_cancelar(app=None):
             datos = comando_integracion.data
 
     
-            logging.info(f"Comando recibido CancelarEvento: {datos}")
-            print(f"Comando recibido Cancelar: {datos}")
+            logging.info(f"Comando recibido RevertirEvento: {datos}")
+            print(f"Comando recibido Revertir: {datos}")
 
             comando = RevertirEvento(
                 id_correlacion= datos.id_correlacion,
                 id_evento = datos.id_evento,
+                fecha_creacion = '',
+                fecha_actualizacion = '',
                 motivo= datos.motivo
             )
 
@@ -206,7 +208,7 @@ def suscribirse_a_comandos_cancelar(app=None):
                 consumidor.acknowledge(mensaje)
 
             except Exception as e:
-                logging.error(f"Error procesando comando Cancelar: {e}")
+                logging.error(f"Error procesando comando Revertir: {e}")
                 traceback.print_exc()
 
                 # decisión: descartar o reintentar

@@ -49,6 +49,18 @@ class RepositorioEventosPostgres(RepositorioEventos):
         dto = db.session.query(EventoDTO).filter_by(id=str(entity_id)).first()
         if dto:
             db.session.delete(dto)
+            
+    def revertir(self, entity_id: UUID) -> Evento:
+        dto = db.session.query(EventoDTO).filter_by(id=str(entity_id)).first()
+        if not dto:
+            return None
+
+        dto.tipo_evento = "REVERTIDO"
+        db.session.commit()
+        db.session.refresh(dto)
+
+        return self.fabrica_eventos.crear_objeto(dto, MapeadorEvento())
+            
 
 
 class RepositorioMediosMarketingPostgres(RepositorioMediosMarketing):

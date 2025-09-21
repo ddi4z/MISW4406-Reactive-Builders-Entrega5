@@ -30,7 +30,7 @@ class ServicioEvento:
             schema=AvroSchema(ComandoCrearEventoTracking),
         )
 
-    def cancelar_evento(self, id_evento:str, motivo:str,in_id_correlacion: str):
+    def revertir_evento(self, id_evento:str, motivo:str,in_id_correlacion: str):
         payload = ComandoRevertirEventoTrackingPayload(
             id_correlacion=in_id_correlacion,
             id_evento=id_evento,
