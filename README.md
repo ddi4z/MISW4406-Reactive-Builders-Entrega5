@@ -102,7 +102,7 @@ Para poder ejecutarlos, diríjase al repositorio de la entrega 1 actualizado. Es
 
 ### Puntos de vista de arquitectura
 
-En la carpeta `docs/` se puede encontrar la entrega 2 corregida, bajo el nombre `entrega_2.pdf`
+En la carpeta `docs/` se puede encontrar la entrega 2 corregida, bajo el nombre `Entrega_2.pdf`
 
 Allí se incluyen los requerimientos de calidad junto a las vistas de contexto, funcional (módulo y C&C) y dominio, con su respectivos puntos de sensibilidad y otras consideraciones
 
