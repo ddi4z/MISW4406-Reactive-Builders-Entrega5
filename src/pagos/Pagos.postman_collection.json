@@ -12,44 +12,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8001/pagos/ping",
+					"raw": "http://localhost:5003/pagos/ping",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8001",
+					"port": "5003",
 					"path": [
 						"pagos",
 						"ping"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Revertir pago",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"id\": \"3714294f-8522-486c-a81b-d02c19313eff\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8001/pagos/revertir",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"pagos",
-						"revertir"
 					]
 				}
 			},
@@ -62,7 +33,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"id\": \"8f3c7a20-9d45-4f0b-8ad4-1c3c7b14a9c7\",\r\n  \"fecha_creacion\": \"2025-09-15T13:45:30Z\",\r\n  \"fecha_actualizacion\": \"2025-09-15T14:10:05Z\",\r\n  \"id_correlacion\": \"corr-12345\",\r\n  \"id_comision\": \"c56a4180-65aa-42ec-a945-5fd21dec0538\",\r\n  \"moneda\": \"USD\",\r\n  \"monto\": 250.75,\r\n  \"metodo_pago\": \"tarjeta_credito\",\r\n  \"estado\": \"PAGADO\",\r\n  \"pasarela\": \"Stripe\"\r\n}\r\n",
+					"raw": "{\r\n  \"id_correlacion\": \"corr-12345\",\r\n  \"id_comision\": \"d2737056-4143-4202-8241-8f6d1c68458b\",\r\n  \"moneda\": \"USD\",\r\n  \"monto\": 250.75,\r\n  \"metodo_pago\": \"tarjeta_credito\",\r\n  \"estado\": \"PAGADO\",\r\n  \"pasarela\": \"Stripe\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -70,14 +41,73 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8001/pagos",
+					"raw": "http://localhost:5003/pagos/crear",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8001",
+					"port": "5003",
 					"path": [
-						"pagos"
+						"pagos",
+						"crear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Revertir pago",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id_pago\": \"0c17555c-dc5a-42e7-9885-2079bd3aeba5\",\r\n  \"id_correlacion\": \"corr-12345\",\r\n  \"motivo\": \"error\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5003/pagos/revertir",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5003",
+					"path": [
+						"pagos",
+						"revertir"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear pago fallido",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id_correlacion\": \"corr-12345\",\r\n  \"id_comision\": \"d2737056-4143-4202-8241-8f6d1c68458b\",\r\n  \"moneda\": \"USD\",\r\n  \"monto\": -250.75,\r\n  \"metodo_pago\": \"tarjeta_credito\",\r\n  \"estado\": \"PAGADO\",\r\n  \"pasarela\": \"Stripe\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5003/pagos/crear",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5003",
+					"path": [
+						"pagos",
+						"crear"
 					]
 				}
 			},
