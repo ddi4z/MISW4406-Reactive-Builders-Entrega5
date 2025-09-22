@@ -3,7 +3,8 @@ FROM python:3.11-slim
 WORKDIR /app
 
 
-COPY . /app/eventos_y_atribucion
+COPY ./src/eventos_y_atribucion /app/eventos_y_atribucion
+
 
 
 RUN pip install --no-cache-dir -r /app/eventos_y_atribucion/eventos-requirements.txt \
