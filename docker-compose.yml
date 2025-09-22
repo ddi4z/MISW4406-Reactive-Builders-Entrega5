@@ -79,10 +79,10 @@ services:
       - managedLedgerDefaultAckQuorum=1
       - advertisedAddress=broker
       #Si se realiza una ejecución manual del microservicio desde el IDE, se debe usar esta línea:
-      #- advertisedListeners=external:pulsar://127.0.0.1:6650
+      - advertisedListeners=external:pulsar://127.0.0.1:6650
       #Si se realiza una ejecución completa de todo (incluido el microservicio) con docker compose, se debería usar esta línea en lugar de la anterior para que se comunique con el contenedor broker dentro de una misma ejecución
-      - advertisedListeners=internal:pulsar://broker:6650
-      - internalListenerName=internal
+      #- advertisedListeners=internal:pulsar://broker:6650
+      #- internalListenerName=internal
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -193,7 +193,7 @@ services:
     networks:
       - pulsar      
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
@@ -214,7 +214,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: pwdadmin
       DB_HOST: postgresdb
-      DB_PORT : 5432
+      DB_PORT : 5434
       DB_NAME: alpes_partners
       DB_SCHEMA: db_asociaciones_estrategicas
       BROKER_HOST: broker
@@ -233,8 +233,9 @@ services:
       # IMPORTANTE: dentro de la red de Docker NO uses localhost
       # Usa el nombre del servicio del micro: "asociaciones"
       - ASSOCIATIONS_HOST=asociaciones
-      - ASSOCIATIONS_PORT=5000   # puerto interno del micro (no el publicado 5001)
+      - ASSOCIATIONS_PORT=8080   # puerto interno del micro (no el publicado 5001)
       - BFF_PORT=8003
+      - BROKER_HOST=broker
     networks:
       - pulsar                   # misma red que "asociaciones"
     ports:
@@ -246,23 +247,29 @@ services:
     #   - ./src/bff_web:/app/src/bff_web
 
 
+ 
   postgres_eventos:
     image: postgres:15
-    hostname: postgres_eventos
     container_name: postgres_eventos
-    restart: always
-    profiles: ["eventos", "db_eventos"]
-    environment:
-      POSTGRES_DB: alpes_partners
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pwdadmin
+    hostname: postgres_eventos
+    profiles: ["eventos", "db_eventos", "aplicacion_eventos"]
+    restart: on-failure
     networks:
-      - pulsar      
-    ports:
-      - "5433:5432"
+      - pulsar
+      - sidecar
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: alpespartners
     volumes:
-      - ./data/postgres_eventos:/var/lib/postgresql/data
-      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d alpespartners"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   eventos:
     build:
@@ -279,34 +286,40 @@ services:
       postgres_eventos:
         condition: service_started
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: pwdadmin
+      DB_USER: admin
+      DB_PASSWORD: admin
       DB_HOST: postgres_eventos
       DB_PORT: 5432
-      DB_NAME: alpes_partners
+      DB_NAME: alpespartners
       DB_SCHEMA: db_eventos
       BROKER_HOST: broker
       FLASK_ENV: production
     ports:
-      - "5002:5000"
+      - "5010:8080"
 
   postgres_pagos:
     image: postgres:15
     hostname: postgres_pagos
     container_name: postgres_pagos
-    restart: always
     profiles: ["pagos", "db_pagos"]
-    environment:
-      POSTGRES_DB: alpes_pagos
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pwdadmin
+    restart: on-failure
     networks:
       - pulsar
-    ports:
-      - "5434:5432"
+      - sidecar
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: alpespartners
     volumes:
-      - ./data/postgres_pagos:/var/lib/postgresql/data
-      - ./init-schema-pagos.sql:/docker-entrypoint-initdb.d/init-schema.sql
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d alpespartners"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   pagos:
     build:
@@ -323,13 +336,16 @@ services:
       postgres_pagos:
         condition: service_started
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: pwdadmin
+      DB_USER: admin
+      DB_PASSWORD: admin
       DB_HOST: postgres_pagos
       DB_PORT: 5432
-      DB_NAME: alpes_pagos
+      DB_NAME: alpespartners
       DB_SCHEMA: db_pagos
       BROKER_HOST: broker
       FLASK_ENV: production
     ports:
-      - "5003:5000"
+      - "5003:8080"
+
+ 
+

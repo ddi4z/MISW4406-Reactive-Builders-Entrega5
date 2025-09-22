@@ -93,11 +93,3 @@ def obtener_asociacion(id_asociacion: str) -> Asociacion:
     data = _get(f"/asociaciones/{id_asociacion}")
     return map_asociacion(data)
 '''
-def crear_asociacion(payload: dict) -> Respuesta:
-    resp = _post("/asociaciones", json=payload)
-    body = resp["body"] or {}
-    return Respuesta(
-        mensaje=body.get("mensaje", "Procesando"),
-        codigo=resp["status_code"],  # 202 si es async
-        idSolicitud=body.get("id_correlacion") or body.get("idSolicitud")
-    )
