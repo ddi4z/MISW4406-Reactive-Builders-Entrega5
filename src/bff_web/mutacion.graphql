@@ -1,0 +1,17 @@
+mutation {
+  crearAsociacion(
+    input: {
+      idMarca: "111e4567-e89b-12d3-a456-426614174100"
+      idSocio: "222e4567-e89b-12d3-a456-426614174100"
+      tipo: "campania"
+      descripcion: "Alianza principal para afiliados"
+      vigencia: {
+        fechaInicio: "2023-09-01T00:00:00"
+        fechaFin: "2025-12-31T23:59:59"
+      }
+    }
+  ) {
+    codigo
+    mensaje
+  }
+}

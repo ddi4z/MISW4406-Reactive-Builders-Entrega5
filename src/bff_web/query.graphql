@@ -1,0 +1,15 @@
+query {
+  asociacionesPorMarca(idMarca: "111e4567-e89b-12d3-a456-426614174100") {
+    id
+    idMarca
+    idSocio
+    tipo
+    descripcion
+    vigencia { 
+      fechaInicio 
+      fechaFin 
+    }
+    fechaCreacion
+    fechaActualizacion
+  }
+}
