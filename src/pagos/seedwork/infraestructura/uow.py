@@ -1,16 +1,25 @@
+# --- imports de arriba ---
+from flask import g, has_request_context, session 
+from contextvars import ContextVar
+
+_current_uow = ContextVar("current_uow", default=None)
+
+
 from abc import ABC, abstractmethod
 from enum import Enum
+
 from pagos.seedwork.dominio.entidades import AgregacionRaiz
 from pydispatch import dispatcher
-import contextvars
-from sqlalchemy.orm import Session
-from pagos.config.db import SessionLocal 
+
+import pickle
+import logging
+import traceback
+
 
 
 class Lock(Enum):
     OPTIMISTA = 1
     PESIMISTA = 2
-
 
 class Batch:
     def __init__(self, operacion, lock: Lock, *args, **kwargs):
@@ -19,34 +28,45 @@ class Batch:
         self.lock = lock
         self.kwargs = kwargs
 
-
 class UnidadTrabajo(ABC):
+
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         self.rollback()
 
-    def _obtener_eventos(self, batches=None):
+    def _obtener_eventos_rollback(self, batches=None):
         batches = self.batches if batches is None else batches
+        eventos = list()
         for batch in batches:
             for arg in batch.args:
                 if isinstance(arg, AgregacionRaiz):
-                    return arg.eventos
-        return list()
+                    eventos += arg.eventos_compensacion
+                    break
+        return eventos
+
+    def _obtener_eventos(self, batches=None):
+        batches = self.batches if batches is None else batches
+        eventos = list()
+        for batch in batches:
+            for arg in batch.args:
+                if isinstance(arg, AgregacionRaiz):
+                    eventos += arg.eventos
+                    break
+        return eventos
 
     @abstractmethod
     def _limpiar_batches(self):
         raise NotImplementedError
 
-    @property
     @abstractmethod
     def batches(self) -> list[Batch]:
         raise NotImplementedError
 
     @abstractmethod
     def savepoints(self) -> list:
-        raise NotImplementedError
+        raise NotImplementedError                    
 
     def commit(self):
         self._publicar_eventos_post_commit()
@@ -55,40 +75,92 @@ class UnidadTrabajo(ABC):
     @abstractmethod
     def rollback(self, savepoint=None):
         self._limpiar_batches()
-
+    
     @abstractmethod
     def savepoint(self):
         raise NotImplementedError
 
-    def registrar_batch(self, operacion, *args, lock=Lock.PESIMISTA, **kwargs):
+    def registrar_batch(self, operacion, *args, lock=Lock.PESIMISTA, repositorio_eventos_func=None,**kwargs):
         batch = Batch(operacion, lock, *args, **kwargs)
         self.batches.append(batch)
-        self._publicar_eventos_dominio(batch)
+        self._publicar_eventos_dominio(batch, repositorio_eventos_func)
 
-    def _publicar_eventos_dominio(self, batch):
+    def _publicar_eventos_dominio(self, batch, repositorio_eventos_func):
         for evento in self._obtener_eventos(batches=[batch]):
+            if repositorio_eventos_func:
+                repositorio_eventos_func(evento)
             dispatcher.send(signal=f'{type(evento).__name__}Dominio', evento=evento)
 
     def _publicar_eventos_post_commit(self):
-        for evento in self._obtener_eventos():
-            dispatcher.send(signal=f'{type(evento).__name__}Integracion', evento=evento)
+        try:
+            for evento in self._obtener_eventos():
+                dispatcher.send(signal=f'{type(evento).__name__}Integracion', evento=evento)
+        except:
+            logging.error('ERROR: Suscribiendose al tópico de eventos!')
+            traceback.print_exc()
+            
+
+def is_flask():
+    try:
+        from flask import session
+        return True
+    except Exception as e:
+        return False
+
+def registrar_unidad_de_trabajo(serialized_obj):
+    from pagos.config.uow import UnidadTrabajoSQLAlchemy
+    from flask import session
+    
+
+    session['uow'] = serialized_obj
+
+def flask_uow():
+    from flask import session
+    from pagos.config.uow import UnidadTrabajoSQLAlchemy, UnidadTrabajoPulsar
+    if session.get('uow'):
+        return session['uow']
+
+    uow_serialized = pickle.dumps(UnidadTrabajoSQLAlchemy())
+    if session.get('uow_metodo') == 'pulsar':
+        uow_serialized = pickle.dumps(UnidadTrabajoPulsar())
+    
+    registrar_unidad_de_trabajo(uow_serialized)
+    return uow_serialized
+
+def unidad_de_trabajo():
+    if has_request_context():
+        # si ya está creada, reusar
+        if not hasattr(g, "uow"):
+            metodo = session.get("uow_metodo", "sqlalchemy")  # default = sqlalchemy
+            if metodo == "pulsar":
+                from pagos.config.uow import UnidadTrabajoPulsar
+                g.uow = UnidadTrabajoPulsar()
+            elif metodo == "hibrida":
+                from pagos.config.uow import UnidadTrabajoHibrida
+                g.uow = UnidadTrabajoHibrida()
+            else:
+                from pagos.config.uow import UnidadTrabajoSQLAlchemy
+                g.uow = UnidadTrabajoSQLAlchemy()
+        return g.uow
+    else:
+        uow = _current_uow.get()
+        if uow is None:
+            # si no hay request, usar hibrida por defecto
+            from pagos.config.uow import UnidadTrabajoHibrida
+            uow = UnidadTrabajoHibrida()
+            _current_uow.set(uow)
+        return uow
 
 
+def guardar_unidad_trabajo(uow):
+    if has_request_context():
+        g.uow = uow
+    else:
+        _current_uow.set(uow)
 
-_uow_context: contextvars.ContextVar[UnidadTrabajo] = contextvars.ContextVar("uow", default=None)
-
-
-def unidad_de_trabajo(session: Session = None) -> UnidadTrabajo:
-    uow = _uow_context.get()
-    if not uow:
-        from pagos.config.uow import UnidadTrabajoSQLAlchemy
-        session = session or SessionLocal()
-        uow = UnidadTrabajoSQLAlchemy(session)
-        _uow_context.set(uow)
-    return uow
-
-def guardar_unidad_trabajo(uow: UnidadTrabajo):
-    _uow_context.set(uow)
+def _clear_nonflask_uow():
+    if not has_request_context():
+        _current_uow.set(None)        
 
 
 class UnidadTrabajoPuerto:
@@ -98,13 +170,15 @@ class UnidadTrabajoPuerto:
         uow = unidad_de_trabajo()
         uow.commit()
         guardar_unidad_trabajo(uow)
+        _clear_nonflask_uow()
 
     @staticmethod
     def rollback(savepoint=None):
         uow = unidad_de_trabajo()
         uow.rollback(savepoint=savepoint)
         guardar_unidad_trabajo(uow)
-
+        _clear_nonflask_uow()
+        
     @staticmethod
     def savepoint():
         uow = unidad_de_trabajo()
@@ -113,7 +187,8 @@ class UnidadTrabajoPuerto:
 
     @staticmethod
     def dar_savepoints():
-        return unidad_de_trabajo().savepoints()
+        uow = unidad_de_trabajo()
+        return uow.savepoints()
 
     @staticmethod
     def registrar_batch(operacion, *args, lock=Lock.PESIMISTA, **kwargs):

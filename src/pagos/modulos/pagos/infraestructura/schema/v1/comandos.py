@@ -1,10 +1,26 @@
 from pulsar.schema import *
-from dataclasses import dataclass, field
 from pagos.seedwork.infraestructura.schema.v1.comandos import (ComandoIntegracion)
 
-class ComandoCrearReservaPayload(ComandoIntegracion):
-    id_usuario = String()
-    # TODO Cree los records para itinerarios
+class ComandoRealizarPagoComisionPayload(ComandoIntegracion):
+    id_correlacion = String()
+    id_comision = String()
+    moneda = String()
+    monto = Float()
+    metodo_pago = String()
+    estado = String()
+    pasarela = String()
+    
 
-class ComandoCrearReserva(ComandoIntegracion):
-    data = ComandoCrearReservaPayload()
+
+class ComandoRealizarPagoComision(ComandoIntegracion):
+    data = ComandoRealizarPagoComisionPayload()
+    
+    
+class ComandoRevertirPagoComisionPayload(ComandoIntegracion):
+    id_correlacion = String()
+    id_pago = String()
+    motivo = String()
+
+
+class ComandoRevertirPagoComision(ComandoIntegracion):
+    data = ComandoRevertirPagoComisionPayload()

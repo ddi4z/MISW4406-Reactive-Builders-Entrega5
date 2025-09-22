@@ -1,65 +1,37 @@
-from fastapi import FastAPI, Depends, Request
-from sqlalchemy.orm import Session
-from sqlalchemy import text
+from pagos.modulos.pagos.aplicacion.comandos.realizar_pago_comision import RealizarPagoComision
+from pagos.modulos.pagos.aplicacion.comandos.revertir_pago_comision import RevertirPagoComision
+from pagos.modulos.pagos.aplicacion.servicios import ServicioPago
+from pagos.seedwork.infraestructura.uow import unidad_de_trabajo
+import pagos.seedwork.presentacion.api as api
+import json
+from pagos.seedwork.dominio.excepciones import ExcepcionDominio
 
-import asyncio
-from contextlib import asynccontextmanager
-
-from pagos.modulos.pagos.aplicacion.comandos.crear_pago import RealizarPagoComision
-from pagos.modulos.pagos.aplicacion.comandos.revertir_pago import RevertirPagoComision
+from flask import request, session, Response
 from pagos.modulos.pagos.aplicacion.mapeadores import MapeadorPagoDTOJson
 from pagos.seedwork.aplicacion.comandos import ejecutar_commando
-from pagos.seedwork.dominio.excepciones import ExcepcionDominio
-from pydantic_settings import BaseSettings
-from typing import Any
+bp = api.crear_blueprint('pagos', '/pagos')
 
 
-from ..config.db import Base, engine
-from ..config.db_dependencies import get_db
-
-
-class Config(BaseSettings):
-    APP_VERSION: str = "1"
-
-settings = Config()
-app_configs: dict[str, Any] = {"title": "Pagos AeroAlpes"}
-tasks = []
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-
-    # task1 = asyncio.create_task(suscribirse_a_topico("evento-pago", "sub-pagos", EventoPago))
-    # task2 = asyncio.create_task(suscribirse_a_topico("comando-pagar-reserva", "sub-com-pagos-reservar", ComandoPagarReserva))
-    # task3 = asyncio.create_task(suscribirse_a_topico("comando-revertir-pago", "sub-com-pagos-revertir", ComandoRevertirPago))
-    # tasks.extend([task1, task2, task3])
-
-    yield
-
-    # for task in tasks:
-        # task.cancel()
+@bp.route("/ping", methods=('GET',))
+def ping():
+    return {"pong": 1}
     
-app = FastAPI(lifespan=lifespan, **app_configs)
-
-
-
-@app.get("/pagos/ping")
-def ping(db: Session = Depends(get_db)):
-    result = db.execute(text("SELECT 1")).scalar()
-    return {"pong": result}
-
-
-
-
     
-@app.post("/pagos", include_in_schema=False)
-async def prueba_pagar_reserva(request: Request) -> dict[str, str]:
+@bp.route('/crear', methods=('POST',))
+def prueba_pagar_comision():
     try:
-        pago_dict = await request.json()
+        session['uow_metodo'] = 'pulsar'
+        pago_dict =  request.json
 
         map_evento = MapeadorPagoDTOJson()
         pago_dto = map_evento.externo_a_dto(pago_dict)
+        id_correlacion = pago_dict.get("id_correlacion", "")
+        ServicioPago().realizar_pago_comision(pago_dto,id_correlacion)
 
+        
+        
+        """
+       
         comando = RealizarPagoComision(            
             pago_dto.id,
             pago_dto.fecha_creacion,
@@ -72,17 +44,20 @@ async def prueba_pagar_reserva(request: Request) -> dict[str, str]:
             pago_dto.estado,
             pago_dto.pasarela
         )
-
-        ejecutar_commando(comando)
         
-        return {"status": "accepted"}
+        ejecutar_commando(comando)
+         """
+        
+        
+        return Response('{}', status=202, mimetype='application/json')
     except ExcepcionDominio as e:
-        return {"error": str(e)}
+        return Response(json.dumps(dict(error=str(e))), status=400, mimetype='application/json')
 
-@app.post("/pagos/revertir", include_in_schema=False)
-async def prueba_revertir_pago(request: Request) -> dict[str, str]:
+@bp.route('/revertir', methods=('POST',))
+def prueba_revertir_pago():
     try:
-        pago_dict = await request.json()
+        #session['uow_metodo'] = 'pulsar'
+        pago_dict = request.json
 
         map_evento = MapeadorPagoDTOJson()
         pago_dto = map_evento.externo_a_dto(pago_dict)
@@ -90,6 +65,6 @@ async def prueba_revertir_pago(request: Request) -> dict[str, str]:
 
         ejecutar_commando(comando)
         
-        return {"status": "accepted"} 
+        return Response('{}', status=202, mimetype='application/json')
     except ExcepcionDominio as e:
-        return {"error": str(e)}
+        return Response(json.dumps(dict(error=str(e))), status=400, mimetype='application/json')
