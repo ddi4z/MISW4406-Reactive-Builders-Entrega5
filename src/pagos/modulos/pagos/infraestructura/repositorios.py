@@ -1,3 +1,4 @@
+from datetime import datetime
 from pagos.config.db import db
 from pagos.modulos.pagos.dominio.entidades import Pago
 from pagos.modulos.pagos.dominio.fabricas import FabricaPagos
@@ -42,13 +43,15 @@ class RepositorioPagosPostgres(RepositorioPagos):
             db.session.delete(dto)
         
 
-    def revertir(self, entity_id: UUID):
-        dto = db.session.query(PagoDTO).filter_by(id=str(entity_id)).first()
-        if not dto:
-            return None
-        dto.estado = "REVERTIDO"
-        db.session.refresh(dto)
-        return self._fabrica_pagos.crear_objeto(dto, MapeadorPago())
+    def revertir(self, id_pago: UUID):
+        pago = db.session.query(PagoDTO).filter_by(id=str(id_pago)).first()
+        if not pago:
+            raise Exception(f"Pago {id_pago} no encontrado")
+
+        pago.estado = "REVERTIDO"
+        pago.fecha_actualizacion = datetime.now()
+
+        db.session.add(pago)
 
 
 class RepositorioEventosPagosPostgres(RepositorioEventosPagos):

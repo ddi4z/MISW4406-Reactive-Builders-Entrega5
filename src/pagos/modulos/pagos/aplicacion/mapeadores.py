@@ -46,6 +46,9 @@ class MapeadorPago(RepMap):
         )
 
     def dto_a_entidad(self, dto: PagoDTO) -> Pago:
+        if (dto.monto < 0):
+            raise Exception
+        
         return Pago(
             id=dto.id,
             id_comision=dto.id_comision,

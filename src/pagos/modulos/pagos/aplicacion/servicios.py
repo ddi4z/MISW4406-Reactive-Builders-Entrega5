@@ -22,18 +22,18 @@ class ServicioPago:
         despachador.publicar_comando(comando, "comandos-pagos.realizar_pago_comision")
         
 
-    def revertir_pago_comision(self, id_evento:str, motivo:str,in_id_correlacion: str):
+    def revertir_pago_comision(self, id_pago:str, motivo:str,in_id_correlacion: str):
         payload = ComandoRevertirPagoComisionPayload(
             id_correlacion=in_id_correlacion,
-            id_evento=id_evento,
+            id_pago=id_pago,
             motivo=motivo
         )
 
         comando = ComandoRevertirPagoComision(
-            type="RevertirEventoTracking",
+            type="RevertirPagoComision",
             specversion="v1",
             datacontenttype="AVRO",
-            service_name="api-eventos",
+            service_name="api-pagos",
             data=payload,
         )
 
@@ -41,5 +41,5 @@ class ServicioPago:
         despachador.publicar_comando(
             comando, 
             topico="comandos-pagos.revertir_pago_comision",
-            schema=AvroSchema(ComandoRevertirPagoComision),
         )        
+        print("COMANDO PUBLICADO")

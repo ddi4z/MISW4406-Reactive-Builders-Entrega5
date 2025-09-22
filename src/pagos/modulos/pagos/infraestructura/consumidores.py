@@ -195,7 +195,7 @@ def suscribirse_a_comandos_revertir(app=None):
 
             comando = RevertirPagoComision(
                 id_correlacion= datos.id_correlacion,
-                id_evento = datos.id_evento,
+                id_pago = datos.id_pago,
                 fecha_creacion = '',
                 fecha_actualizacion = '',
                 motivo= datos.motivo
