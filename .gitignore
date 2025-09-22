@@ -141,3 +141,5 @@ src/compile_files.py
 src/contents_summary.txt
 compile_files.py
 contents_summary.txt
+src/eventos_y_atribucion/compile_files.py
+src/eventos_y_atribucion/contents_summary.txt
