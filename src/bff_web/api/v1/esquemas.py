@@ -5,7 +5,12 @@ from typing import Optional, List
 
 ASSOCIATIONS_HOST = os.getenv("ASSOCIATIONS_HOST", "localhost")
 ASSOCIATIONS_PORT = int(os.getenv("ASSOCIATIONS_PORT", "5000"))
-BASE_URL = f"http://{ASSOCIATIONS_HOST}:{ASSOCIATIONS_PORT}"
+
+# Si el host ya incluye "run.app", asumimos que es un servicio Cloud Run y usamos https sin puerto
+if "run.app" in ASSOCIATIONS_HOST:
+    BASE_URL = f"https://{ASSOCIATIONS_HOST}"
+else:
+    BASE_URL = f"http://{ASSOCIATIONS_HOST}:{ASSOCIATIONS_PORT}"
 
 # ===== Tipos GraphQL =====
 

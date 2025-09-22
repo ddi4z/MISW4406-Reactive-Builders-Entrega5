@@ -1,20 +1,19 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY pagos-requirements.txt .
-RUN pip install --upgrade --no-cache-dir "pip<24.1" setuptools wheel \
-    && pip install --no-cache-dir -r pagos-requirements.txt \
-    && pip install --no-cache-dir uvicorn gunicorn
+
+COPY src/ /app
 
 
-COPY . /app
+COPY pagos-requirements.txt /app/
 
-ENV PYTHONPATH=/app/src
 
-ENV PORT=8080
+RUN pip install --no-cache-dir -r /app/pagos-requirements.txt \
+    && pip install --no-cache-dir gunicorn
 
-# Exponemos el puerto
-EXPOSE 8080
+ENV PYTHONPATH=/app
+ENV PORT=5003
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "--bind", "0.0.0.0:8080", "pagos.api.pagos:app"]
+
+CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:5003", "pagos.api:app"]

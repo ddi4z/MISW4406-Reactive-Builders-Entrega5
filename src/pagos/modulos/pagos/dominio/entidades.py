@@ -11,7 +11,7 @@ from datetime import datetime
 import uuid
 
 from pagos.seedwork.dominio.entidades import AgregacionRaiz
-from pagos.modulos.pagos.dominio.eventos import PagoCreado
+from pagos.modulos.pagos.dominio.eventos import PagoRealizado
 
 
 @dataclass
@@ -37,7 +37,7 @@ class Pago(AgregacionRaiz):
         self.estado = pago.estado
         self.pasarela = pago.pasarela
  
-        self.agregar_evento(PagoCreado( 
+        self.agregar_evento(PagoRealizado( 
             id_comision = self.id_comision,
             fecha_actualizacion =  self.fecha_actualizacion,
             fecha_creacion = self.fecha_creacion,
