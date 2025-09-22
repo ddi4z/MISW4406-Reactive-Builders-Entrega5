@@ -16,7 +16,7 @@ from pagos.modulos.pagos.dominio.eventos import PagoRealizado
 
 @dataclass
 class Pago(AgregacionRaiz):
-    id_comision: uuid = field(default_factory=uuid)
+    id_comision: uuid.UUID = field(default_factory=uuid.uuid4)
     fecha_creacion: datetime = field(default_factory=datetime.now)
     fecha_actualizacion: datetime = field(default_factory=datetime.now)
     id_correlacion: str = field(default_factory=str)

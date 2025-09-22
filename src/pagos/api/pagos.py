@@ -1,3 +1,4 @@
+import uuid
 from pagos.modulos.pagos.aplicacion.comandos.realizar_pago_comision import RealizarPagoComision
 from pagos.modulos.pagos.aplicacion.comandos.revertir_pago_comision import RevertirPagoComision
 from pagos.modulos.pagos.aplicacion.servicios import ServicioPago
@@ -56,14 +57,16 @@ def prueba_pagar_comision():
 @bp.route('/revertir', methods=('POST',))
 def prueba_revertir_pago():
     try:
-        #session['uow_metodo'] = 'pulsar'
+        session['uow_metodo'] = 'pulsar'
         pago_dict = request.json
 
-        map_evento = MapeadorPagoDTOJson()
-        pago_dto = map_evento.externo_a_dto(pago_dict)
-        comando = RevertirPagoComision(pago_dto.id)
+        id_pago = pago_dict.get("id_pago", str(uuid.uuid4()))  
+        id_correlacion = pago_dict.get("id_correlacion", str(uuid.uuid4()))  
+        motivo =  pago_dict.get('id_publicacion', '')
 
-        ejecutar_commando(comando)
+        ServicioPago().revertir_pago_comision(id_pago, motivo, id_correlacion)
+        #comando = RevertirPagoComision(pago_dto.id)
+        #ejecutar_commando(comando)
         
         return Response('{}', status=202, mimetype='application/json')
     except ExcepcionDominio as e:

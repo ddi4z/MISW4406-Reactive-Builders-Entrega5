@@ -156,7 +156,7 @@ class MapeadorEventosPago(Mapeador):
             metodo_pago = entidad.metodo_pago,
             estado = entidad.estado,
             pasarela= entidad.pasarela,
-            motivo = entidad.montivo,
+            motivo = entidad.motivo,
         )
         evento = EventoPago(id=str(entidad.id_pago))
         evento.time = int(unix_time_millis(entidad.fecha_cancelacion))

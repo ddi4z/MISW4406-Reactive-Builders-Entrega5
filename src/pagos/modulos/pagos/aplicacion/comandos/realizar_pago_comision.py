@@ -1,4 +1,6 @@
+import logging
 from pagos.modulos.pagos.dominio.entidades import Pago
+from pagos.modulos.pagos.dominio.eventos import PagoFallido
 from pagos.modulos.pagos.dominio.repositorios import RepositorioEventosPagos, RepositorioPagos
 from pagos.seedwork.aplicacion.comandos import Comando
 from pagos.modulos.pagos.aplicacion.dto import PagoDTO
@@ -25,32 +27,52 @@ class RealizarPagoComision(Comando):
 class RealizarPagoComisionHandler(RealizarPagoComisionBaseHandler):
 
       def handle(self, comando: RealizarPagoComision):
+        try:
 
-        pago_dto = PagoDTO(
-            fecha_actualizacion = comando.fecha_actualizacion,
-            fecha_creacion = comando.fecha_creacion,
-            id = comando.id,
-            id_correlacion = comando.id_correlacion,
-            id_comision = comando.id_comision,
-            moneda = comando.moneda,
-            monto = comando.monto,
-            metodo_pago = comando.metodo_pago,
-            estado = comando.estado,
-            pasarela = comando.pasarela
-        )
-        pago: Pago = self.fabrica_pagos.crear_objeto(pago_dto, MapeadorPago())
-        pago.crear_pago(pago)
-        repositorio = self.fabrica_repositorio.crear_objeto(RepositorioPagos)
-        repositorio_eventos = self.fabrica_repositorio.crear_objeto(
-            RepositorioEventosPagos
-        )
-        
-        UnidadTrabajoPuerto.registrar_batch(
-            repositorio.agregar,
-            pago,
-            repositorio_eventos_func=repositorio_eventos.agregar,
-        )
-        UnidadTrabajoPuerto.commit()
+            pago_dto = PagoDTO(
+                fecha_actualizacion = comando.fecha_actualizacion,
+                fecha_creacion = comando.fecha_creacion,
+                id = comando.id,
+                id_correlacion = comando.id_correlacion,
+                id_comision = comando.id_comision,
+                moneda = comando.moneda,
+                monto = comando.monto,
+                metodo_pago = comando.metodo_pago,
+                estado = comando.estado,
+                pasarela = comando.pasarela
+            )
+            pago: Pago = self.fabrica_pagos.crear_objeto(pago_dto, MapeadorPago())
+            pago.crear_pago(pago)
+            repositorio = self.fabrica_repositorio.crear_objeto(RepositorioPagos)
+            repositorio_eventos = self.fabrica_repositorio.crear_objeto(
+                RepositorioEventosPagos
+            )
+            
+            UnidadTrabajoPuerto.registrar_batch(
+                repositorio.agregar,
+                pago,
+                repositorio_eventos_func=repositorio_eventos.agregar,
+            )
+            UnidadTrabajoPuerto.commit()
+        except Exception as e:
+            print(f"Procesando la exepcion dentro del handler {e}")
+            logging.warning(f"[SAGA] PagoFallido emitido: {str(e)} (id_correlacion={comando.id_correlacion})")
+
+            pago = Pago()
+            pago.agregar_evento(PagoFallido(
+                id_correlacion=comando.id_correlacion,
+                id_pago=comando.id,
+                motivo=str(e),
+            ))
+
+            repositorio_eventos = self.fabrica_repositorio.crear_objeto(RepositorioEventosPagos)
+
+            UnidadTrabajoPuerto.registrar_batch(
+                lambda x: None,
+                pago,
+                repositorio_eventos_func=repositorio_eventos.agregar,
+            )
+            UnidadTrabajoPuerto.commit()
 
 
 @comando.register(RealizarPagoComision)
