@@ -72,6 +72,12 @@ def create_app(configuracion={}):
     # Registro de Blueprints
     app.register_blueprint(asociaciones.bp)
 
+    from asociaciones_estrategicas.modulos.sagas.infraestructura.consumidores import inicializar_consumidores
+    try:
+        inicializar_consumidores()
+    except Exception as e:
+        app.logger.warning(f"No se pudieron inicializar consumidores de la saga: {e}")
+
     @app.route("/spec")
     def spec():
         swag = swagger(app)

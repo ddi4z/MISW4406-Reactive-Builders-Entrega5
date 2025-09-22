@@ -1,18 +1,16 @@
-
-import logging
+# -*- coding: utf-8 -*-
 from dataclasses import dataclass
 from asociaciones_estrategicas.seedwork.aplicacion.comandos import Comando
+from asociaciones_estrategicas.seedwork.infraestructura.pulsar import publicar_comando
 
 @dataclass
 class RealizarPagoComision(Comando):
-    id_asociacion: str | None = None
-    monto: float | None = None
-    monto_vat: float | None = None
+    id_correlacion: str
+    def publicar(self):
+        publicar_comando("pagos.comandos.realizar_comision", {"id_correlacion": self.id_correlacion})
 
 @dataclass
 class RevertirPagoComision(Comando):
-    id_pago: str | None = None
-    id_asociacion: str | None = None
-
-def ejecutar(comando: Comando):
-    logging.info(f"[SAGA] Publicando comando pagos: {type(comando).__name__} -> {comando}")
+    id_correlacion: str
+    def publicar(self):
+        publicar_comando("pagos.comandos.revertir_comision", {"id_correlacion": self.id_correlacion})
