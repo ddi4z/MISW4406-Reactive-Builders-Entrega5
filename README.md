@@ -13,9 +13,9 @@
 
 Se encuentra en el directorio principal, con el nombre `video.mp4`
 
-[Link video](https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega5/blob/main/video.mp4)
 
 [Link video en Canvas](https://www.canva.com/design/DAGzn5Er4PQ/Fnc5eQl4zDDf7eAuf40_EA/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0)
+
 [CarpetaVideoEnAltaCalidd](https://drive.google.com/drive/folders/1T9DMTi5cxOYJw5hnS_ttDESNzULEYIlM?usp=sharing)
 
 
