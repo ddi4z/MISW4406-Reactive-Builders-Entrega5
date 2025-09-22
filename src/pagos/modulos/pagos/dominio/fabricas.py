@@ -5,6 +5,7 @@ objetos complejos del dominio de publicaciones y eventos
 
 """
 
+from pagos.seedwork.dominio.eventos import EventoDominio
 from .entidades import Pago
 from .excepciones import TipoObjetoNoExisteEnDominioPagosExcepcion
 from pagos.seedwork.dominio.repositorios import Mapeador
@@ -17,12 +18,8 @@ from dataclasses import dataclass
 @dataclass
 class FabricaPagos(Fabrica):
     def crear_objeto(self, obj: any, mapeador: Mapeador) -> any:
-        if mapeador.obtener_tipo() == Pago.__class__:
-            if isinstance(obj, Entidad):
-                return mapeador.entidad_a_dto(obj)
-            else:
-                pago: Pago = mapeador.dto_a_entidad(obj)
-                return pago
+        if isinstance(obj, Entidad) or isinstance(obj, EventoDominio):
+            return mapeador.entidad_a_dto(obj)
         else:
-            raise TipoObjetoNoExisteEnDominioPagosExcepcion()
-        
+            return mapeador.dto_a_entidad(obj)
+

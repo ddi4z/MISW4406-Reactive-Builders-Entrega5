@@ -1,0 +1,155 @@
+import "subdominios.cml"
+
+/* Alpes Partners – TO-BE V1.2 (con regiones normativas y patrones de integración)
+*/
+
+/* -------- Bounded Contexts con Vision Statements del documento -------- */
+
+BoundedContext GestionProgramasAfiliados implements Afiliados {
+  domainVisionStatement = "Gestiona la relación de negocio para programas de afiliados"
+}
+
+BoundedContext GestionInfluencersYCreadores implements InfluencersYCreadoresContenido {
+  domainVisionStatement = "Gestiona la relación de negocio para programas de influencers y creadores de contenido"
+}
+
+BoundedContext GestionProgramasLealtad implements Lealtad {
+  domainVisionStatement = "Gestiona la relación de negocio para programas de lealtad"
+}
+
+BoundedContext GestionAlianzasB2B implements AlianzasB2B {
+  domainVisionStatement = "Gestiona la relación de negocio para alianzas B2B"
+}
+
+BoundedContext Marketing implements Campanias, PaidMedia {
+  domainVisionStatement = "Gestión de campañas y medios de marketing"
+}
+
+BoundedContext GestionContratosYOnboarding implements ContratosYOnboarding {
+  domainVisionStatement = "
+Genera, administra y valida contratos entre marcas y partners, asegurando que los términos legales y regulatorios de cada región se cumplan.
+"
+}
+
+BoundedContext TrackingEventos implements TrackingEventos {
+  domainVisionStatement = "
+Registra, procesa y valida los eventos generados por las interacciones entre partners y consumidores, incluyendo conversiones y métricas de desempeño.
+"
+}
+
+BoundedContext Pagos implements PagosYFinCore {
+  domainVisionStatement = "Gestiona los pagos a los partners con base en los contratos y eventos registrados, asegurando cumplimiento normativo y fiscal en cada región.
+"
+}
+
+BoundedContext ReportesYAnalitica implements ReportesYAnalitica {
+  domainVisionStatement = "
+Genera reportes de ejecución y análisis de partners y campañas, apoyando la toma de decisiones de campaña.
+"
+}
+
+BoundedContext ContenidoYProductos implements ContenidoYProductos {
+  domainVisionStatement = "
+  Maneja las ofertas y el catálogo.
+"
+}
+
+/* -------- Cumplimiento Normativo Regional (OHS + ACL) -------- */
+
+BoundedContext CumplimientoNormativoLATAM implements CumplimientoYAuditoria {
+  domainVisionStatement = "
+Define y supervisa las reglas regulatorias y fiscales de Latinoamérica (Colombia, Brasil).
+"
+}
+
+BoundedContext CumplimientoNormativoNA implements CumplimientoYAuditoria {
+  domainVisionStatement = "
+Define y supervisa las reglas regulatorias y fiscales de Norteamérica (EE.UU.).
+"
+}
+
+BoundedContext CumplimientoNormativoEMEA implements CumplimientoYAuditoria {
+  domainVisionStatement = "
+Define y supervisa las reglas regulatorias y fiscales de Europa, Medio Oriente y África (Reino Unido, Alemania, Sudáfrica).
+"
+}
+
+BoundedContext CumplimientoNormativoAPAC implements CumplimientoYAuditoria {
+  domainVisionStatement = "
+Define y supervisa las reglas regulatorias y fiscales de Asia-Pacífico (Australia, Singapur, Japón).
+"
+}
+
+/* Notación de relaciones:
+ *   Izquierda [D]  = Downstream (consumidor)
+ *   Derecha  [U]  = Upstream   (proveedor)
+ *   OHS = Open Host Service, PL = Published Language, ACL = Anti-Corruption Layer
+ */
+
+ContextMap AlpesPartners {
+  state = TO_BE
+  contains GestionProgramasAfiliados
+  contains GestionInfluencersYCreadores
+  contains GestionProgramasLealtad
+  contains GestionAlianzasB2B
+  contains Marketing
+  contains GestionContratosYOnboarding
+  contains TrackingEventos
+  contains Pagos
+  contains ReportesYAnalitica
+  contains ContenidoYProductos
+  contains CumplimientoNormativoLATAM
+  contains CumplimientoNormativoNA
+  contains CumplimientoNormativoEMEA
+  contains CumplimientoNormativoAPAC
+
+  // Marketing depende de Asociaciones
+  Marketing [D,ACL]<-[U,OHS] GestionProgramasAfiliados
+  Marketing [D,ACL]<-[U,OHS] GestionInfluencersYCreadores
+  Marketing [D,ACL]<-[U,OHS] GestionProgramasLealtad
+  Marketing [D,ACL]<-[U,OHS] GestionAlianzasB2B
+
+  // Contratos depende de Asociaciones (entrada de relación partner↔marca)
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] GestionProgramasAfiliados
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] GestionInfluencersYCreadores
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] GestionProgramasLealtad
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] GestionAlianzasB2B
+
+  // Tracking consume publicaciones de Asociaciones (PL)
+  TrackingEventos [D,ACL]<-[U,PL] GestionProgramasAfiliados
+  TrackingEventos [D,ACL]<-[U,PL] GestionInfluencersYCreadores
+  TrackingEventos [D,ACL]<-[U,PL] GestionProgramasLealtad
+  TrackingEventos [D,ACL]<-[U,PL] GestionAlianzasB2B
+
+  // Pagos depende de Contratos (OHS) y de Tracking (PL)
+  Pagos [D,ACL]<-[U,OHS] GestionContratosYOnboarding
+  Pagos [D,ACL]<-[U,PL]  TrackingEventos
+
+  // Reportes/Analítica consume de múltiples fuentes (PL)
+  ReportesYAnalitica [D,ACL]<-[U,PL] TrackingEventos
+  ReportesYAnalitica [D,ACL]<-[U,PL] Pagos
+  ReportesYAnalitica [D,ACL]<-[U,PL] Marketing
+  ReportesYAnalitica [D,ACL]<-[U,PL] GestionProgramasAfiliados
+  ReportesYAnalitica [D,ACL]<-[U,PL] GestionInfluencersYCreadores
+  ReportesYAnalitica [D,ACL]<-[U,PL] GestionProgramasLealtad
+  ReportesYAnalitica [D,ACL]<-[U,PL] GestionAlianzasB2B
+
+  // Contenido y productos con Asociaciones Estratégicas
+  GestionProgramasAfiliados [D,ACL]<-[U,PL] ContenidoYProductos
+  GestionInfluencersYCreadores [D,ACL]<-[U,PL] ContenidoYProductos
+  GestionProgramasLealtad [D,ACL]<-[U,PL] ContenidoYProductos
+  GestionAlianzasB2B [D,ACL]<-[U,PL] ContenidoYProductos
+
+  // Cumplimiento Normativo regional expone OHS; consumidores protegen su modelo con ACL
+  // Contratos -> Cumplimiento (por región)
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] CumplimientoNormativoLATAM
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] CumplimientoNormativoNA
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] CumplimientoNormativoEMEA
+  GestionContratosYOnboarding [D,ACL]<-[U,OHS] CumplimientoNormativoAPAC
+
+  // Pagos -> Cumplimiento (por región)
+  Pagos [D,ACL]<-[U,OHS] CumplimientoNormativoLATAM
+  Pagos [D,ACL]<-[U,OHS] CumplimientoNormativoNA
+  Pagos [D,ACL]<-[U,OHS] CumplimientoNormativoEMEA
+  Pagos [D,ACL]<-[U,OHS] CumplimientoNormativoAPAC
+}

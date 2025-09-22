@@ -9,7 +9,7 @@ from pulsar.schema import AvroSchema
 """
 class ComandoRealizarPagoComisionPayload(ComandoIntegracion):
     moneda = String()
-    monto = String()
+    monto = Float()
     metodo_pago = String()
     estado = String()
     pasarela = String()

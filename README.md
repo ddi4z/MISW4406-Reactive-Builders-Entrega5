@@ -1,6 +1,6 @@
-# Entrega 4 - Implementación
+# Entrega 5
 
-## 👥 Integrantes - Reactive Builders
+## Integrantes - Reactive Builders
 
 | Nombre | Correo |
 | :--- | :--- |
@@ -9,35 +9,110 @@
 | Sara Sofía Cárdenas Rodríguez | ss.cardenas@uniandes.edu.co |
 | Daniel Felipe Díaz Moreno | d.diazm@uniandes.edu.co |
 
-## Estructura del proyecto
+## Video de la ejecución
 
-Cada microservicio se encuentra en la carpeta `src`. En el repositorio principal se encuentra el `docker-compose.yml` para pruebas locales y el `infra.yaml` para despliegue
+Se encuentra en el directorio principal, con el nombre `video.mp4`
+
+[Link video](https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega5/blob/main/video.mp4)
+
+[Link video en Canvas](https://www.canva.com/design/DAGzn5Er4PQ/0rAWpR-zyRM7IYxHBqRTIg/watch?utm_content=DAGzn5Er4PQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h50774f66e3)
 
 ## Repartición de trabajo
 
-| Nombre | Contribución |
-| :--- | :--- |
-| Orlando Giovanny Solarte Delgado | Microservicio de Asociaciones estratégicas |
-| Martín Flores Arango | BFF |
-| Sara Sofía Cárdenas Rodríguez | Microservicio de Pagos y Despliegue GCP |
-| Daniel Felipe Díaz Moreno | Complementar Microservicio de Eventos y Atribución (Entrega 3), Configuración de Pulsar y Despliegue GCP  |
+### Entrega 4
+
+**Orlando Giovanny Solarte Delgado**
+
+- Realizar una repartición y planificación detallada de las actividades
+- Implementar microservicio de Asociaciones Estratégicas
+- Hacer la integración del microservicio con Pulsar
+- Grabar video de microservicio individual
+
+**Martín Flores Arango**
+
+- Implementar BFF
+- Hacer documentación y Postman del microservicio
+- Hacer justificaciones sobre las decisiones de diseño y arquitectura
+- Grabar video de microservicio individual
+
+**Sara Sofía Cárdenas Rodríguez**
+
+- Implementar microservicio de Pagos
+- Hacer cambios mayores al despliegue de GCP con máquinas virtuales
+- Grabar video de microservicio individual
+- Llenar wiki
+
+**Daniel Felipe Díaz Moreno**
+
+- Complementar microservicio de Eventos Tracking (Entrega 3)
+- Configurar el bróker de Pulsar
+- Crear archivo base de despliegue de GCP
+- Grabar video de microservicio individual
+
+### Entrega 5
+
+**Orlando Giovanny Solarte Delgado**
+
+- Realizar una repartición y planificación detallada de las actividades
+- Colocar eventos y comandos compensación en el microservicio Asociaciones Estratégicas
+- Desplegar los microservicios en la nube con comunicación con eventos
+- Realizar y documentar la experimentación para el escenario de calidad de escalabilidad
+- Hacer video del despliegue en la nube y el escenario de escalabilidad
+
+**Martín Flores Arango**
+
+- Implementar la Saga con orquestación
+- Implementar el Saga Log
+- Documentar la saga
+- Preparar el Postman para el flujo de negocio
+- Hacer video del funcionamiento de la Saga
+
+**Sara Sofía Cárdenas Rodríguez**
+
+- Hacer que el BFF se conecte a los comandos y eventos del microservicio de Asociaciones Estratégicas
+- Realizar y documentar la experimentación para el escenario de calidad de modificabilidad, alterando Pagos y el BFF
+- Realizar y documentar la experimentación para el escenario de calidad de disponibilidad
+- Refinar mapa de contextos TO BE
+- Refinar los puntos de vista de arquitectura de la entrega 2
+- Hacer videos de los escenarios de modificabilidad y disponibilidad, mapa TO BE y puntos de vista de arquitectura
+
+**Daniel Felipe Díaz Moreno**
+
+- Colocar eventos y comandos en el microservicio Eventos Tracking
+- Colocar eventos y comandos en el microservicio Pagos
+- Realizar ajustes y cambios en el microservicio de Eventos Tracking
+- Realizar ajustes y cambios en el microservicioa los microservicios de Pagos
+- Modificar bróker de pulsar, Dockerfiles y docker-compose
+
+## Estructura del proyecto
+
+Cada microservicio se encuentra en la carpeta `src`. En el repositorio principal se encuentra el `docker-compose.yml` para pruebas locales y el `infra.yaml` para despliegue. También se presentan los diferentes `X-requirements.txt` y Dockerfiles
 
 ## Arquitectura
 
-![Dominio](Dominio.jpg)
+### Mapa de contexto TO BE
 
-![Componentes](Componentes.png)
+En la carpeta `docs/` se puede encontrar la imagen `to_be.png`
 
+![TO BE](docs/to_be.png)
 
-## Escenarios de calidad relacionados
+Los archivos de generación están en la misma carpeta, bajo los nombres `contextosToBe.cml` y `subdominios.cml`
 
-**Escalabilidad:** Escenario de calidad: Crecimiento de clics ante jornada de descuentos
-**Modificabilidad:** Agregar un nuevo caso de uso sin modificarlos existentes
+Para poder ejecutarlos, diríjase al repositorio de la entrega 1 actualizado. Este es el [link](https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega1/tree/main)
+
+### Puntos de vista de arquitectura
+
+En la carpeta `docs/` se puede encontrar la entrega 2 corregida, bajo el nombre `entrega_2.pdf`
+
+Allí se incluyen los requerimientos de calidad junto a las vistas de contexto, funcional (módulo y C&C) y dominio
+
+### Escenarios de calidad relacionados
+
+**Escalabilidad:** Crecimiento de clics ante jornada de descuentos
+
+**Modificabilidad:** Agregar un nuevo caso de uso sin modificar los existentes
+
 **Disponibilidad:** Caída de un servicio y el sistema sigue operando ante el cliente
-
-## Aplicación de DDD y EDA
-
-Explicada en los videos
 
 ## Pasos de ejecución
 
@@ -45,81 +120,3 @@ Cada microservicio ubicado en la carpeta `src` tiene sus propios pasos de ejecuc
 
 ## Ejecución con GCP
 
-### 1. Configurar el proyecto
-Primero, selecciona el proyecto de Google Cloud con el que vas a trabajar:
-
-```bash
-gcloud config set project reactive-builders
-```
-
-### 2. Habilitar las APIs necesarias
-
-Deployment Manager y Compute Engine requieren que ciertas APIs estén habilitadas:
-
-```bash
-gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com
-```
-
-### 3. Editar el archivo de configuración YAML
-
-Antes de crear un deployment, asegúrate de definir tu infraestructura en un archivo YAML:
-
-```bash
-nano infra.yaml
-```
-
-En este archivo defines instancias de Compute Engine, discos, redes, y cualquier otro recurso que necesites.
-
-Para esto, puedes copiar y pegar el contenido del archivo del mismo nombre.
-
-### 4. Crear un deployment
-
-Una vez tengas tu archivo YAML listo, puedes crear el deployment:
-
-```bash
-gcloud deployment-manager deployments create alpes-infra --config infra.yaml
-```
-
-Esto creará todas las instancias y recursos definidos en `infra.yaml`.
-
-### 5. Actualizar un deployment
-
-Si haces cambios en `infra.yaml`, puedes actualizar tu deployment existente:
-
-```bash
-gcloud deployment-manager deployments update alpes-infra --config infra.yaml
-```
-
-### 6. Revisar logs de arranque de instancias
-
-Para depurar o verificar que tus instancias levantaron correctamente, puedes revisar el output del puerto serial:
-
-```bash
-gcloud compute instances get-serial-port-output postgres-pagos --zone=us-central1-c | grep -i "startup"
-gcloud compute instances get-serial-port-output postgres-eventos --zone=us-central1-b | grep -i "startup"
-gcloud compute instances get-serial-port-output postgres-asociaciones --zone=us-central1-f | grep -i "startup"
-gcloud compute instances get-serial-port-output pagos-app --zone=us-central1-c | grep -i "startup"
-gcloud compute instances get-serial-port-output eventos-app --zone=us-central1-b | grep -i "startup"
-gcloud compute instances get-serial-port-output asociaciones-app --zone=us-central1-f | grep -i "startup"
-gcloud compute instances get-serial-port-output bff-app --zone=us-central1-c | grep -i "startup"
-```
-
-> Esto permite filtrar los mensajes de inicio (`startup`) generados por los scripts de inicialización de cada VM.
-
-### 7. Eliminar un deployment
-
-Cuando ya no necesites los recursos, puedes eliminarlos de forma segura:
-
-```bash
-gcloud deployment-manager deployments delete alpes-infra --quiet
-```
-
-El flag `--quiet` evita confirmaciones interactivas.
-
-## Video de la ejecución
-
-https://www.canva.com/design/DAGzAbrq3tQ/_sg78z7WpYrdPNSeRpp21g/edit?utm_content=DAGzAbrq3tQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
-
-También se encuentra en el directorio principal, con el nombre `video.mp4`
-
-[Link video](https://github.com/ddi4z/MISW4406-Reactive-Builders-Entrega3/blob/main/video.mp4)

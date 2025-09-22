@@ -302,25 +302,24 @@ services:
     hostname: postgres_pagos
     container_name: postgres_pagos
     profiles: ["pagos", "db_pagos"]
-    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwdadmin
+      POSTGRES_DB: alpespartners
     networks:
       - pulsar
-      - sidecar
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: alpespartners
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d alpespartners"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d alpespartners"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-
+    
   pagos:
     build:
       context: .
@@ -334,18 +333,17 @@ services:
       broker:
         condition: service_healthy
       postgres_pagos:
-        condition: service_started
+        condition: service_healthy
     environment:
-      DB_USER: admin
-      DB_PASSWORD: admin
-      DB_HOST: postgres_pagos
+      DB_USER: postgres
+      DB_PASSWORD: pwdadmin
+      DB_HOST: postgres_pagos  
       DB_PORT: 5432
       DB_NAME: alpespartners
       DB_SCHEMA: db_pagos
       BROKER_HOST: broker
       FLASK_ENV: production
     ports:
-      - "5003:8080"
+      - "5003:5003"
 
  
-

@@ -1,5 +1,5 @@
 from pagos.modulos.pagos.dominio.entidades import Pago
-from pagos.modulos.pagos.dominio.repositorios import RepositorioPagos
+from pagos.modulos.pagos.dominio.repositorios import RepositorioEventosPagos, RepositorioPagos
 from pagos.seedwork.aplicacion.comandos import Comando
 from pagos.modulos.pagos.aplicacion.dto import PagoDTO
 from .base import RealizarPagoComisionBaseHandler
@@ -41,9 +41,15 @@ class RealizarPagoComisionHandler(RealizarPagoComisionBaseHandler):
         pago: Pago = self.fabrica_pagos.crear_objeto(pago_dto, MapeadorPago())
         pago.crear_pago(pago)
         repositorio = self.fabrica_repositorio.crear_objeto(RepositorioPagos)
-
-        UnidadTrabajoPuerto.registrar_batch(repositorio.agregar, pago)
-        UnidadTrabajoPuerto.savepoint()
+        repositorio_eventos = self.fabrica_repositorio.crear_objeto(
+            RepositorioEventosPagos
+        )
+        
+        UnidadTrabajoPuerto.registrar_batch(
+            repositorio.agregar,
+            pago,
+            repositorio_eventos_func=repositorio_eventos.agregar,
+        )
         UnidadTrabajoPuerto.commit()
 
 

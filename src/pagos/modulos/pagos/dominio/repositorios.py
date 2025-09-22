@@ -13,5 +13,6 @@ class RepositorioPagos(Repositorio, ABC):
     def revertir(self, entity_id):
         ...
     
-
+class RepositorioEventosPagos(Repositorio, ABC):
+    ...
     

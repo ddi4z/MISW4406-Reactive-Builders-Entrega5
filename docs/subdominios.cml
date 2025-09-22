@@ -1,0 +1,76 @@
+Domain CreacionYGestionDeAsociacionesEstrategicas {
+  domainVisionStatement = "Creación, gestión y escalamiento de asociaciones estratégicas entre marcas y socios."
+
+  //--- Subdominios de Núcleo ---//
+  Subdomain Afiliados {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Gestión de programas de afiliados."
+  }
+
+  Subdomain InfluencersYCreadoresContenido {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Gestión de marketing de influencers y creadores de contenido."
+  }
+
+  Subdomain Lealtad {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Gestión de programas de lealtad."
+  }
+
+  Subdomain AlianzasB2B {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Gestión de alianzas Business To Business."
+  }
+
+  Subdomain TrackingEventos {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Tracking y procesamiento de eventos."
+  }
+
+  //--- Subdominios de Soporte ---//
+  Subdomain ProcesosYOperaciones {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Administración y automatización de procesos internos y operaciones."
+  }
+
+  Subdomain CumplimientoYAuditoria {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Cumplimiento normativo y auditoría antifraude."
+  }
+
+  Subdomain PagosYFinCore {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Procesamiento de pagos y FinCore."
+  }
+
+  Subdomain ContratosYOnboarding {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Gestión de contratos y onboarding."
+  }
+
+  Subdomain ReportesYAnalitica {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Generación de reportes y analítica de datos."
+  }
+
+  Subdomain ContenidoYProductos {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Gestión de contenido y productos."
+  }
+
+  //--- Subdominios Genéricos ---//
+  Subdomain Campanias {
+    type = GENERIC_SUBDOMAIN
+    domainVisionStatement = "Gestión de campañas de marketing."
+  }
+
+  Subdomain PaidMedia {
+    type = GENERIC_SUBDOMAIN
+    domainVisionStatement = "Publicidad y marketing pagado."
+  }
+
+  Subdomain FinanzasYTesoreria {
+    type = GENERIC_SUBDOMAIN
+    domainVisionStatement = "Gestión financiera y de tesorería."
+  }
+}
